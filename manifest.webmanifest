@@ -1,0 +1,17 @@
+{
+  "id":"./",
+  "name":"启程 · 个人成长与保送工作台",
+  "short_name":"启程",
+  "description":"在本机保存资料与简历，离线编辑、预览、导出和备份。",
+  "lang":"zh-CN",
+  "start_url":"./index.html",
+  "scope":"./",
+  "display":"standalone",
+  "background_color":"#fff5d9",
+  "theme_color":"#122d49",
+  "icons":[
+    {"src":"assets/icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
+    {"src":"assets/icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},
+    {"src":"assets/icons/maskable-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
+  ]
+}

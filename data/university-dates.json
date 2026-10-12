@@ -1,0 +1,311 @@
+{
+  "北京大学": {
+    "2025": {
+      "text": "测试安排在 2025 年元旦左右；简章未公布具体月日，以报名系统通知为准。",
+      "url": "https://bkzs.pku.edu.cn/tzgg/9b92395e6bc44d06a20e09fdc028d2de.htm",
+      "label": "2025 年官方招生简章"
+    },
+    "2026": {
+      "text": "笔试：1 月 15 日；英语能力测试：1 月 15 日上午；专业综合能力测试：1 月 16—17 日。",
+      "url": "https://bkzs.pku.edu.cn/tzgg/d24d1f3ac99d4263bd2ab51442a7a7a8.htm",
+      "label": "2026 年官方招生简章"
+    }
+  },
+  "清华大学": {
+    "2025": {
+      "text": "初试、复试：2025 年 1 月上旬；具体时间以报名系统通知为准。",
+      "url": "https://www.join-tsinghua.edu.cn/info/1033/1976.htm",
+      "label": "2025 年官方招生简章"
+    },
+    "2026": {
+      "text": "综合考核：2026 年 1 月中旬，具体安排以报名系统内通知为准。",
+      "url": "https://www.join-tsinghua.edu.cn/info/1006/2129.htm",
+      "label": "2026 年官方招生简章"
+    }
+  },
+  "复旦大学": {
+    "2025": {
+      "text": "自荐初试：1 月 9 日；复试笔试及小语种加试：1 月 10 日；面试：1 月 11 日。",
+      "url": "https://ao.fudan.edu.cn/c5/7d/c36330a705917/page.htm",
+      "label": "2025 年官方招生简章"
+    },
+    "2026": {
+      "text": "笔试：1 月 20 日；面试：1 月 22 日。",
+      "url": "https://ao.fudan.edu.cn/aa/b5/c36330a764597/page.htm",
+      "label": "2026 年官方招生简章"
+    }
+  },
+  "同济大学": {
+    "2025": {
+      "text": "笔试：1 月 10 日；面试：1 月 13 日。",
+      "url": "https://xxgk.tongji.edu.cn/index.php?classid=3138&newsid=19363&t=show",
+      "label": "2025 年官方招生简章"
+    },
+    "2026": {
+      "text": "笔试：1 月 19 日；面试：1 月 21 日。",
+      "url": "https://xxgk.tongji.edu.cn/index.php?classid=3138&newsid=20906&t=show",
+      "label": "2026 年官方招生简章"
+    }
+  },
+  "上海外国语大学": {
+    "2025": {
+      "text": "综合考核：1 月 2—3 日。",
+      "url": "https://info.shisu.edu.cn/a9/f7/c11a43511/page.htm",
+      "label": "2025 年官方招生简章"
+    },
+    "2026": {
+      "text": "综合考核：1 月 11—12 日。",
+      "url": "https://admissions.shisu.edu.cn/1a/69/c632a203369/page.htm",
+      "label": "2026 年官方招生简章"
+    }
+  },
+  "浙江大学": {
+    "2025": {
+      "text": "笔试：1 月 2 日 14:30—16:30；面试：1 月 10 日。",
+      "url": "https://zdzsc.zju.edu.cn/2024/1227/c87333a3007816/page.htm",
+      "label": "2025 年官方测试通知"
+    },
+    "2026": {
+      "text": "笔试：1 月 16 日 14:00—16:00；面试：1 月 18 日。",
+      "url": "https://zdzsc.zju.edu.cn/2025/1212/c87242a3118365/page.htm",
+      "label": "2026 年官方招生简章"
+    }
+  },
+  "厦门大学": {
+    "2025": {
+      "text": "笔试：1 月 5 日下午；面试：1 月 6 日。",
+      "url": "https://zs.xmu.edu.cn/info/1171/31751.htm",
+      "label": "2025 年官方招生简章"
+    },
+    "2026": {
+      "text": "笔试：1 月 16 日下午；面试：1 月 17 日。",
+      "url": "https://zs.xmu.edu.cn/info/1048/35322.htm",
+      "label": "2026 年官方招生简章"
+    }
+  },
+  "北京外国语大学": {
+    "2025": {
+      "text": "测试安排在 2025 年 1 月初；具体时间及地点以报名系统通知为准。",
+      "url": "https://gaokao.chsi.com.cn/gkxx/bss/gxjz/202412/20241213/2293349942.html",
+      "label": "2025 年招生简章 · 阳光高考"
+    }
+  },
+  "南开大学": {
+    "2025": {
+      "text": "笔试：1 月 9 日；面试：1 月 10 日。具体时间及考场详见准考证。",
+      "url": "https://gaokao.chsi.com.cn/gkxx/bss/gxjz/202412/20241211/2293348525.html",
+      "label": "2025 年招生简章 · 阳光高考"
+    },
+    "2026": {
+      "text": "笔试：1 月 16 日上午；面试：1 月 17 日。",
+      "url": "https://zsb.nankai.edu.cn/2026-01-04/1790",
+      "label": "2026 年官方招生简章"
+    }
+  },
+  "武汉大学": {
+    "2025": {
+      "text": "冬令营测试：1 月 9—10 日，包含笔试和面试。",
+      "url": "https://gaokao.chsi.com.cn/gkxx/bss/gxjz/202412/20241210/2293348417.html",
+      "label": "2025 年招生简章 · 阳光高考"
+    },
+    "2026": {
+      "text": "冬令营测试：1 月 16—17 日，包含笔试和面试。",
+      "url": "https://gaokao.chsi.com.cn/zzbm/xxgk/detailXx.action?xxId=2wub9s179b9ix5qe",
+      "label": "2026 年官方招生简章"
+    }
+  },
+  "南京大学": {
+    "2025": {
+      "text": "面试：1 月 11 日；具体安排以准考证为准。",
+      "url": "https://gaokao.chsi.com.cn/gkxx/bss/gxjz/202412/20241216/2293348761.html",
+      "label": "2025 年招生简章 · 阳光高考"
+    }
+  },
+  "外交学院": {
+    "2025": {
+      "text": "线下考核：1 月 2—3 日，具体安排另行通知。",
+      "url": "https://zs.cfau.edu.cn/col3000/col3008/cbb84de824044bafa1da0abb46d0fc16.htm",
+      "label": "2025 年官方招生简章"
+    },
+    "2026": {
+      "text": "线下考核：1 月 10—11 日，具体安排另行通知。",
+      "url": "https://zs.cfau.edu.cn/col3000/col3008/86f0a22a82c14ccba014f14a711bdccc.htm",
+      "label": "2026 年官方招生简章"
+    }
+  },
+  "华中科技大学": {
+    "2025": {
+      "text": "基础测试：1 月 9 日 8:30—11:30；复试：同日 14:00 开始。",
+      "url": "https://zsb.hust.edu.cn/info/1010/2503.htm",
+      "label": "2025 年官方招生简章"
+    },
+    "2026": {
+      "text": "基础测试：1 月 16 日上午；复试：同日下午。",
+      "url": "https://zsb.hust.edu.cn/info/1010/3012.htm",
+      "label": "2026 年官方招生简章"
+    }
+  },
+  "东南大学": {
+    "2025": {
+      "text": "笔试：1 月 18 日 9:00—11:00；面试：同日 13:30 开始。",
+      "url": "https://zsb.seu.edu.cn/2025/0114/c23610a517448/page.htm",
+      "label": "2025 年官方测试通知"
+    },
+    "2026": {
+      "text": "笔试：1 月 24 日下午；面试：1 月 25 日。",
+      "url": "https://xxgk.seu.edu.cn/2026/0106/c10817a551331/page.htm",
+      "label": "2026 年官方招生简章"
+    }
+  },
+  "北京语言大学": {
+    "2025": {
+      "text": "线上面试：1 月 6 日。",
+      "url": "https://zsb.blcu.edu.cn/info/1521/16581.htm",
+      "label": "2025 年官方招生简章"
+    }
+  },
+  "北京航空航天大学": {
+    "2025": {
+      "text": "笔试：2 月 22 日；面试：2 月 23 日。",
+      "url": "https://gaokao.chsi.com.cn/gkxx/bss/gxjz/202501/20250103/2293350637.html",
+      "label": "2025 年招生简章 · 阳光高考"
+    },
+    "2026": {
+      "text": "笔试：1 月 17 日；面试：1 月 18 日。",
+      "url": "https://zs.buaa.edu.cn/info/1047/3487.htm",
+      "label": "2026 年官方招生简章"
+    }
+  },
+  "深圳大学": {
+    "2025": {
+      "text": "测试：2 月 22 日，结束时间视考生人数而定。",
+      "url": "https://zs.szu.edu.cn/info/1032/4262.htm",
+      "label": "2025 年官方招生简章"
+    }
+  },
+  "华中师范大学": {
+    "2025": {
+      "text": "测试：2 月 22 日上午；具体安排详见测试公告及准考证。",
+      "url": "https://zs.ccnu.edu.cn/info/1006/8633.htm",
+      "label": "2025 年官方招生简章"
+    },
+    "2026": {
+      "text": "面试：3 月 21 日上午，具体要求详见测试公告及准考证。",
+      "url": "https://zs.ccnu.edu.cn/info/1006/10893.htm",
+      "label": "2026 年官方招生简章"
+    }
+  },
+  "电子科技大学": {
+    "2025": {
+      "text": "测试：1 月 13 日。",
+      "url": "https://xxgkw.uestc.edu.cn/__local/F/21/09/60857F8E920B9E98AF984B0110E_4FBF5179_114D0D.pdf",
+      "label": "2025 年官方招生简章 PDF"
+    },
+    "2026": {
+      "text": "测试：1 月 15 日。",
+      "url": "https://zs.uestc.edu.cn/wap/article/view/id/2063.html",
+      "label": "2026 年官方招生简章"
+    }
+  },
+  "华东师范大学": {
+    "2025": {
+      "text": "笔试：1 月 12 日；面试：1 月 13 日。",
+      "url": "https://xxgk.ecnu.edu.cn/17/ff/c29049a661503/page.htm",
+      "label": "2025 年官方招生简章"
+    },
+    "2026": {
+      "text": "笔试：1 月 16 日；面试：1 月 17 日。",
+      "url": "https://xxgk.ecnu.edu.cn/46/3a/c29049a738874/page.htm",
+      "label": "2026 年官方招生简章"
+    }
+  },
+  "上海财经大学": {
+    "2025": {
+      "text": "笔试：1 月 10 日；面试：1 月 11 日。",
+      "url": "https://gongkai.sufe.edu.cn/d1/2c/c226a250156/page.htm",
+      "label": "2025 年官方招生简章"
+    },
+    "2026": {
+      "text": "笔试：1 月 16 日；面试：1 月 17 日。",
+      "url": "https://zs.sufe.edu.cn/e3/51/c3336a254801/page.htm",
+      "label": "2026 年官方招生简章"
+    }
+  },
+  "哈尔滨工业大学": {
+    "2026": {
+      "text": "线下综合面试：1 月 13 日，具体要求另行通知。",
+      "url": "https://zsb.hit.edu.cn/article/read/1469612da6baa241e1e51b14032c901b",
+      "label": "2026 年官方招生简章"
+    }
+  },
+  "兰州大学": {
+    "2026": {
+      "text": "考试：3 月 21 日，具体考试安排以学校及报名系统通知为准。",
+      "url": "https://zsb.lzu.edu.cn/zhaoshengdongtai/tongzhigonggao/2026/0109/327274.html",
+      "label": "2026 年官方招生简章"
+    }
+  },
+  "北京科技大学": {
+    "2026": {
+      "text": "专业面试：1 月 14 日。",
+      "url": "https://ty8.ustb.edu.cn/pub/bkzsw/zkxx/tslxzs/wylbss/a5a91652971f42079934605e64073152.htm",
+      "label": "2026 年官方招生简章"
+    }
+  },
+  "东华大学": {
+    "2026": {
+      "text": "线上面试：1 月 20 日。",
+      "url": "https://xxgk.dhu.edu.cn/2026/0106/c1737a370619/page.htm",
+      "label": "2026 年官方招生简章"
+    }
+  },
+  "华东理工大学": {
+    "2026": {
+      "text": "网络面试：3 月 14 日。",
+      "url": "https://zsb.ecust.edu.cn/2026/0126/c2302a187535/page.htm",
+      "label": "2026 年官方招生简章"
+    }
+  },
+  "天津外国语大学": {
+    "2026": {
+      "text": "校测：3 月 13 日，科目时间详见准考证。",
+      "url": "https://zsb.tjfsu.edu.cn/info/1012/1405.htm",
+      "label": "2026 年官方招生简章"
+    }
+  },
+  "湖南大学": {
+    "2026": {
+      "text": "测试：3 月 7 日 9:00 开始。",
+      "url": "https://admi.hnu.edu.cn/info/1186/7276.htm",
+      "label": "2026 年官方招生简章"
+    }
+  },
+  "中南大学": {
+    "2026": {
+      "text": "测试：2 月 1 日 13:00 开始。",
+      "url": "https://zhaosheng.csu.edu.cn/info/1247/2484.htm",
+      "label": "2026 年官方招生简章"
+    }
+  },
+  "广东外语外贸大学": {
+    "2026": {
+      "text": "考试：1 月 16 日 10:00—11:30。",
+      "url": "https://xxgk.gdufs.edu.cn/info/1153/3315.htm",
+      "label": "2026 年官方招生简章"
+    }
+  },
+  "深圳北理莫斯科大学": {
+    "2026": {
+      "text": "学校测试：1 月 18 日。",
+      "url": "https://admission.smbu.edu.cn/info/1339/12182.htm",
+      "label": "2026 年官方招生简章"
+    }
+  },
+  "西南大学": {
+    "2026": {
+      "text": "考核预计在 2026 年 3 月上旬进行；具体时间另行通知。",
+      "url": "https://bkzsw.swu.edu.cn/info/1047/1953.htm",
+      "label": "2026 年官方招生简章"
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "qicheng-pwa",
+  "version": "4.0.0-beta.1",
+  "private": true,
+  "type": "module",
+  "description": "启程 Local First PWA · 原生 HTML/CSS/JavaScript",
+  "scripts": {
+    "package": "node scripts/package.mjs",
+    "check": "node scripts/check.mjs",
+    "test": "node --experimental-vm-modules --test tests/*.test.mjs"
+  }
+}

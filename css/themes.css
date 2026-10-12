@@ -1,0 +1,580 @@
+/* 3.1: a quiet paper workspace against a distinct navigation surface. */ :root{
+  --map-base:#fbefc5;
+  --map-active:#ecd17d;
+  --map-hover:#e1b74e;
+  --map-stroke:#bc9a4d;
+  --map-label:#69552f;
+  --map-water:#fffaf0;
+  --logo-bg:#f3df9e;
+  --logo-ink:#584323
+}
+body[data-theme=obsidian]{
+  --map-base:#493024;
+  --map-active:#cb753b;
+  --map-hover:#ed914f;
+  --map-stroke:#916044;
+  --map-label:#ebbd96;
+  --map-water:#15171b;
+  --logo-bg:#ff974e;
+  --logo-ink:#211812
+}
+body[data-theme=blue]{
+  --bg:#edf3f9;
+  --surface:#fff;
+  --soft:#e6eff8;
+  --ink:#172f48;
+  --muted:#58718b;
+  --accent:#2775b8;
+  --accent-ink:#fff;
+  --line:#cbdcea;
+  --nav:#122d49;
+  --map-base:#d9e8f5;
+  --map-active:#89b5d8;
+  --map-hover:#4a8bbb;
+  --map-stroke:#5889b0;
+  --map-label:#244f75;
+  --map-water:#f6fafe;
+  --logo-bg:#77b9e5;
+  --logo-ink:#12334f;
+  background-image:linear-gradient(#3770a006 1px,transparent 1px),linear-gradient(90deg,#3770a006 1px,transparent 1px);
+  background-size:40px 40px
+}
+body[data-theme=blue] .sidebar3{
+  --ink:#f2f7fc;
+  --muted:#b3c8db;
+  --surface:#264965;
+  --soft:#23445f;
+  --line:#35546e;
+  --accent:#7dbde8;
+  color:var(--ink);
+  background:linear-gradient(160deg,#153653,#102840 80%);
+  border-color:#163653;
+  box-shadow:8px 0 40px #152f4910
+}
+body[data-theme=blue] .sidebar3 .brand3{
+  color:#f2f7fc
+}
+body[data-theme=blue] .sidebar3 .nav-caption{
+  color:#9db9d0
+}
+body[data-theme=blue] .sidebar3 .nav-group-toggle{
+  color:#e5f0f9
+}
+body[data-theme=blue] .sidebar3 .nav-item:hover{
+  background:#214762
+}
+body[data-theme=blue] .sidebar3 .nav-item.active{
+  background:#2b5879;
+  border-left-color:#86c9f0;
+  color:#fff;
+  box-shadow:inset 0 0 0 1px #82bce81a
+}
+body[data-theme=blue] .sidebar3 .sidebar-tools .side-actions button{
+  border-color:#43627b;
+  color:#e7f1fb
+}
+body[data-theme=blue] .sidebar3 .offline-save{
+  background:#224762;
+  color:#eaf5ff
+}
+body[data-theme=blue] .topbar3{
+  background:#f8fbfee8
+}
+body[data-theme=blue] .panel{
+  box-shadow:0 6px 24px #25415e07
+}
+body[data-theme=blue] .page-head3 .eyebrow{
+  color:#477fa8
+}
+body[data-theme=blue] .school-hero3{
+  background:linear-gradient(120deg,#fff,#eaf3fc);
+  border-color:#ccdfef
+}
+.brand3 .brand-mark,body[data-theme=obsidian] .brand3 .brand-mark{
+  width:46px;
+  height:46px;
+  flex-shrink:0;
+  border:0;
+  border-radius:13px;
+  background:var(--logo-bg);
+  color:var(--logo-ink);
+  box-shadow:0 3px 12px #0000000b;
+  overflow:hidden
+}
+.brand3 .brand-mark .qicheng-logo31{
+  display:block;
+  width:39px;
+  height:39px;
+  margin:0
+}
+.brand3{
+  color:var(--ink)
+}
+.logo-route31,.logo-spark31{
+  opacity:1
+}
+.startup-brand301 .qicheng-logo31{
+  width:47px;
+  height:47px;
+  color:#765c27
+}
+.sample-blue{
+  background:#122d49!important;
+  color:#d6edff!important;
+  position:relative
+}
+.sample-blue::after{
+  content:'';
+  position:absolute;
+  left:38%;
+  right:0;
+  top:0;
+  bottom:0;
+  background:#edf3f9;
+  z-index:0
+}
+.sample-blue b,.sample-blue i{
+  position:relative;
+  z-index:1
+}
+.sample-blue b{
+  background:#122d49;
+  border-radius:9px;
+  padding:2px 8px
+}
+.sample-blue i{
+  background:#77b9e5!important
+}
+.vector-map-panel31{
+  padding:25px!important;
+  overflow:visible
+}
+.map-heading31{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:18px;
+  padding:5px 7px 20px
+}
+.map-heading31 .eyebrow{
+  font-size:.66rem;
+  color:var(--muted);
+  letter-spacing:.22em
+}
+.map-heading31 h2{
+  font-size:clamp(1.2rem,2vw,1.75rem)!important;
+  margin:9px 0 5px;
+  letter-spacing:.04em
+}
+.map-heading31 p{
+  font-size:.77rem;
+  color:var(--muted);
+  margin:0
+}
+.map-heading31 button{
+  font-size:.73rem;
+  white-space:nowrap
+}
+.vector-map-stage31{
+  position:relative;
+  background:var(--map-water);
+  border:1px solid var(--line);
+  border-radius:15px;
+  overflow:hidden
+}
+.vector-map31{
+  display:block;
+  width:100%;
+  height:auto;
+  min-height:240px;
+  max-height:75vh
+}
+.province31{
+  fill:var(--map-base);
+  stroke:var(--map-stroke);
+  stroke-width:.8;
+  vector-effect:non-scaling-stroke;
+  cursor:pointer;
+  transition:fill .18s,stroke .18s;
+  outline:none
+}
+.province31.has-schools31{
+  fill:var(--map-active)
+}
+.province31:hover,.province31:focus-visible,.province31.is-selected31{
+  fill:var(--map-hover);
+  stroke:var(--map-label);
+  stroke-width:1.4
+}
+.province-label31{
+  font-size:11px;
+  fill:var(--map-label);
+  font-weight:600;
+  pointer-events:none;
+  paint-order:stroke;
+  stroke:var(--map-water);
+  stroke-width:3;
+  stroke-linejoin:round
+}
+.province31.inset-province31{
+  stroke-width:.6
+}
+.sea-line31{
+  fill:var(--map-base);
+  stroke:var(--map-stroke);
+  stroke-width:.7;
+  vector-effect:non-scaling-stroke;
+  pointer-events:none
+}
+.map-inset-box31{
+  fill:var(--map-water);
+  stroke:var(--line);
+  stroke-width:1
+}
+.map-inset-title31{
+  font-size:10px;
+  fill:var(--map-label)
+}
+.map-callout31{
+  stroke:var(--map-stroke);
+  stroke-width:.8;
+  fill:none
+}
+.map-chip31{
+  font-size:12px;
+  fill:var(--map-label);
+  cursor:pointer
+}
+.map-chip31 rect{
+  fill:var(--map-water);
+  stroke:var(--map-stroke);
+  stroke-width:1
+}
+.map-chip31 text{
+  font-size:12px;
+  fill:var(--map-label);
+  pointer-events:none
+}
+.map-chip31:hover rect,.map-chip31:focus-visible rect{
+  fill:var(--map-active)
+}
+.map-legend31{
+  display:flex;
+  justify-content:space-between;
+  gap:16px;
+  flex-wrap:wrap;
+  padding:15px 7px 0;
+  color:var(--muted);
+  font-size:.7rem
+}
+.map-legend31 span{
+  display:inline-flex;
+  gap:7px;
+  align-items:center
+}
+.map-legend31 i{
+  width:10px;
+  height:10px;
+  border-radius:3px;
+  background:var(--map-active);
+  border:1px solid var(--map-stroke)
+}
+.map-legend31 a{
+  color:var(--muted);
+  font-size:.65rem
+}
+.province-popover31{
+  position:absolute;
+  z-index:6;
+  width:290px;
+  max-width:calc(100% - 24px);
+  max-height:min(440px,calc(100% - 24px));
+  overflow:auto;
+  padding:19px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:15px;
+  box-shadow:0 16px 60px #0003;
+  animation:mapPopup31 .18s ease-out
+}
+.province-popover31[hidden]{
+  display:none
+}
+.province-popover31 header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px
+}
+.province-popover31 h3{
+  font-size:1rem!important;
+  margin:0
+}
+.province-popover31 header button{
+  padding:2px 8px;
+  font-size:1.1rem;
+  background:transparent;
+  border:0
+}
+.province-popover31>p{
+  font-size:.72rem;
+  color:var(--muted);
+  line-height:1.7
+}
+.province-schools31{
+  display:grid;
+  gap:6px
+}
+.province-schools31 button{
+  padding:9px 11px;
+  text-align:left;
+  font-size:.78rem;
+  display:flex;
+  align-items:center;
+  justify-content:space-between
+}
+.province-schools31 button span{
+  color:var(--muted);
+  font-size:.68rem
+}
+.province-empty31{
+  padding:12px;
+  background:var(--soft);
+  border-radius:9px;
+  font-size:.75rem;
+  line-height:1.75;
+  color:var(--muted)
+}
+@keyframes mapPopup31{
+  from{
+    opacity:0;
+    transform:translateY(7px) scale(.98)
+  }
+  to{
+    opacity:1;
+    transform:none
+  }
+}
+.md-tools31{
+  display:grid;
+  gap:7px;
+  margin:11px 0 15px
+}
+.md-tools31 button{
+  font-size:.71rem;
+  padding:9px 10px;
+  text-align:left;
+  display:flex;
+  align-items:center;
+  gap:7px
+}
+.md-tools31 button svg{
+  width:16px;
+  height:16px;
+  margin:0
+}
+.md-import31{
+  max-width:510px;
+  width:calc(100% - 32px);
+  padding:30px
+}
+.md-import31 .eyebrow{
+  color:var(--accent);
+  font-size:.65rem
+}
+.md-import31 h2{
+  margin:10px 0
+}
+.md-import31 p{
+  font-size:.8rem;
+  line-height:1.8
+}
+.md-upload31{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  width:100%;
+  padding:25px;
+  border:1px dashed var(--accent);
+  background:var(--soft);
+  border-radius:12px;
+  cursor:pointer;
+  color:var(--ink);
+  font-size:.86rem;
+  margin:20px 0
+}
+.md-upload31 svg{
+  width:23px;
+  height:23px
+}
+.md-progress31{
+  margin:22px 0
+}
+.md-progress31 .progress-label31{
+  display:flex;
+  justify-content:space-between;
+  font-size:.76rem;
+  color:var(--muted);
+  margin-bottom:10px
+}
+.md-progress31 progress{
+  display:block;
+  width:100%;
+  height:8px;
+  border:0;
+  appearance:none;
+  border-radius:9px;
+  background:var(--soft);
+  color:var(--accent)
+}
+.md-progress31 progress::-webkit-progress-bar{
+  background:var(--soft);
+  border-radius:9px
+}
+.md-progress31 progress::-webkit-progress-value{
+  background:var(--accent);
+  border-radius:9px;
+  transition:width .18s
+}
+.md-progress31 progress::-moz-progress-bar{
+  background:var(--accent);
+  border-radius:9px
+}
+.md-success31{
+  padding:19px;
+  background:var(--soft);
+  border-radius:12px;
+  color:var(--ink);
+  margin:20px 0;
+  display:flex;
+  gap:12px;
+  align-items:center
+}
+.md-success31 svg{
+  width:26px;
+  height:26px;
+  color:var(--accent)
+}
+.md-error31{
+  color:#c15b38!important;
+  font-size:.77rem!important;
+  overflow-wrap:anywhere
+}
+.md-import31 .actions{
+  justify-content:flex-end
+}
+.exam-years31{
+  display:grid;
+  gap:11px
+}
+.exam-year-row31{
+  padding:13px;
+  background:var(--soft);
+  border-radius:10px;
+  font-size:.8rem;
+  line-height:1.8
+}
+.exam-year-row31 strong{
+  display:block;
+  font-size:.75rem;
+  color:var(--ink)
+}
+.exam-year-row31 a{
+  display:inline-block;
+  font-size:.7rem;
+  margin-top:5px;
+  color:var(--accent)
+}
+@media(max-width:600px){
+  .vector-map-panel31{
+    padding:17px!important
+  }
+  .map-heading31{
+    align-items:flex-start;
+    flex-wrap:wrap;
+    padding:0 1px 16px
+  }
+  .map-heading31 button{
+    font-size:.65rem;
+    padding:7px 10px
+  }
+  .vector-map31{
+    min-height:230px
+  }
+  .province-label31{
+    font-size:12px
+  }
+  .vector-map-stage31{
+    overflow:visible
+  }
+  .province-popover31{
+    position:absolute;
+    left:10px!important;
+    right:10px;
+    top:12px!important;
+    width:auto;
+    max-width:none;
+    max-height:calc(100% - 24px);
+    padding:15px
+  }
+  .province-schools31{
+    gap:4px
+  }
+  .province-schools31 button{
+    padding:7px 9px;
+    font-size:.73rem
+  }
+  .map-legend31{
+    font-size:.63rem;
+    padding-top:11px
+  }
+  .md-import31{
+    padding:24px
+  }
+  .md-tools31 button{
+    font-size:.68rem
+  }
+  .brand3 .brand-mark{
+    width:43px;
+    height:43px
+  }
+  .brand3 .brand-mark .qicheng-logo31{
+    width:36px;
+    height:36px
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .province31,.province-popover31,.md-progress31 progress{
+    transition:none;
+    animation:none
+  }
+}
+.exam-dates31{
+  margin-top:20px
+}
+.exam-dates31 h3,.exam-mode-heading31{
+  font-size:.9rem!important;
+  margin:0 0 12px
+}
+.exam-modes-pending31{
+  padding:15px;
+  background:var(--soft);
+  border-radius:12px
+}
+.exam-modes-pending31 p{
+  font-size:.78rem;
+  color:var(--muted);
+  margin:8px 0 0
+}
+.province-popover31{
+  animation:mapPopup31 .16s ease-out
+}
+@keyframes mapPopup31{
+  from{
+    transform:translateY(5px)
+  }
+  to{
+    transform:none
+  }
+}

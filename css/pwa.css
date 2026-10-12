@@ -1,0 +1,26 @@
+/* Storage, recovery and PWA controls; the original stylesheet order is preserved. */
+#settingsDialog { max-height:90dvh; overflow:auto; width:min(720px,calc(100% - 24px)); }
+.backup-settings,.pwa-settings { margin:24px 0; padding-top:20px; border-top:1px solid var(--line); }
+.backup-settings h3,.pwa-settings h3 { margin:0 0 8px; }
+.backup-settings p,.pwa-settings p { color:var(--muted); font-size:.88rem; }
+.backup-buttons { display:flex; flex-wrap:wrap; gap:10px; }
+.danger-button { color:#b02e36; border-color:#b02e3655; }
+body[data-theme=obsidian] .danger-button { color:#ffb0b5; border-color:#ffb0b555; }
+#confirmMessage { white-space:pre-line; overflow-wrap:anywhere; max-height:55dvh; overflow:auto; }
+#textBackup textarea { display:block; width:100%; max-height:55dvh; resize:vertical; font-family:monospace; margin:16px 0; }
+.startup-error { width:min(720px,calc(100% - 32px)); margin:10vh auto; padding:28px; border:1px solid var(--line); background:var(--surface); border-radius:18px; overflow-wrap:anywhere; }
+.startup-error h1 { font-size:1.7rem; }
+#emergencyStatus a { display:block; padding:16px 0; }
+.save-status.saved-error { color:#ba3540; font-weight:650; }
+@media(display-mode:standalone) {
+  .sidebar3 { padding-top:max(24px,env(safe-area-inset-top)); }
+  .topbar3 { padding-top:max(16px,env(safe-area-inset-top)); }
+  .page-content3 { padding-bottom:max(30px,env(safe-area-inset-bottom)); }
+}
+@media(max-width:650px) {
+  #settingsDialog { padding:20px 16px; }
+  .backup-buttons { display:grid; grid-template-columns:1fr; }
+  .backup-buttons button { min-height:46px; }
+  .startup-error .actions { display:grid; grid-template-columns:1fr; }
+  .province-popover31 { max-width:calc(100% - 24px); }
+}
