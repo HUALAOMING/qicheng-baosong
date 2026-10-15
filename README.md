@@ -73,7 +73,7 @@ node --experimental-vm-modules --test tests/*.test.mjs
 
 ## 验证与源码
 
-111 项自动化检查、25 项真实 Edge 浏览器验收通过。完整结果见 `TEST_REPORT.md`、`docs/TEST_EVIDENCE.json`；交付摘要见 `docs/UPGRADE_REPORT.md`；基线和题库来源见 `docs/BASELINE_AUDIT.md`。
+111 项自动化检查、25 项开发阶段真实 Edge 浏览器验收，以及 12 项发布后的线上 Edge 验收全部通过。完整结果见 `TEST_REPORT.md`、`docs/TEST_EVIDENCE.json`；交付摘要见 `docs/UPGRADE_REPORT.md`；基线和题库来源见 `docs/BASELINE_AUDIT.md`；上线记录与安装条件见 `docs/DEPLOYMENT_REPORT.md`。
 
 4.2 主要新增 `js/modules/explore.js`、`data/classics.json`，接入原导航、首页和离线打包；4.1 已有 `js/resources.js`、`js/modules/home.js`、`js/modules/quiz.js`、`css/workflow.css`、`data/resources/`；主要修改 `js/app.js`、`js/events.js`、`js/backup.js`、`js/modules/settings.js`、`js/storage.js`、`js/utils/validation.js`、`scripts/package.mjs`。
 

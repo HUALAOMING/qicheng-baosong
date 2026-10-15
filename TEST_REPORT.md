@@ -65,9 +65,9 @@
 
 - 实际使用 Windows Edge 的渲染、数据库、Service Worker、文件下载和离线页面。平板/触控是浏览器模拟，未做 Safari、iPhone/iPad 或实体平板验收。
 - Edge 正常隔离配置通过安装条件检查；没有在用户日常浏览器点击安装或替换已有应用，也未验收实际安装后的应用外壳。
-- 更新测试使用本机 manifest 请求与受控 HTTPS JSON 响应，没有发布生产服务。发布后应用同源 manifest 即为更新来源。
+- 原 25 项开发验收使用本机 manifest 与受控 HTTPS JSON 响应；后续发布后，另在真实同源 manifest 上完成下载、校验、写入与离线复开验证。
 - 原 Desktop/Documents 文件和真实网站数据库未触碰。兼容由旧格式样例、原快照及真实浏览器恢复确认。
 
-没有已知功能阻塞。本地源码、资源、Service Worker、离线模板已可进入发布阶段，本阶段未发布。机器可读证据见 `docs/TEST_EVIDENCE.json`。
+没有已知功能阻塞。已按用户后续授权完成 GitHub Pages 发布，额外 12 项线上验收全部通过。开发证据见 `docs/TEST_EVIDENCE.json`，线上证据见 `docs/DEPLOYMENT_EVIDENCE.json` 和 `docs/DEPLOYMENT_REPORT.md`。
 
 4.2 未改用户存储和备份结构。111 项检查包含完整原业务回归与新典籍检查；浏览器错题用例按“先复练，再进行额外随机组”执行，避免后续随机答对同题、合法清除错题后产生误判。
