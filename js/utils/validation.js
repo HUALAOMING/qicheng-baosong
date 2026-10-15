@@ -1,7 +1,7 @@
 import { clone, validData3 } from './helpers.js';
 import { fresh, photoRefs3 } from '../model.js';
 import { PROFILE, EDU_FIELDS, EDU_STAGES, AWARD_FIELDS, EXP_FIELDS, EXAM_FIELDS, BOOK_FIELDS, ACHIEVEMENT_FIELDS, MODULES, NAV3, THEMES, draftKeys } from '../constants.js';
-import { SCHOOLS } from '../data.js';
+import { SCHOOLS, CLASSICS } from '../data.js';
 const fail = path => {
   throw new Error ('备份数据格式不正确：' + path);
 };
@@ -66,6 +66,8 @@ function validateDraft (input) {
   object (input, 'current');
   if (input.format !== 'qicheng-resume' || input.version !== 6) throw new Error ('这不是当前 PWA 版本的启程数据。');
   const s = clone (input), defaults = fresh ();
+  // Navigation is deliberately omitted from backups. Older backups retain these fields.
+  for (const key of ['route', 'section', 'step', 'sidebarHidden', 'menuOpen']) if (! Object.hasOwn (s, key)) s[key] = clone(defaults[key]);
   for (const key of Object.keys (defaults)) if (! Object.hasOwn (s, key)) fail ('current.' + key + '（必要字段缺失）');
   text (s.appVersion, 'appVersion');
   fields (s.profile, PROFILE, 'profile');
@@ -84,7 +86,7 @@ function validateDraft (input) {
   stringList (s.menuOpen, 'menuOpen', NAV3.length);
   s.menuOpen.forEach (k => choice (k, NAV3.map (g => g.id), 'menuOpen'));
   text (s.route, 'route');
-  const routes = NAV3.flatMap (g => g.items.map (i => i [0]));
+  const routes = [...NAV3.flatMap (g => g.items.map (i => i [0])), 'backup', 'quiz', ...CLASSICS.books.map (book => 'classic:' + book.id)];
   if (! routes.includes (s.route)) {
     try {
       if (! s.route.startsWith ('school:') || ! SCHOOLS.some (x => x.name === decodeURIComponent (s.route.slice (7)))) fail ('route');

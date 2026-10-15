@@ -119,12 +119,18 @@ function storageReplaceAll (records) {
     store.clear (); for (const [key, value] of Object.entries (records)) store.put (value, key);
   });
 }
+// Merge related records in one transaction; failed writes leave every old value intact.
+function storageSetMany (records) {
+  return storageTransaction ('readwrite', store => {
+    for (const [key, value] of Object.entries (records)) store.put (value, key);
+  });
+}
 function storageClose () {
   connection?.close ();
   connection = null;
 }
 const storage = {
   open : storageOpen, close : storageClose, get : storageGet, set : storageSet, update : storageUpdate, remove : storageRemove,
-  getAll : storageGetAll, clear : storageClear, replaceAll : storageReplaceAll
+  getAll : storageGetAll, clear : storageClear, replaceAll : storageReplaceAll, setMany : storageSetMany
 };
 export { storage, DATABASE_NAME };

@@ -97,7 +97,7 @@ function fresh () {
   const version = newVersion ();
   return {
     format : 'qicheng-resume', version : 6, appVersion : VERSION, theme : 'pudding', uiLang : 'zh', onboarded : false,
-    route : 'profile', section : 'resume', step : 0, orientation : 'portrait', sidebarHidden : false, menuOpen : ['entry'],
+    route : 'home', section : 'resume', step : 0, orientation : 'portrait', sidebarHidden : true, menuOpen : ['start'],
     profile : Object.fromEntries (PROFILE.map (([key]) => [key, ''])), education : EDU_STAGES.slice (0, 3).map (blankEducation),
     statement : {
       zh : '', en : '', strengths : '', hobbies : ''

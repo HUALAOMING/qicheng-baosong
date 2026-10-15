@@ -1,0 +1,2962 @@
+{
+  "schemaVersion": 1,
+  "bank": {
+    "id": "english-grammar",
+    "name": "English Grammar",
+    "subject": "english",
+    "section": "grammar",
+    "version": "1.0.0"
+  },
+  "questions": [
+    {
+      "id": "MT31-01",
+      "type": "single-choice",
+      "question": "I am surprised ______ the exam is pretty difficult.",
+      "options": [
+        {
+          "id": "A",
+          "text": "with what you were thinking"
+        },
+        {
+          "id": "B",
+          "text": "that you should think"
+        },
+        {
+          "id": "C",
+          "text": "that you would think"
+        },
+        {
+          "id": "D",
+          "text": "by what you are thinking"
+        }
+      ],
+      "answer": "B",
+      "explanation": "be surprised that… 后的 should 表“竟然”，不是“应该”。这里惊讶的是“你竟觉得考试很难”，不是考试本身很难。"
+    },
+    {
+      "id": "MT31-02",
+      "type": "single-choice",
+      "question": "In \"He will come <i>to learn driving from you</i>\", the infinitive indicates ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "cause."
+        },
+        {
+          "id": "B",
+          "text": "purpose."
+        },
+        {
+          "id": "C",
+          "text": "result."
+        },
+        {
+          "id": "D",
+          "text": "direction."
+        }
+      ],
+      "answer": "B",
+      "explanation": "to learn… 说明来这里的目的，作目的状语。"
+    },
+    {
+      "id": "MT31-03",
+      "type": "single-choice",
+      "question": "Tom told his father ______ had happened.",
+      "options": [
+        {
+          "id": "A",
+          "text": "all which"
+        },
+        {
+          "id": "B",
+          "text": "that"
+        },
+        {
+          "id": "C",
+          "text": "all that"
+        },
+        {
+          "id": "D",
+          "text": "all what"
+        }
+      ],
+      "answer": "C",
+      "explanation": "all 是 told 的宾语，that 引导定语从句并在从句中作主语；整体相当于 what had happened。"
+    },
+    {
+      "id": "MT31-05",
+      "type": "single-choice",
+      "question": "Many reporters hurried to the airport, only to be told that the superstar had already left. The infinitive verb phrase only to be told is used ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "to reveal cause and effect"
+        },
+        {
+          "id": "B",
+          "text": "to express an intended purpose"
+        },
+        {
+          "id": "C",
+          "text": "to indicate a high degree of possibility"
+        },
+        {
+          "id": "D",
+          "text": "to reveal an undesirable consequence"
+        }
+      ],
+      "answer": "D",
+      "explanation": "only to do 在此引出出乎意料且令人失望的结果：赶到机场却被告知明星已经离开。"
+    },
+    {
+      "id": "MT31-06",
+      "type": "single-choice",
+      "question": "In doing experiments, you must be ______ the precision instruments.",
+      "options": [
+        {
+          "id": "A",
+          "text": "more than careful with"
+        },
+        {
+          "id": "B",
+          "text": "more careful than with"
+        },
+        {
+          "id": "C",
+          "text": "careful more than with"
+        },
+        {
+          "id": "D",
+          "text": "with more careful than"
+        }
+      ],
+      "answer": "A",
+      "explanation": "more than + 形容词 = 非常、十分；be careful with = 小心对待。这里没有比较对象，不能拆成 more careful than。"
+    },
+    {
+      "id": "MT31-07",
+      "type": "single-choice",
+      "question": "Everyone has climbed up to the top of the mountain, ______?",
+      "options": [
+        {
+          "id": "A",
+          "text": "haven't they"
+        },
+        {
+          "id": "B",
+          "text": "don't they"
+        },
+        {
+          "id": "C",
+          "text": "won't he"
+        },
+        {
+          "id": "D",
+          "text": "doesn't he"
+        }
+      ],
+      "answer": "A",
+      "explanation": "主句为现在完成时的肯定句，反意疑问用 haven't；everyone 可由 they 承接。"
+    },
+    {
+      "id": "MT31-08",
+      "type": "single-choice",
+      "question": "Little ______ what was upsetting me.",
+      "options": [
+        {
+          "id": "A",
+          "text": "may he realize"
+        },
+        {
+          "id": "B",
+          "text": "he realizes"
+        },
+        {
+          "id": "C",
+          "text": "he may realize"
+        },
+        {
+          "id": "D",
+          "text": "did he realize"
+        }
+      ],
+      "answer": "D",
+      "explanation": "否定意义的 Little 位于句首，用部分倒装；was upsetting 表明过去语境，借助 did。"
+    },
+    {
+      "id": "MT31-09",
+      "type": "single-choice",
+      "question": "______ more attention, the trees could have grown better.",
+      "options": [
+        {
+          "id": "A",
+          "text": "Being given"
+        },
+        {
+          "id": "B",
+          "text": "Given"
+        },
+        {
+          "id": "C",
+          "text": "To give"
+        },
+        {
+          "id": "D",
+          "text": "Giving"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Given more attention = If the trees had been given more attention。树是“被照料”，用过去分词；could have grown 暗示对过去的假设。此处 given 是分词，不宜只记成“考虑到”的介词。"
+    },
+    {
+      "id": "MT31-10",
+      "type": "single-choice",
+      "question": "It's no good ______ her. She is such a miser that she won't spare a penny out.",
+      "options": [
+        {
+          "id": "A",
+          "text": "to turn to"
+        },
+        {
+          "id": "B",
+          "text": "turning to"
+        },
+        {
+          "id": "C",
+          "text": "turn to"
+        },
+        {
+          "id": "D",
+          "text": "turned to"
+        }
+      ],
+      "answer": "B",
+      "explanation": "It's no good doing… 表示做某事无益；turn to sb 表示向某人求助。"
+    },
+    {
+      "id": "MT32-01",
+      "type": "single-choice",
+      "question": "In \"We listened eagerly, for he brought news of our families\", \"for\" is used to indicate ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "purpose."
+        },
+        {
+          "id": "B",
+          "text": "cause."
+        },
+        {
+          "id": "C",
+          "text": "direction."
+        },
+        {
+          "id": "D",
+          "text": "result."
+        }
+      ],
+      "answer": "B",
+      "explanation": "for 连接两个分句，在此补充说明急切聆听的原因。"
+    },
+    {
+      "id": "MT32-02",
+      "type": "single-choice",
+      "question": "______, he should be punished if he goes against the law.",
+      "options": [
+        {
+          "id": "A",
+          "text": "Whether the president or the citizen"
+        },
+        {
+          "id": "B",
+          "text": "Was he the president or the citizen"
+        },
+        {
+          "id": "C",
+          "text": "Be he the president or the citizen"
+        },
+        {
+          "id": "D",
+          "text": "Were he the president or the citizen"
+        }
+      ],
+      "answer": "C",
+      "explanation": "Be he A or B = Whether he be A or B，意为“不论他是 A 还是 B”。这是保留动词原形 be 的正式旧式句型；不要靠日常语感改成 was。"
+    },
+    {
+      "id": "MT32-03",
+      "type": "single-choice",
+      "question": "It is generally believed that teaching is ______ it is a science.",
+      "options": [
+        {
+          "id": "A",
+          "text": "as an art much as"
+        },
+        {
+          "id": "B",
+          "text": "as much an art as"
+        },
+        {
+          "id": "C",
+          "text": "an art much as"
+        },
+        {
+          "id": "D",
+          "text": "much as an art as"
+        }
+      ],
+      "answer": "B",
+      "explanation": "as much an art as a science = 既是一门科学，也同样是一门艺术。顺序是 as much + a/an + 单数名词 + as，不是 as an art much。"
+    },
+    {
+      "id": "MT32-04",
+      "type": "single-choice",
+      "question": "The rhetorical question \"Is that a reason for despair?\" implies ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "negation"
+        },
+        {
+          "id": "B",
+          "text": "uncertainty"
+        },
+        {
+          "id": "C",
+          "text": "surprise"
+        },
+        {
+          "id": "D",
+          "text": "resolution"
+        }
+      ],
+      "answer": "A",
+      "explanation": "反问意在否定：这不是绝望的理由，而非真正询问信息。"
+    },
+    {
+      "id": "MT32-06",
+      "type": "single-choice",
+      "question": "John wants to visit me today. I'd rather he ______ tomorrow.",
+      "options": [
+        {
+          "id": "A",
+          "text": "came"
+        },
+        {
+          "id": "B",
+          "text": "come"
+        },
+        {
+          "id": "C",
+          "text": "are coming"
+        },
+        {
+          "id": "D",
+          "text": "will come"
+        }
+      ],
+      "answer": "A",
+      "explanation": "would rather + 主语 + 过去式，表示现在或将来的愿望；tomorrow 也用 came。若遗憾过去已发生的事，则用 had done，见 42-9。"
+    },
+    {
+      "id": "MT32-07",
+      "type": "single-choice",
+      "question": "Mr. Wells has found some new clues in his investigation, ______ of great importance to solve this criminal case.",
+      "options": [
+        {
+          "id": "A",
+          "text": "I think which is"
+        },
+        {
+          "id": "B",
+          "text": "that I think is"
+        },
+        {
+          "id": "C",
+          "text": "which I think is"
+        },
+        {
+          "id": "D",
+          "text": "which I think it is"
+        }
+      ],
+      "answer": "C",
+      "explanation": "先去掉插入语 I think，得到 which is of great importance。逗号后不能用 that；which 已作主语，不能再加 it。这里单数 is 按“发现新线索这件事”理解；若指 clues 本身，应为 are。"
+    },
+    {
+      "id": "MT32-08",
+      "type": "single-choice",
+      "question": "Susan is ______ as an “addlehead”—she always leaves her keys on the door.",
+      "options": [
+        {
+          "id": "A",
+          "text": "who is known"
+        },
+        {
+          "id": "B",
+          "text": "which is known"
+        },
+        {
+          "id": "C",
+          "text": "whom is known"
+        },
+        {
+          "id": "D",
+          "text": "what is known"
+        }
+      ],
+      "answer": "D",
+      "explanation": "what is known as… = 所谓的、被称作……的那种人或事物。what 引导名词性表语从句；这里重在称呼或类别，不是普通的 who 定语从句。"
+    },
+    {
+      "id": "MT32-10",
+      "type": "single-choice",
+      "question": "Old ______ my grandpa is, he works like a young man.",
+      "options": [
+        {
+          "id": "A",
+          "text": "that"
+        },
+        {
+          "id": "B",
+          "text": "as"
+        },
+        {
+          "id": "C",
+          "text": "who"
+        },
+        {
+          "id": "D",
+          "text": "like"
+        }
+      ],
+      "answer": "B",
+      "explanation": "形容词前置的 Old as… 构成让步从句，相当于 Although my grandpa is old。"
+    },
+    {
+      "id": "MT33-01",
+      "type": "single-choice",
+      "question": "What does the present progressive in the sentence \"The doctor is coming in a minute\" indicate?",
+      "options": [
+        {
+          "id": "A",
+          "text": "An ongoing action in the present."
+        },
+        {
+          "id": "B",
+          "text": "An action about to happen very soon."
+        },
+        {
+          "id": "C",
+          "text": "A habitual action in a long time."
+        },
+        {
+          "id": "D",
+          "text": "A plan of action for the nurse."
+        }
+      ],
+      "answer": "B",
+      "explanation": "is coming 配合 in a minute 表示即将发生的行动，而非此刻正在进行的动作。"
+    },
+    {
+      "id": "MT33-02",
+      "type": "single-choice",
+      "question": "A recent survey shows that most adolescents eat ______ as they actually need every day.",
+      "options": [
+        {
+          "id": "A",
+          "text": "protein as three times much"
+        },
+        {
+          "id": "B",
+          "text": "three times protein as much"
+        },
+        {
+          "id": "C",
+          "text": "three times as much protein"
+        },
+        {
+          "id": "D",
+          "text": "protein as much three times"
+        }
+      ],
+      "answer": "C",
+      "explanation": "倍数表达的顺序为 three times + as much + 不可数名词 + as。"
+    },
+    {
+      "id": "MT33-03",
+      "type": "single-choice",
+      "question": "No sooner ______ his speech than listeners put forward questions.",
+      "options": [
+        {
+          "id": "A",
+          "text": "he has finished"
+        },
+        {
+          "id": "B",
+          "text": "has he finished"
+        },
+        {
+          "id": "C",
+          "text": "he had finished"
+        },
+        {
+          "id": "D",
+          "text": "had he finished"
+        }
+      ],
+      "answer": "D",
+      "explanation": "No sooner 位于句首用部分倒装；与过去事件 put forward 配合，用 had he finished。"
+    },
+    {
+      "id": "MT33-06",
+      "type": "single-choice",
+      "question": "Susan ______ a book about cooking last year, but I don't know whether she has finished it.",
+      "options": [
+        {
+          "id": "A",
+          "text": "was writing"
+        },
+        {
+          "id": "B",
+          "text": "has written"
+        },
+        {
+          "id": "C",
+          "text": "wrote"
+        },
+        {
+          "id": "D",
+          "text": "had written"
+        }
+      ],
+      "answer": "A",
+      "explanation": "was writing 只说明去年在写，不保证写完；wrote a book 通常把写书视为完成的整体事件。后半句明确“是否完成尚不知”，因此选 A。"
+    },
+    {
+      "id": "MT33-07",
+      "type": "single-choice",
+      "question": "Mr. James is such a good teacher ______ we all love and respect.",
+      "options": [
+        {
+          "id": "A",
+          "text": "as"
+        },
+        {
+          "id": "B",
+          "text": "that"
+        },
+        {
+          "id": "C",
+          "text": "whom"
+        },
+        {
+          "id": "D",
+          "text": "which"
+        }
+      ],
+      "answer": "A",
+      "explanation": "love 和 respect 后缺宾语，as 在定语从句中充当宾语，组成 such…as。若选结果连词 that，从句通常须有 him：such a good teacher that we all love and respect him。"
+    },
+    {
+      "id": "MT33-08",
+      "type": "single-choice",
+      "question": "The present simple in “I will telephone you directly I hear the news” is used to indicate ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "future time"
+        },
+        {
+          "id": "B",
+          "text": "present time"
+        },
+        {
+          "id": "C",
+          "text": "an objective truth"
+        },
+        {
+          "id": "D",
+          "text": "an urgent action"
+        }
+      ],
+      "answer": "A",
+      "explanation": "directly 在这里 = as soon as，意为“一……就……”，引导时间状语从句；hear 用一般现在时表达将来，遵循主将从现。"
+    },
+    {
+      "id": "MT33-10",
+      "type": "single-choice",
+      "question": "All of the plants now farmed on a large scale were developed from plants ______ wild.",
+      "options": [
+        {
+          "id": "A",
+          "text": "that once grew"
+        },
+        {
+          "id": "B",
+          "text": "once they grew"
+        },
+        {
+          "id": "C",
+          "text": "they once grew"
+        },
+        {
+          "id": "D",
+          "text": "once grew"
+        }
+      ],
+      "answer": "A",
+      "explanation": "that 引导修饰 plants 的定语从句并作主语；其余选项缺少正确的连接结构。"
+    },
+    {
+      "id": "MT34-01",
+      "type": "single-choice",
+      "question": "The sentence \"If he had married Alice, how happy he would have been!\" expresses ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "a thrill of excitement"
+        },
+        {
+          "id": "B",
+          "text": "great anger"
+        },
+        {
+          "id": "C",
+          "text": "a sense of regret"
+        },
+        {
+          "id": "D",
+          "text": "the feeling of being grateful"
+        }
+      ],
+      "answer": "C",
+      "explanation": "had married 与 would have been 构成对过去未实现情况的反事实假设，感叹句表达遗憾。"
+    },
+    {
+      "id": "MT34-02",
+      "type": "single-choice",
+      "question": "\"—<i>Must</i> I come at four o'clock?\" \"—No, you <i>needn't</i> come at four o'clock.\" The modal auxiliary verbs in the conversation imply ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "suggestion"
+        },
+        {
+          "id": "B",
+          "text": "permission"
+        },
+        {
+          "id": "C",
+          "text": "necessity"
+        },
+        {
+          "id": "D",
+          "text": "possibility"
+        }
+      ],
+      "answer": "C",
+      "explanation": "must 询问是否必要，needn't 否定必要性，表示不必四点来。"
+    },
+    {
+      "id": "MT34-03",
+      "type": "single-choice",
+      "question": "Sorry I'm late. I ______ have turned off the alarm clock and gone back to sleep again.",
+      "options": [
+        {
+          "id": "A",
+          "text": "might"
+        },
+        {
+          "id": "B",
+          "text": "should"
+        },
+        {
+          "id": "C",
+          "text": "mustn't"
+        },
+        {
+          "id": "D",
+          "text": "couldn't"
+        }
+      ],
+      "answer": "A",
+      "explanation": "might have done 表示对过去情况的不确定推测；迟到者推测自己可能关掉闹钟后又睡了。"
+    },
+    {
+      "id": "MT34-04",
+      "type": "single-choice",
+      "question": "The newly designed bedroom seems to be a great deal larger than ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "it is necessary"
+        },
+        {
+          "id": "B",
+          "text": "being necessary"
+        },
+        {
+          "id": "C",
+          "text": "to be necessary"
+        },
+        {
+          "id": "D",
+          "text": "is necessary"
+        }
+      ],
+      "answer": "D",
+      "explanation": "than is necessary = 比所需要的还……，比较从句可保留 is necessary 而不出现显式主语。a great deal 修饰 larger，意为“大得多”。固定识别 than is necessary。"
+    },
+    {
+      "id": "MT34-05",
+      "type": "single-choice",
+      "question": "He was determined to sail around the world ______ his illness and old age.",
+      "options": [
+        {
+          "id": "A",
+          "text": "given"
+        },
+        {
+          "id": "B",
+          "text": "although"
+        },
+        {
+          "id": "C",
+          "text": "despite"
+        },
+        {
+          "id": "D",
+          "text": "in spite"
+        }
+      ],
+      "answer": "C",
+      "explanation": "despite 直接接名词短语，表示尽管；although 后接从句，in spite 还须接 of。"
+    },
+    {
+      "id": "MT34-07",
+      "type": "single-choice",
+      "question": "It is not ______ much his appearance I like as his personality.",
+      "options": [
+        {
+          "id": "A",
+          "text": "as"
+        },
+        {
+          "id": "B",
+          "text": "very"
+        },
+        {
+          "id": "C",
+          "text": "so"
+        },
+        {
+          "id": "D",
+          "text": "that"
+        }
+      ],
+      "answer": "C",
+      "explanation": "not so much A as B = 与其说 A，不如说 B。这里是“与其说喜欢外貌，不如说喜欢性格”；his appearance 后省略关系词 that。"
+    },
+    {
+      "id": "MT34-08",
+      "type": "single-choice",
+      "question": "There is much chance ______ Bill will recover from his injury in time for the race.",
+      "options": [
+        {
+          "id": "A",
+          "text": "that"
+        },
+        {
+          "id": "B",
+          "text": "which"
+        },
+        {
+          "id": "C",
+          "text": "until"
+        },
+        {
+          "id": "D",
+          "text": "if"
+        }
+      ],
+      "answer": "A",
+      "explanation": "that 引导说明 chance 内容的同位语从句；从句本身结构完整。"
+    },
+    {
+      "id": "MT34-10",
+      "type": "single-choice",
+      "question": "I don't think ______ possible to master a foreign language without much memory work.",
+      "options": [
+        {
+          "id": "A",
+          "text": "that"
+        },
+        {
+          "id": "B",
+          "text": "this"
+        },
+        {
+          "id": "C",
+          "text": "you"
+        },
+        {
+          "id": "D",
+          "text": "it"
+        }
+      ],
+      "answer": "D",
+      "explanation": "think it possible to do 中 it 作形式宾语，真正宾语是后面的不定式。"
+    },
+    {
+      "id": "MT35-01",
+      "type": "single-choice",
+      "question": "Which of the following italicized parts explains PURPOSE?",
+      "options": [
+        {
+          "id": "A",
+          "text": "He is <i>such</i> an honest man <i>that we all believe in him</i>."
+        },
+        {
+          "id": "B",
+          "text": "Please open the window <i>so that we can breathe fresh air</i>."
+        },
+        {
+          "id": "C",
+          "text": "I returned home in a hurry, <i>only to find my house broken into</i>."
+        },
+        {
+          "id": "D",
+          "text": "He had <i>so</i> little education <i>that he was unfit for this job</i>."
+        }
+      ],
+      "answer": "B",
+      "explanation": "B 的 so that 从句说明开窗的目的；A、D 表结果，C 表意外结果。"
+    },
+    {
+      "id": "MT35-02",
+      "type": "single-choice",
+      "question": "If you have really been living in France for so many years, it’s about time you ______ able to talk with people in French.",
+      "options": [
+        {
+          "id": "A",
+          "text": "must be"
+        },
+        {
+          "id": "B",
+          "text": "are"
+        },
+        {
+          "id": "C",
+          "text": "be"
+        },
+        {
+          "id": "D",
+          "text": "were"
+        }
+      ],
+      "answer": "D",
+      "explanation": "It is (about/high) time + 主语 + 过去式 = 早该……了。这里 were 表现在应有而尚未实现的状态。不能套用 necessary that 的原形虚拟；另一种形式是 should be，should 不省略。"
+    },
+    {
+      "id": "MT35-03",
+      "type": "single-choice",
+      "question": "He ______ have been nervous because he didn't go straight in.",
+      "options": [
+        {
+          "id": "A",
+          "text": "ought to"
+        },
+        {
+          "id": "B",
+          "text": "must"
+        },
+        {
+          "id": "C",
+          "text": "should"
+        },
+        {
+          "id": "D",
+          "text": "had to"
+        }
+      ],
+      "answer": "B",
+      "explanation": "because 后给出判断依据；must have been 表示推断他当时一定紧张。"
+    },
+    {
+      "id": "MT35-04",
+      "type": "single-choice",
+      "question": "Some researchers believe that there is no doubt ______ recycling saves energy and raw materials, and reduces pollution.",
+      "options": [
+        {
+          "id": "A",
+          "text": "which"
+        },
+        {
+          "id": "B",
+          "text": "that"
+        },
+        {
+          "id": "C",
+          "text": "what"
+        },
+        {
+          "id": "D",
+          "text": "whether"
+        }
+      ],
+      "answer": "B",
+      "explanation": "there is no doubt that… 表示毫无疑问，that 引导说明 doubt 内容的从句。"
+    },
+    {
+      "id": "MT35-05",
+      "type": "single-choice",
+      "question": "It is clearly stated on the bulletin that ______ throws the rubbish away at will will be punished.",
+      "options": [
+        {
+          "id": "A",
+          "text": "whenever"
+        },
+        {
+          "id": "B",
+          "text": "who"
+        },
+        {
+          "id": "C",
+          "text": "anyone"
+        },
+        {
+          "id": "D",
+          "text": "whoever"
+        }
+      ],
+      "answer": "D",
+      "explanation": "whoever throws… = anyone who throws…，整体作 will be punished 的主语。两个 will：第一个属于 at will“任意地”，第二个才是将来时助动词；不要误认为重复谓语。"
+    },
+    {
+      "id": "MT35-06",
+      "type": "single-choice",
+      "question": "\"Is that true? Aren't you stretching it a bit?\" These two questions are used to ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "express anger"
+        },
+        {
+          "id": "B",
+          "text": "voice doubts"
+        },
+        {
+          "id": "C",
+          "text": "refuse to offer help"
+        },
+        {
+          "id": "D",
+          "text": "deny the truth"
+        }
+      ],
+      "answer": "B",
+      "explanation": "询问是否属实并质疑是否夸大，是表达怀疑，尚未直接否定事实。"
+    },
+    {
+      "id": "MT35-08",
+      "type": "single-choice",
+      "question": "They are such a big family that this new house is not ______ for them to live in.",
+      "options": [
+        {
+          "id": "A",
+          "text": "enough large"
+        },
+        {
+          "id": "B",
+          "text": "too large"
+        },
+        {
+          "id": "C",
+          "text": "large enough"
+        },
+        {
+          "id": "D",
+          "text": "so large"
+        }
+      ],
+      "answer": "C",
+      "explanation": "enough 修饰形容词时后置：large enough；一家人多，房子不够大。"
+    },
+    {
+      "id": "MT35-09",
+      "type": "single-choice",
+      "question": "______ that the environment continues to be damaged at the current rate, it will not be long before the earth is totally destroyed.",
+      "options": [
+        {
+          "id": "A",
+          "text": "Concerning"
+        },
+        {
+          "id": "B",
+          "text": "Assuming"
+        },
+        {
+          "id": "C",
+          "text": "Ascertaining"
+        },
+        {
+          "id": "D",
+          "text": "Regarding"
+        }
+      ],
+      "answer": "B",
+      "explanation": "assuming that = 假如、假定；concerning/regarding = 关于，通常接名词或名词短语；ascertain = 查明。条件假设选 Assuming。"
+    },
+    {
+      "id": "MT35-10",
+      "type": "single-choice",
+      "question": "______ that is put forward is adoptable.",
+      "options": [
+        {
+          "id": "A",
+          "text": "It is not every plan"
+        },
+        {
+          "id": "B",
+          "text": "Every plan that is not"
+        },
+        {
+          "id": "C",
+          "text": "When not every plan"
+        },
+        {
+          "id": "D",
+          "text": "Not every plan"
+        }
+      ],
+      "answer": "D",
+      "explanation": "Not every plan 作主语，that is put forward 作定语从句；表达并非每个提出的计划都可采纳。"
+    },
+    {
+      "id": "MT36-02",
+      "type": "single-choice",
+      "question": "Which of the following sentences is INCORRECT?",
+      "options": [
+        {
+          "id": "A",
+          "text": "All the guests had a good time."
+        },
+        {
+          "id": "B",
+          "text": "Many her students passed the exam."
+        },
+        {
+          "id": "C",
+          "text": "Half the car was damaged."
+        },
+        {
+          "id": "D",
+          "text": "Both her parents are teachers."
+        }
+      ],
+      "answer": "B",
+      "explanation": "many 不能直接置于 her students 前，应说 many of her students；其余限定词排列正确。"
+    },
+    {
+      "id": "MT36-03",
+      "type": "single-choice",
+      "question": "The manager has anticipated the situation that we ______ a certain amount of resistance to our plan.",
+      "options": [
+        {
+          "id": "A",
+          "text": "meet"
+        },
+        {
+          "id": "B",
+          "text": "will meet"
+        },
+        {
+          "id": "C",
+          "text": "met"
+        },
+        {
+          "id": "D",
+          "text": "have met"
+        }
+      ],
+      "answer": "B",
+      "explanation": "anticipate 预料将发生什么，不是建议、要求；同位语从句照实际时态使用 will meet。不能因 that 或 anticipated 的“设想感”就套原形虚拟。"
+    },
+    {
+      "id": "MT36-04",
+      "type": "single-choice",
+      "question": "Many a delegate was in favor of his proposal that a special committee ______ to investigate the incident.",
+      "options": [
+        {
+          "id": "A",
+          "text": "is set up"
+        },
+        {
+          "id": "B",
+          "text": "was set up"
+        },
+        {
+          "id": "C",
+          "text": "be set up"
+        },
+        {
+          "id": "D",
+          "text": "will be set up"
+        }
+      ],
+      "answer": "C",
+      "explanation": "proposal 表建议，that 从句用 (should) + 原形；委员会“被设立”，用 be set up。Many a + 单数名词 + 单数谓语，所以原句 was 正确。"
+    },
+    {
+      "id": "MT36-05",
+      "type": "single-choice",
+      "question": "They gained ______ fat as could be expected, and it was all in their belly area.",
+      "options": [
+        {
+          "id": "A",
+          "text": "twice as much"
+        },
+        {
+          "id": "B",
+          "text": "much twice"
+        },
+        {
+          "id": "C",
+          "text": "twice so much"
+        },
+        {
+          "id": "D",
+          "text": "as much twice"
+        }
+      ],
+      "answer": "A",
+      "explanation": "不可数名词 fat 的倍数比较为 twice as much fat as…；倍数放在 as much 前。"
+    },
+    {
+      "id": "MT36-06",
+      "type": "single-choice",
+      "question": "\"What if we move the picture over there? Do you think it'll look better?\" These two questions are used to ask for ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "information"
+        },
+        {
+          "id": "B",
+          "text": "permission"
+        },
+        {
+          "id": "C",
+          "text": "directions"
+        },
+        {
+          "id": "D",
+          "text": "advice"
+        }
+      ],
+      "answer": "D",
+      "explanation": "提出挪动图片的设想并询问效果，是向对方征求意见、建议。"
+    },
+    {
+      "id": "MT36-08",
+      "type": "single-choice",
+      "question": "The Greens went to Qingdao to visit some friends, and spent the ______ days at the seaside.",
+      "options": [
+        {
+          "id": "A",
+          "text": "few sunny last"
+        },
+        {
+          "id": "B",
+          "text": "last sunny few"
+        },
+        {
+          "id": "C",
+          "text": "last few sunny"
+        },
+        {
+          "id": "D",
+          "text": "few last sunny"
+        }
+      ],
+      "answer": "C",
+      "explanation": "限定次序为 last + few + 描写形容词 sunny + 名词 days。"
+    },
+    {
+      "id": "MT36-09",
+      "type": "single-choice",
+      "question": "Please contact us at 4777 8886 whenever ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "it will be convenient to you"
+        },
+        {
+          "id": "B",
+          "text": "you will be convenient"
+        },
+        {
+          "id": "C",
+          "text": "you are convenient"
+        },
+        {
+          "id": "D",
+          "text": "it is convenient to you"
+        }
+      ],
+      "answer": "D",
+      "explanation": "convenient 通常以 it 作主语表示事情方便；时间从句表达将来时用一般现在时。"
+    },
+    {
+      "id": "MT36-10",
+      "type": "single-choice",
+      "question": "—Do you like orange juice? —Yes. So much ______ that I drink it almost every day in summer.",
+      "options": [
+        {
+          "id": "A",
+          "text": "as"
+        },
+        {
+          "id": "B",
+          "text": "so"
+        },
+        {
+          "id": "C",
+          "text": "to"
+        },
+        {
+          "id": "D",
+          "text": "for"
+        }
+      ],
+      "answer": "B",
+      "explanation": "so much so that… = 到了这样的程度，以至于……。第二个 so 承接前面的“喜欢”，不是多余单词；这是整段承接表达，不是普通 so much + 名词 + that。"
+    },
+    {
+      "id": "MT37-01",
+      "type": "single-choice",
+      "question": "Which of the following italicized phrases indicates CAUSE?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The temperature varies <i>from 30 degrees to minus 20</i>."
+        },
+        {
+          "id": "B",
+          "text": "I work hard <i>so as to get promoted</i>."
+        },
+        {
+          "id": "C",
+          "text": "<i>For all his efforts</i>, he didn't pass the exam."
+        },
+        {
+          "id": "D",
+          "text": "I was frightened <i>at the terrible sight</i>."
+        }
+      ],
+      "answer": "D",
+      "explanation": "D 表示因看到可怕景象而害怕，说明原因；A 表范围，B 表目的，C 表让步。"
+    },
+    {
+      "id": "MT37-02",
+      "type": "single-choice",
+      "question": "The sentence that expresses COMPLAINT is ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "How did you find the new product?"
+        },
+        {
+          "id": "B",
+          "text": "Don't you like playing badminton?"
+        },
+        {
+          "id": "C",
+          "text": "Where will you go this weekend?"
+        },
+        {
+          "id": "D",
+          "text": "Couldn't you be a little bit quiet?"
+        }
+      ],
+      "answer": "D",
+      "explanation": "Couldn't you be a little bit quiet? 以否定疑问形式抱怨对方不够安静。"
+    },
+    {
+      "id": "MT37-03",
+      "type": "single-choice",
+      "question": "In phrases like <i>steaming hot</i>, <i>shining bright</i>, <i>biting cold</i>, the -ING participle is used ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "for emphasis."
+        },
+        {
+          "id": "B",
+          "text": "for concession."
+        },
+        {
+          "id": "C",
+          "text": "as a condition."
+        },
+        {
+          "id": "D",
+          "text": "as a command."
+        }
+      ],
+      "answer": "A",
+      "explanation": "这些 -ing 形式强化后面形容词的程度，如热气腾腾、刺骨寒冷，起强调作用。"
+    },
+    {
+      "id": "MT37-04",
+      "type": "single-choice",
+      "question": "Michelle is said ______ some progress in her scientific research in the past year.",
+      "options": [
+        {
+          "id": "A",
+          "text": "to have made"
+        },
+        {
+          "id": "B",
+          "text": "to make"
+        },
+        {
+          "id": "C",
+          "text": "making"
+        },
+        {
+          "id": "D",
+          "text": "having made"
+        }
+      ],
+      "answer": "A",
+      "explanation": "is said 后接不定式；进步发生在此前一年，用完成式 to have made。"
+    },
+    {
+      "id": "MT37-07",
+      "type": "single-choice",
+      "question": "When ______, the bridge connecting the island to the continent will be open to traffic next year.",
+      "options": [
+        {
+          "id": "A",
+          "text": "completed"
+        },
+        {
+          "id": "B",
+          "text": "completing"
+        },
+        {
+          "id": "C",
+          "text": "being completed"
+        },
+        {
+          "id": "D",
+          "text": "to be completed"
+        }
+      ],
+      "answer": "A",
+      "explanation": "When completed 相当于 When the bridge is completed；桥被完工后开放，用过去分词。"
+    },
+    {
+      "id": "MT37-08",
+      "type": "single-choice",
+      "question": "______ these objections, we can not ignore the advantages of learning through the Internet.",
+      "options": [
+        {
+          "id": "A",
+          "text": "Despite"
+        },
+        {
+          "id": "B",
+          "text": "Instead of"
+        },
+        {
+          "id": "C",
+          "text": "For"
+        },
+        {
+          "id": "D",
+          "text": "Like"
+        }
+      ],
+      "answer": "A",
+      "explanation": "despite 直接接名词表示尽管，与仍不能忽视优势形成让步关系。"
+    },
+    {
+      "id": "MT37-09",
+      "type": "single-choice",
+      "question": "Mom enjoyed herself so much ______ she was on vacation in France with dad last year.",
+      "options": [
+        {
+          "id": "A",
+          "text": "where"
+        },
+        {
+          "id": "B",
+          "text": "that"
+        },
+        {
+          "id": "C",
+          "text": "which"
+        },
+        {
+          "id": "D",
+          "text": "when"
+        }
+      ],
+      "answer": "D",
+      "explanation": "去掉 so much，主干仍是“度假时玩得很开心”，故 when 表时间。was on vacation 不是“开心”造成的结果，不能看到 so 就机械选 that。"
+    },
+    {
+      "id": "MT38-01",
+      "type": "single-choice",
+      "question": "\"The Prime Minister is to speak on television tonight.\" The simple present tense in the sentence is used to introduce ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "an official arrangement"
+        },
+        {
+          "id": "B",
+          "text": "an order"
+        },
+        {
+          "id": "C",
+          "text": "an assumption"
+        },
+        {
+          "id": "D",
+          "text": "an urgent appointment"
+        }
+      ],
+      "answer": "A",
+      "explanation": "be to do 在此表示正式安排，tonight 指总理已安排的电视讲话。"
+    },
+    {
+      "id": "MT38-02",
+      "type": "single-choice",
+      "question": "What a pity! If only they ______ here now, we would be able to celebrate their wedding anniversary.",
+      "options": [
+        {
+          "id": "A",
+          "text": "are"
+        },
+        {
+          "id": "B",
+          "text": "were"
+        },
+        {
+          "id": "C",
+          "text": "have been"
+        },
+        {
+          "id": "D",
+          "text": "had been"
+        }
+      ],
+      "answer": "B",
+      "explanation": "now 决定是假设现在，用 were。had been 用于对过去的愿望；if only“要是……就好了”与 only if“只有……才”意义不同。"
+    },
+    {
+      "id": "MT38-03",
+      "type": "single-choice",
+      "question": "Among the four sentences below, Sentence ______ expresses the highest degree of possibility.",
+      "options": [
+        {
+          "id": "A",
+          "text": "It could rain tomorrow."
+        },
+        {
+          "id": "B",
+          "text": "It may rain tomorrow."
+        },
+        {
+          "id": "C",
+          "text": "It will rain tomorrow."
+        },
+        {
+          "id": "D",
+          "text": "It should rain tomorrow."
+        }
+      ],
+      "answer": "C",
+      "explanation": "will 在此作肯定的将来预测，确定程度高于 could、may 的可能性及 should 的预期。"
+    },
+    {
+      "id": "MT38-04",
+      "type": "single-choice",
+      "question": "There ______ be any difficulty in passing the road test since you have practiced a lot in the driving school.",
+      "options": [
+        {
+          "id": "A",
+          "text": "mustn't"
+        },
+        {
+          "id": "B",
+          "text": "needn't"
+        },
+        {
+          "id": "C",
+          "text": "shall not"
+        },
+        {
+          "id": "D",
+          "text": "shouldn't"
+        }
+      ],
+      "answer": "D",
+      "explanation": "shouldn't 在此表示按已有练习情况预计不会有困难；mustn't 表禁止，needn't 表不必。"
+    },
+    {
+      "id": "MT38-05",
+      "type": "single-choice",
+      "question": "______, he sometimes can not stand the way she solves problems.",
+      "options": [
+        {
+          "id": "A",
+          "text": "Although much he likes her"
+        },
+        {
+          "id": "B",
+          "text": "Much although he likes her"
+        },
+        {
+          "id": "C",
+          "text": "As he likes her much"
+        },
+        {
+          "id": "D",
+          "text": "Much as he likes her"
+        }
+      ],
+      "answer": "D",
+      "explanation": "Much as… 是让步结构，意为尽管很喜欢她；程度副词 much 前置。"
+    },
+    {
+      "id": "MT38-06",
+      "type": "single-choice",
+      "question": "Which of the following sentences is INCORRECT?",
+      "options": [
+        {
+          "id": "A",
+          "text": "His family is well known in this country."
+        },
+        {
+          "id": "B",
+          "text": "The public were not allowed to hear the trial."
+        },
+        {
+          "id": "C",
+          "text": "Poultry is expensive at this time of year."
+        },
+        {
+          "id": "D",
+          "text": "Physics include mechanics, heat, light, etc."
+        }
+      ],
+      "answer": "D",
+      "explanation": "physics 表示物理学时作单数学科名词，谓语应为 includes；其余集体名词的用法可成立。"
+    },
+    {
+      "id": "MT38-07",
+      "type": "single-choice",
+      "question": "Which of the following sentences is a COMMAND?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Good old Mike!"
+        },
+        {
+          "id": "B",
+          "text": "Try that again."
+        },
+        {
+          "id": "C",
+          "text": "Have a good night."
+        },
+        {
+          "id": "D",
+          "text": "Beg your forgiveness."
+        }
+      ],
+      "answer": "B",
+      "explanation": "Try that again. 要求再次尝试，是祈使命令；其余分别表达称赞、祝愿或请求原谅。"
+    },
+    {
+      "id": "MT38-09",
+      "type": "single-choice",
+      "question": "______ with last year, the output of the factory this year has increased by twenty percent.",
+      "options": [
+        {
+          "id": "A",
+          "text": "Comparing"
+        },
+        {
+          "id": "B",
+          "text": "Compared"
+        },
+        {
+          "id": "C",
+          "text": "Having compared"
+        },
+        {
+          "id": "D",
+          "text": "To compare"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Compared with… 表示与……相比；被比较的是产量，用过去分词。"
+    },
+    {
+      "id": "MT39-01",
+      "type": "single-choice",
+      "question": "What is the function of the past perfect tense in \"When he came in, I had waited for two hours\"?",
+      "options": [
+        {
+          "id": "A",
+          "text": "To indicate an unreal situation."
+        },
+        {
+          "id": "B",
+          "text": "To show a sequence of events in the past."
+        },
+        {
+          "id": "C",
+          "text": "To express a wish or regret."
+        },
+        {
+          "id": "D",
+          "text": "To emphasize a repeated action."
+        }
+      ],
+      "answer": "B",
+      "explanation": "had waited 表示在 came in 这一过去时点之前已经等待了两小时，标示过去事件的先后。"
+    },
+    {
+      "id": "MT39-03",
+      "type": "single-choice",
+      "question": "“The next day John went with me to the station, where I bought a ticket for London.” The relative clause in the sentence serves to ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "describe the antecedent “the station”"
+        },
+        {
+          "id": "B",
+          "text": "supply additional information about the station"
+        },
+        {
+          "id": "C",
+          "text": "narrate a subsequent event"
+        },
+        {
+          "id": "D",
+          "text": "put restrictions on the identity of John"
+        }
+      ],
+      "answer": "C",
+      "explanation": "where I bought… 形式上是非限制性定语从句，语用上推进叙事：到车站后买票，近似 and there I bought…。题目问功能，不只是问从句名称。"
+    },
+    {
+      "id": "MT39-04",
+      "type": "single-choice",
+      "question": "You can never imagine what great trouble I have had ______ the customer to withdraw a claim.",
+      "options": [
+        {
+          "id": "A",
+          "text": "persuade"
+        },
+        {
+          "id": "B",
+          "text": "to persuade"
+        },
+        {
+          "id": "C",
+          "text": "persuading"
+        },
+        {
+          "id": "D",
+          "text": "persuaded"
+        }
+      ],
+      "answer": "C",
+      "explanation": "还原：I have had great trouble (in) persuading the customer…。had 在这里是 have trouble 的完成时，不是使役 have sb do；先识别 have trouble doing。"
+    },
+    {
+      "id": "MT39-05",
+      "type": "single-choice",
+      "question": "At a rough estimate, Nigeria is ______ Great Britain.",
+      "options": [
+        {
+          "id": "A",
+          "text": "three times the size as"
+        },
+        {
+          "id": "B",
+          "text": "the size three times of"
+        },
+        {
+          "id": "C",
+          "text": "three times as the size of"
+        },
+        {
+          "id": "D",
+          "text": "three times the size of"
+        }
+      ],
+      "answer": "D",
+      "explanation": "倍数表达为 three times + the size + of，表示面积是另一方的三倍。"
+    },
+    {
+      "id": "MT39-07",
+      "type": "single-choice",
+      "question": "Which of the italicized parts functions as an attribute?",
+      "options": [
+        {
+          "id": "A",
+          "text": "He had his leg <i>broken</i> when playing football."
+        },
+        {
+          "id": "B",
+          "text": "The boy was caught <i>stealing</i>."
+        },
+        {
+          "id": "C",
+          "text": "Henry is standing <i>at the front door</i>."
+        },
+        {
+          "id": "D",
+          "text": "Everybody <i>involved</i> should stay here."
+        }
+      ],
+      "answer": "D",
+      "explanation": "involved 后置修饰 Everybody，作定语；A、B 为补足语，C 表地点。"
+    },
+    {
+      "id": "MT39-08",
+      "type": "single-choice",
+      "question": "This poor country has earthquakes in some areas, and ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "while other famines"
+        },
+        {
+          "id": "B",
+          "text": "famines in others"
+        },
+        {
+          "id": "C",
+          "text": "famines are others"
+        },
+        {
+          "id": "D",
+          "text": "others in famine"
+        }
+      ],
+      "answer": "B",
+      "explanation": "and 连接 has 的两组宾语：earthquakes in some areas 与 famines in others；others 指其他地区。"
+    },
+    {
+      "id": "MT39-09",
+      "type": "single-choice",
+      "question": "—Have you returned from Japan yet? —Yes, but I ______ at home for only four days before my company sent me to Australia.",
+      "options": [
+        {
+          "id": "A",
+          "text": "was"
+        },
+        {
+          "id": "B",
+          "text": "have been"
+        },
+        {
+          "id": "C",
+          "text": "will be"
+        },
+        {
+          "id": "D",
+          "text": "would be"
+        }
+      ],
+      "answer": "A",
+      "explanation": "sent 把“在家待四天”限定为过去结束的时段，用 was。for + 时间长度也能搭配一般过去时，不能看到 for 就自动选现在完成时。"
+    },
+    {
+      "id": "MT39-10",
+      "type": "single-choice",
+      "question": "______ we are not asked to fill the readers' feedback, we have no need to do it.",
+      "options": [
+        {
+          "id": "A",
+          "text": "So that"
+        },
+        {
+          "id": "B",
+          "text": "At that"
+        },
+        {
+          "id": "C",
+          "text": "Since that"
+        },
+        {
+          "id": "D",
+          "text": "Now that"
+        }
+      ],
+      "answer": "D",
+      "explanation": "now that 表既然、由于，引出不必填写反馈的原因；since 作连词时不与 that 连用。"
+    },
+    {
+      "id": "MT40-01",
+      "type": "single-choice",
+      "question": "They thought her unpractical, which she was not. The relative clause in this sentence ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "explains a reason"
+        },
+        {
+          "id": "B",
+          "text": "clarifies a misconception"
+        },
+        {
+          "id": "C",
+          "text": "implies a change in attitudes"
+        },
+        {
+          "id": "D",
+          "text": "restrict the antecedent “her”"
+        }
+      ],
+      "answer": "B",
+      "explanation": "think her unpractical = 认为她不切实际；which 对应前面的表语 unpractical，which she was not 意为“她其实并非如此”，用来澄清误解。不是解释原因，也不是限制 her 指谁。"
+    },
+    {
+      "id": "MT40-02",
+      "type": "single-choice",
+      "question": "Our teacher recommended that we ______ as attentive as possible when we visit the museum.",
+      "options": [
+        {
+          "id": "A",
+          "text": "are"
+        },
+        {
+          "id": "B",
+          "text": "shall be"
+        },
+        {
+          "id": "C",
+          "text": "be"
+        },
+        {
+          "id": "D",
+          "text": "were"
+        }
+      ],
+      "answer": "C",
+      "explanation": "recommend 表建议，宾语从句用 (should) + 动词原形：we (should) be…。外层 recommended 是过去式，也不能把表示建议的 be 改成 were；shall be 不是这里的虚拟形式。"
+    },
+    {
+      "id": "MT40-05",
+      "type": "single-choice",
+      "question": "He hardly had time to finish the sound-recording ______ he turned off the radio.",
+      "options": [
+        {
+          "id": "A",
+          "text": "when"
+        },
+        {
+          "id": "B",
+          "text": "than"
+        },
+        {
+          "id": "C",
+          "text": "until"
+        },
+        {
+          "id": "D",
+          "text": "as"
+        }
+      ],
+      "answer": "A",
+      "explanation": "hardly…when… = 刚……就……；与 no sooner…than… 分开记。此处 hardly 不在句首，不需倒装。若改成 Hardly had he…，才需部分倒装。"
+    },
+    {
+      "id": "MT40-06",
+      "type": "single-choice",
+      "question": "Which of the following sentences is INCORRECT?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The strike may last another three days."
+        },
+        {
+          "id": "B",
+          "text": "I’m going camping with other two little boys."
+        },
+        {
+          "id": "C",
+          "text": "She has got five more electric fans."
+        },
+        {
+          "id": "D",
+          "text": "You must both come over some evening."
+        }
+      ],
+      "answer": "B",
+      "explanation": "B 应为 two other little boys。another three days = 另外三天；two other boys = 另外两个男孩；five more fans = 再多五台。both 放在情态动词 must 后、主要动词 come 前，D 正确。"
+    },
+    {
+      "id": "MT40-07",
+      "type": "single-choice",
+      "question": "It is a fine day today. Let's go to the park for boating, ______?",
+      "options": [
+        {
+          "id": "A",
+          "text": "will you"
+        },
+        {
+          "id": "B",
+          "text": "shall we"
+        },
+        {
+          "id": "C",
+          "text": "do you"
+        },
+        {
+          "id": "D",
+          "text": "do we"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Let's… 提出共同活动的建议，反意疑问通常用 shall we?。"
+    },
+    {
+      "id": "MT40-08",
+      "type": "single-choice",
+      "question": "The simple future tense in “'You will stay here till you are relieved,' said the officer.” is used to indicate ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "an order"
+        },
+        {
+          "id": "B",
+          "text": "future time"
+        },
+        {
+          "id": "C",
+          "text": "a wish"
+        },
+        {
+          "id": "D",
+          "text": "a hypothesis"
+        }
+      ],
+      "answer": "A",
+      "explanation": "军官说 You will stay here…，是命令“你必须留在这里，直到有人接替”。will 在权威口吻中可表达命令，不能一看到 will 就只选 future time。relieve 此处指换岗、接替。"
+    },
+    {
+      "id": "MT40-10",
+      "type": "single-choice",
+      "question": "It was impossible for you to avoid ______ if you both work in the same office.",
+      "options": [
+        {
+          "id": "A",
+          "text": "from being affected"
+        },
+        {
+          "id": "B",
+          "text": "being affected"
+        },
+        {
+          "id": "C",
+          "text": "affecting"
+        },
+        {
+          "id": "D",
+          "text": "to be affected"
+        }
+      ],
+      "answer": "B",
+      "explanation": "avoid 后接动名词，you 是受影响的一方，用 being affected；不接 from 或不定式。"
+    },
+    {
+      "id": "MT41-01",
+      "type": "single-choice",
+      "question": "A heavy stone fell on the man, who was killed on the spot. The relative clause in this sentence ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "supplies additional information about the stone"
+        },
+        {
+          "id": "B",
+          "text": "implies the reason for the event"
+        },
+        {
+          "id": "C",
+          "text": "puts restrictions on the identity of the man"
+        },
+        {
+          "id": "D",
+          "text": "indicates the outcome of the event"
+        }
+      ],
+      "answer": "D",
+      "explanation": "who was killed on the spot 说明石头砸中男子的结果：他当场死亡。"
+    },
+    {
+      "id": "MT41-03",
+      "type": "single-choice",
+      "question": "Which of the following sentences is INCORRECT?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Fire and water do not agree."
+        },
+        {
+          "id": "B",
+          "text": "Each minute and each second are valuable."
+        },
+        {
+          "id": "C",
+          "text": "Bread and butter is a nutritious food for patients."
+        },
+        {
+          "id": "D",
+          "text": "The scholar and poet is dead."
+        }
+      ],
+      "answer": "B",
+      "explanation": "each A and each B 强调每一个，用单数 is。C 的 bread and butter 作为一种整体食物；D 单个 the 表示同一位兼具学者与诗人身份的人，均可接 is。不是“两个不可数名词用 and 就单数”。"
+    },
+    {
+      "id": "MT41-04",
+      "type": "single-choice",
+      "question": "Who ______ was going to visit our company this afternoon?",
+      "options": [
+        {
+          "id": "A",
+          "text": "did you say that"
+        },
+        {
+          "id": "B",
+          "text": "you did say"
+        },
+        {
+          "id": "C",
+          "text": "you said"
+        },
+        {
+          "id": "D",
+          "text": "did you say"
+        }
+      ],
+      "answer": "D",
+      "explanation": "结构是 Who did you say was going to…? 主句 did you say 倒装，后面的主语疑问内容保留 was going to。此处 who 已被提到句首，不再用 that 阻隔这一主语位置的关联。"
+    },
+    {
+      "id": "MT41-05",
+      "type": "single-choice",
+      "question": "England is justly proud of ______ great poets, especially ______ in the 18th century.",
+      "options": [
+        {
+          "id": "A",
+          "text": "his; they"
+        },
+        {
+          "id": "B",
+          "text": "its; that"
+        },
+        {
+          "id": "C",
+          "text": "her; that"
+        },
+        {
+          "id": "D",
+          "text": "its; those"
+        }
+      ],
+      "answer": "D",
+      "explanation": "its 表示英格兰的，those 代指复数 great poets；that 不能指代复数诗人。"
+    },
+    {
+      "id": "MT41-06",
+      "type": "single-choice",
+      "question": "Which of the following sentences is INCORRECT?",
+      "options": [
+        {
+          "id": "A",
+          "text": "We each has our own view on marriage."
+        },
+        {
+          "id": "B",
+          "text": "Not you but your father is to blame."
+        },
+        {
+          "id": "C",
+          "text": "There is a pen and some books on the desk."
+        },
+        {
+          "id": "D",
+          "text": "His family are waiting for him."
+        }
+      ],
+      "answer": "A",
+      "explanation": "A 的主语是复数 We，each 为同位性成分，谓语应为 have；B、C 按邻近主语一致，D 指家庭成员。"
+    },
+    {
+      "id": "MT41-07",
+      "type": "single-choice",
+      "question": "Everyone has got a chance to give a speech, ______?",
+      "options": [
+        {
+          "id": "A",
+          "text": "hasn't it"
+        },
+        {
+          "id": "B",
+          "text": "didn't he"
+        },
+        {
+          "id": "C",
+          "text": "haven't they"
+        },
+        {
+          "id": "D",
+          "text": "won't he"
+        }
+      ],
+      "answer": "C",
+      "explanation": "Everyone 可用 they 承接；主句为现在完成时肯定句，反意疑问用 haven't they。"
+    },
+    {
+      "id": "MT42-01",
+      "type": "single-choice",
+      "question": "Which of the following sentences expresses SURPRISE?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Should it rain tomorrow, I wouldn’t go."
+        },
+        {
+          "id": "B",
+          "text": "I don’t know why you should think that I did it."
+        },
+        {
+          "id": "C",
+          "text": "I should say that it would be better to try it again."
+        },
+        {
+          "id": "D",
+          "text": "You should inform the receptionist of your arrival."
+        }
+      ],
+      "answer": "B",
+      "explanation": "B：“你怎么竟会觉得是我做的？”A 为 should 条件倒装；C 为委婉提出看法；D 为建议或义务。要从语境识别 should，不要只背一个中文义。"
+    },
+    {
+      "id": "MT42-02",
+      "type": "single-choice",
+      "question": "If only the victims in the car accident ______ immediate treatment, they might still be alive now.",
+      "options": [
+        {
+          "id": "A",
+          "text": "should receive"
+        },
+        {
+          "id": "B",
+          "text": "had received"
+        },
+        {
+          "id": "C",
+          "text": "were receiving"
+        },
+        {
+          "id": "D",
+          "text": "received"
+        }
+      ],
+      "answer": "B",
+      "explanation": "过去没得到及时治疗，用 had received；结果却指向现在 alive now，主句为 might be，而非 might have been。过去原因 + 现在结果，是混合条件。"
+    },
+    {
+      "id": "MT42-03",
+      "type": "single-choice",
+      "question": "Which of the following sentences is INCORRECT?",
+      "options": [
+        {
+          "id": "A",
+          "text": "We each have our private views about it."
+        },
+        {
+          "id": "B",
+          "text": "They got two pieces of paper each."
+        },
+        {
+          "id": "C",
+          "text": "The apples are fifty cents each."
+        },
+        {
+          "id": "D",
+          "text": "Each they have bought the same blouse."
+        }
+      ],
+      "answer": "D",
+      "explanation": "each 不能直接放在人称代词 they 前；应为 They each… 或 Each of them…。"
+    },
+    {
+      "id": "MT42-04",
+      "type": "single-choice",
+      "question": "The situation is rather complicated ______ we have two managing directors.",
+      "options": [
+        {
+          "id": "A",
+          "text": "since that"
+        },
+        {
+          "id": "B",
+          "text": "in that"
+        },
+        {
+          "id": "C",
+          "text": "at that"
+        },
+        {
+          "id": "D",
+          "text": "so that"
+        }
+      ],
+      "answer": "B",
+      "explanation": "in that = because / in the sense that，意为“原因在于、在……方面”。so that 通常表目的或结果；不能把 since 与 that 随意拼成 since that。"
+    },
+    {
+      "id": "MT42-05",
+      "type": "single-choice",
+      "question": "______ a dark cloud cannot long hide the sun, ______ no lies can cover up the fact.",
+      "options": [
+        {
+          "id": "A",
+          "text": "As; as"
+        },
+        {
+          "id": "B",
+          "text": "So; so"
+        },
+        {
+          "id": "C",
+          "text": "So; as"
+        },
+        {
+          "id": "D",
+          "text": "As; so"
+        }
+      ],
+      "answer": "D",
+      "explanation": "(Just) as…so… = 正如……，……也同样如此。不是 as…as 的程度比较；两个完整分句之间建立类比关系。"
+    },
+    {
+      "id": "MT42-06",
+      "type": "single-choice",
+      "question": "Which of the following sentences is INCORRECT?",
+      "options": [
+        {
+          "id": "A",
+          "text": "I have read all the books that you gave to me."
+        },
+        {
+          "id": "B",
+          "text": "This is the last time that I will say these words."
+        },
+        {
+          "id": "C",
+          "text": "He has reached the point where a change is needed."
+        },
+        {
+          "id": "D",
+          "text": "I really miss the time when I spent with you."
+        }
+      ],
+      "answer": "D",
+      "explanation": "D 中 spent 缺宾语，关系词应为 that/which 或省略；when 只能作时间状语。"
+    },
+    {
+      "id": "MT42-07",
+      "type": "single-choice",
+      "question": "He believes in private ownership, which idea we are quite opposed to. The relative clause in this sentence is used to ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "play devil's advocate in the discussion"
+        },
+        {
+          "id": "B",
+          "text": "compare different opinions carefully"
+        },
+        {
+          "id": "C",
+          "text": "show the speaker has an innovative view"
+        },
+        {
+          "id": "D",
+          "text": "express the speaker's stance about the idea"
+        }
+      ],
+      "answer": "D",
+      "explanation": "which idea 指前面的私有制观念，we are quite opposed to 表明说话者反对的立场。"
+    },
+    {
+      "id": "MT42-08",
+      "type": "single-choice",
+      "question": "Which of the following sentences is INCORRECT?",
+      "options": [
+        {
+          "id": "A",
+          "text": "He earns twice as much as he used to."
+        },
+        {
+          "id": "B",
+          "text": "The width of this new road is two times that of the old one."
+        },
+        {
+          "id": "C",
+          "text": "This book is four times more expensive than that one."
+        },
+        {
+          "id": "D",
+          "text": "The new square is four times size that of the previous one."
+        }
+      ],
+      "answer": "D",
+      "explanation": "D 的倍数结构错误，应为 four times the size of…；A、B 结构成立，C 是教材常见比较级倍数表达。"
+    },
+    {
+      "id": "MT42-10",
+      "type": "single-choice",
+      "question": "So sudden ______ that people in the building had no time to escape.",
+      "options": [
+        {
+          "id": "A",
+          "text": "the attack was"
+        },
+        {
+          "id": "B",
+          "text": "the attack did"
+        },
+        {
+          "id": "C",
+          "text": "was the attack"
+        },
+        {
+          "id": "D",
+          "text": "did the attack"
+        }
+      ],
+      "answer": "C",
+      "explanation": "so + 形容词位于句首时，系动词 be 与主语倒装：So sudden was the attack that…。"
+    },
+    {
+      "id": "MT43-02",
+      "type": "single-choice",
+      "question": "The present perfect in \"I've been there already and don't want to go there again\" is used to ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "explain an unintended consequence"
+        },
+        {
+          "id": "B",
+          "text": "indicate a sequential action"
+        },
+        {
+          "id": "C",
+          "text": "provide a reason for the decision"
+        },
+        {
+          "id": "D",
+          "text": "to emphasize a fact known to both"
+        }
+      ],
+      "answer": "C",
+      "explanation": "现在完成时说明已有的经历，并为现在不想再去的决定提供理由。"
+    },
+    {
+      "id": "MT43-03",
+      "type": "single-choice",
+      "question": "______ is announced in the papers, our country has launched a largescale movement against smuggling and fraudulent activities in foreign currency exchange deals.",
+      "options": [
+        {
+          "id": "A",
+          "text": "What"
+        },
+        {
+          "id": "B",
+          "text": "As"
+        },
+        {
+          "id": "C",
+          "text": "Which"
+        },
+        {
+          "id": "D",
+          "text": "That"
+        }
+      ],
+      "answer": "B",
+      "explanation": "As is announced… 为前置的非限制性定语从句，as 指后面整个分句；what、that 不能构成此结构。"
+    },
+    {
+      "id": "MT43-05",
+      "type": "single-choice",
+      "question": "______ you ______ any doubt on the delivery receipt, contact us at 4008 9666.",
+      "options": [
+        {
+          "id": "A",
+          "text": "Should; have"
+        },
+        {
+          "id": "B",
+          "text": "In case; had"
+        },
+        {
+          "id": "C",
+          "text": "If; had"
+        },
+        {
+          "id": "D",
+          "text": "Have; had"
+        }
+      ],
+      "answer": "A",
+      "explanation": "Should you have… = If you should have…，“万一有疑问，请联系”。这是将来可能条件，可直接接祈使主句，不要求主句也用 would。"
+    },
+    {
+      "id": "MT43-06",
+      "type": "single-choice",
+      "question": "The sentence that expresses REQUEST is ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "Just do it right now."
+        },
+        {
+          "id": "B",
+          "text": "Take it easy. It'll be OK."
+        },
+        {
+          "id": "C",
+          "text": "Please pass me the paper."
+        },
+        {
+          "id": "D",
+          "text": "Welcome to the plaza."
+        }
+      ],
+      "answer": "C",
+      "explanation": "C 的 Please 引出礼貌请求；A 命令，B 安慰，D 欢迎。"
+    },
+    {
+      "id": "MT43-07",
+      "type": "single-choice",
+      "question": "I believe watching TV is ______ listening to radio.",
+      "options": [
+        {
+          "id": "A",
+          "text": "so good or better than"
+        },
+        {
+          "id": "B",
+          "text": "like good or better than"
+        },
+        {
+          "id": "C",
+          "text": "as good as or better than"
+        },
+        {
+          "id": "D",
+          "text": "as good as or better"
+        }
+      ],
+      "answer": "C",
+      "explanation": "并列的是 as good as 与 better than，两个结构都要保留各自搭配：as good as or better than…。不能只留最后一个连接词凑成一组。"
+    },
+    {
+      "id": "MT43-08",
+      "type": "single-choice",
+      "question": "Which of the following sentences is INCORRECT?",
+      "options": [
+        {
+          "id": "A",
+          "text": "She spends lots of money on makeup each year."
+        },
+        {
+          "id": "B",
+          "text": "He always has a great amount of work to do."
+        },
+        {
+          "id": "C",
+          "text": "Tom bought a few furniture for his new house."
+        },
+        {
+          "id": "D",
+          "text": "A great quantity of flowers were placed in the hall."
+        }
+      ],
+      "answer": "C",
+      "explanation": "furniture 是不可数名词，不能由 a few 修饰；可说 some furniture 或 a few pieces of furniture。"
+    },
+    {
+      "id": "MT43-09",
+      "type": "single-choice",
+      "question": "—Do you know Jim has broken up with his wife? —I don't know, ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "I don't care neither"
+        },
+        {
+          "id": "B",
+          "text": "nor do I care"
+        },
+        {
+          "id": "C",
+          "text": "nor don't I care"
+        },
+        {
+          "id": "D",
+          "text": "I don't care also"
+        }
+      ],
+      "answer": "B",
+      "explanation": "nor 表示也不，引起部分倒装：nor do I care；不再重复否定 don't。"
+    },
+    {
+      "id": "MT44-01",
+      "type": "single-choice",
+      "question": "He invested his money in many companies, three of which went bankrupt within five months. The relative clause in this sentence is used to ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "indicate a low degree of possibility"
+        },
+        {
+          "id": "B",
+          "text": "express a goal difficult to achieve"
+        },
+        {
+          "id": "C",
+          "text": "reveal an undesirable consequence"
+        },
+        {
+          "id": "D",
+          "text": "overstate the bad result of the case"
+        }
+      ],
+      "answer": "C",
+      "explanation": "three of which went bankrupt 交代投资后的不利结果；没有表示可能性、目的或夸张。"
+    },
+    {
+      "id": "MT44-02",
+      "type": "single-choice",
+      "question": "If given ______ hours, Jack surely can have all the tasks done.",
+      "options": [
+        {
+          "id": "A",
+          "text": "other two"
+        },
+        {
+          "id": "B",
+          "text": "the other"
+        },
+        {
+          "id": "C",
+          "text": "another two"
+        },
+        {
+          "id": "D",
+          "text": "the more"
+        }
+      ],
+      "answer": "C",
+      "explanation": "another two hours 表示再给两小时；another 可放在数词和复数名词前。"
+    },
+    {
+      "id": "MT44-03",
+      "type": "single-choice",
+      "question": "An actor cannot well play the role without life experience ______ a dancer can make a difference without much practice.",
+      "options": [
+        {
+          "id": "A",
+          "text": "no less than"
+        },
+        {
+          "id": "B",
+          "text": "no more than"
+        },
+        {
+          "id": "C",
+          "text": "any more than"
+        },
+        {
+          "id": "D",
+          "text": "much more than"
+        }
+      ],
+      "answer": "C",
+      "explanation": "not/cannot A any more than B = 正如 B 不能一样，A 也不能。前面已经有 cannot，后面用 any more than；不是再添一个 no more than。两项都是说缺少积累就无法成功。"
+    },
+    {
+      "id": "MT44-04",
+      "type": "single-choice",
+      "question": "It is said that more than one organization ______ in this well-known criminal case.",
+      "options": [
+        {
+          "id": "A",
+          "text": "involved"
+        },
+        {
+          "id": "B",
+          "text": "to be involved"
+        },
+        {
+          "id": "C",
+          "text": "were involved"
+        },
+        {
+          "id": "D",
+          "text": "was involved"
+        }
+      ],
+      "answer": "D",
+      "explanation": "more than one + 单数名词，意义不止一个，语法上通常仍接单数谓语；be involved in 涉及、卷入。不是按中文“不止一个组织”就选 were。"
+    },
+    {
+      "id": "MT44-06",
+      "type": "single-choice",
+      "question": "We are rejoiced that you <i>should have achieved</i> such great successes in your work. The italicized verb phrase is used to express ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "deep appreciation"
+        },
+        {
+          "id": "B",
+          "text": "a sense of surprise"
+        },
+        {
+          "id": "C",
+          "text": "an expected consequence"
+        },
+        {
+          "id": "D",
+          "text": "a wild ambition"
+        }
+      ],
+      "answer": "B",
+      "explanation": "情绪类 should have achieved 表“竟已取得”，成就实际上发生了，并非“本应取得但没有”。have done 只说明事情先已完成；与后悔义 should have done 要按语境区分。"
+    },
+    {
+      "id": "MT44-07",
+      "type": "single-choice",
+      "question": "Time ______, both my parents will attend his wedding ceremony.",
+      "options": [
+        {
+          "id": "A",
+          "text": "permit"
+        },
+        {
+          "id": "B",
+          "text": "permits"
+        },
+        {
+          "id": "C",
+          "text": "permitted"
+        },
+        {
+          "id": "D",
+          "text": "permitting"
+        }
+      ],
+      "answer": "D",
+      "explanation": "Time permitting 是独立主格，相当于 If time permits；time 与 permit 为主动关系。"
+    },
+    {
+      "id": "MT44-08",
+      "type": "single-choice",
+      "question": "How can I ever complete it if you ______ continually ______ me so many silly questions?",
+      "options": [
+        {
+          "id": "A",
+          "text": "have; asked"
+        },
+        {
+          "id": "B",
+          "text": "were; asking"
+        },
+        {
+          "id": "C",
+          "text": "had; asked"
+        },
+        {
+          "id": "D",
+          "text": "are; asking"
+        }
+      ],
+      "answer": "D",
+      "explanation": "are continually asking 表示当下不断提问，进行时与 continually 连用可表达不满。"
+    },
+    {
+      "id": "MT44-09",
+      "type": "single-choice",
+      "question": "A: Are you going to see a film? B: I'm not sure. I ______ go fishing instead.",
+      "options": [
+        {
+          "id": "A",
+          "text": "must"
+        },
+        {
+          "id": "B",
+          "text": "would"
+        },
+        {
+          "id": "C",
+          "text": "might"
+        },
+        {
+          "id": "D",
+          "text": "should"
+        }
+      ],
+      "answer": "C",
+      "explanation": "I'm not sure 表明尚未决定，might 表示可能改去钓鱼。"
+    },
+    {
+      "id": "MT44-10",
+      "type": "single-choice",
+      "question": "Every means ______ tried out but none works. I have run out of my patience.",
+      "options": [
+        {
+          "id": "A",
+          "text": "is"
+        },
+        {
+          "id": "B",
+          "text": "are"
+        },
+        {
+          "id": "C",
+          "text": "has been"
+        },
+        {
+          "id": "D",
+          "text": "have been"
+        }
+      ],
+      "answer": "C",
+      "explanation": "means 单复数同形；Every means 按单数，用 has。run out of patience 与“试过仍不奏效”的结果对应，选完成时被动 has been tried out。"
+    },
+    {
+      "id": "MT45-01",
+      "type": "single-choice",
+      "question": "Which of the following sentences is INCORRECT?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Both his parents agree to buy a new car."
+        },
+        {
+          "id": "B",
+          "text": "He has cleaned all these dirty shoes."
+        },
+        {
+          "id": "C",
+          "text": "He is so thirsty that he drinks much the water."
+        },
+        {
+          "id": "D",
+          "text": "She writes the answers on every other line."
+        }
+      ],
+      "answer": "C",
+      "explanation": "much 不能直接置于 the water 前，应为 much water 或 much of the water；其余限定词用法成立。"
+    },
+    {
+      "id": "MT45-03",
+      "type": "single-choice",
+      "question": "______ for the fact that his father was in hospital, he might have gone abroad.",
+      "options": [
+        {
+          "id": "A",
+          "text": "Hadn’t it been"
+        },
+        {
+          "id": "B",
+          "text": "Had it not been"
+        },
+        {
+          "id": "C",
+          "text": "Were it not"
+        },
+        {
+          "id": "D",
+          "text": "Was it not"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Had it not been for… = If it had not been for…，“要不是……”。might have gone 对过去虚拟，从句用 had been；倒装时 not 通常仍在主语 it 后，不写成 Hadn’t it…。"
+    },
+    {
+      "id": "MT45-04",
+      "type": "single-choice",
+      "question": "Health is ______ counts most.",
+      "options": [
+        {
+          "id": "A",
+          "text": "that"
+        },
+        {
+          "id": "B",
+          "text": "what"
+        },
+        {
+          "id": "C",
+          "text": "which"
+        },
+        {
+          "id": "D",
+          "text": "where"
+        }
+      ],
+      "answer": "B",
+      "explanation": "what 引导表语从句并作 counts 的主语，意为最重要的事情。"
+    },
+    {
+      "id": "MT45-05",
+      "type": "single-choice",
+      "question": "There must be someone else who killed the fish. Lily is ______ girl to do such a thing.",
+      "options": [
+        {
+          "id": "A",
+          "text": "such a timid"
+        },
+        {
+          "id": "B",
+          "text": "too timid a"
+        },
+        {
+          "id": "C",
+          "text": "so timid a"
+        },
+        {
+          "id": "D",
+          "text": "too timid"
+        }
+      ],
+      "answer": "B",
+      "explanation": "too + 形容词 + a/an + 单数名词 + to do = 太……而不能做。too timid a girl“胆子太小的女孩”；C 的 so timid a 可作名词短语，却不能独立表达这里的 too…to 否定结果。"
+    },
+    {
+      "id": "MT45-06",
+      "type": "single-choice",
+      "question": "The thermometer is a useful instrument, by means of which we measure the temperature of different kinds of things. The relative clause in this sentence is used to ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "describe the function of the thermometer"
+        },
+        {
+          "id": "B",
+          "text": "introduce a wide range of uses"
+        },
+        {
+          "id": "C",
+          "text": "tell us how to use the thermometer"
+        },
+        {
+          "id": "D",
+          "text": "reveal the shortcoming of the thermometer"
+        }
+      ],
+      "answer": "A",
+      "explanation": "关系从句说明温度计用于测量温度这一功能，未具体教授操作方法。"
+    },
+    {
+      "id": "MT45-07",
+      "type": "single-choice",
+      "question": "What should I have done <i>in Tom’s place</i>? The italicized part of the sentence expresses ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "sympathy"
+        },
+        {
+          "id": "B",
+          "text": "a precise location"
+        },
+        {
+          "id": "C",
+          "text": "a contradiction"
+        },
+        {
+          "id": "D",
+          "text": "a hypothesis"
+        }
+      ],
+      "answer": "D",
+      "explanation": "in Tom’s place = 假如我是 Tom、处在他的境地，语义上提供隐含条件，因此是 hypothesis。不是具体坐在 Tom 的位置上。"
+    },
+    {
+      "id": "MT45-09",
+      "type": "single-choice",
+      "question": "______ from each other, they get along well and can always find a balance.",
+      "options": [
+        {
+          "id": "A",
+          "text": "Much as they differ"
+        },
+        {
+          "id": "B",
+          "text": "As much they differ"
+        },
+        {
+          "id": "C",
+          "text": "As they much differ"
+        },
+        {
+          "id": "D",
+          "text": "As they differ much"
+        }
+      ],
+      "answer": "A",
+      "explanation": "Much as they differ = Although they differ a lot，“尽管差异很大”。把程度副词 much 前置到 as 前，后面仍是主语 + 谓语；同类有 Old as…、Child as…。"
+    },
+    {
+      "id": "MT45-10",
+      "type": "single-choice",
+      "question": "Which of the following sentences is CORRECT?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Henry is so hungry that he eats all of apples that you give him."
+        },
+        {
+          "id": "B",
+          "text": "Henry is so hungry that he eats the all apples that you give him."
+        },
+        {
+          "id": "C",
+          "text": "Henry is so hungry that he eats whole the apples that you give him."
+        },
+        {
+          "id": "D",
+          "text": "Henry is so hungry that he eats all the apples that you give him."
+        }
+      ],
+      "answer": "D",
+      "explanation": "all the apples 的限定词次序正确；all of 后接带限定词的名词短语，whole 不能这样修饰复数 apples。"
+    }
+  ]
+}

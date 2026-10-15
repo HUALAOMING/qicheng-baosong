@@ -1,0 +1,379 @@
+{
+  "format": "qicheng-resume",
+  "version": 6,
+  "appVersion": "4.0.0-beta.1",
+  "theme": "pudding",
+  "uiLang": "zh",
+  "onboarded": true,
+  "route": "profile",
+  "section": "resume",
+  "step": 0,
+  "orientation": "portrait",
+  "sidebarHidden": false,
+  "menuOpen": [
+    "entry"
+  ],
+  "profile": {
+    "name": "测试同学",
+    "birthday": "测试 出生年月日",
+    "school": "测试 就读中学",
+    "grade": "测试 年级 / 毕业届别",
+    "city": "测试 所在城市",
+    "schoolLanguage": "测试 高中所学语种",
+    "email": "student@example.test",
+    "phone": "13800000000",
+    "targetSchool": "哈尔滨工业大学",
+    "targetMajor": "测试 语言 / 申请专业"
+  },
+  "education": [
+    {
+      "id": "rmv5apjgmtt4yq12",
+      "stage": "小学",
+      "school": "测试学校",
+      "start": "2023-09",
+      "end": "2026-06",
+      "location": "重庆",
+      "detail": "课程与活动"
+    },
+    {
+      "id": "rmv5apjgmimgyxz3",
+      "stage": "初中",
+      "school": "测试学校",
+      "start": "2023-09",
+      "end": "2026-06",
+      "location": "重庆",
+      "detail": "课程与活动"
+    },
+    {
+      "id": "rmv5apjgm06hlr3t",
+      "stage": "高中",
+      "school": "测试学校",
+      "start": "2023-09",
+      "end": "2026-06",
+      "location": "重庆",
+      "detail": "课程与活动"
+    }
+  ],
+  "statement": {
+    "zh": "成长是逐渐承担责任。\n这是第二段。",
+    "en": "Growth means learning to take responsibility.",
+    "strengths": "足球、主持",
+    "hobbies": "摇滚、阅读"
+  },
+  "academics": {
+    "languageLearning": "英语学习与德语兴趣",
+    "certificates": "CET-6"
+  },
+  "awards": [
+    {
+      "id": "rmv5apjgmv47qljm",
+      "title": "奖项 / 荣誉名称 测试",
+      "scope": "校级",
+      "level": "奖项等级与名次 测试",
+      "organizer": "主办 / 颁发单位 测试",
+      "date": "获奖时间 测试",
+      "location": "举办 / 颁发地点 测试",
+      "category": "艺术与体育",
+      "priority": "优先呈现",
+      "note": "补充备注 测试",
+      "reflection": "获奖心得与成长 测试",
+      "photos": []
+    }
+  ],
+  "experiences": [
+    {
+      "id": "rmv5apjgmc6wsnh1",
+      "title": "经历 / 项目名称 测试",
+      "category": "经历类别 测试",
+      "priority": "优先呈现",
+      "role": "担任角色 测试",
+      "date": "起止时间 测试",
+      "location": "地点 / 组织 测试",
+      "action": "具体行动与成果 测试",
+      "reflection": "收获与思考 测试",
+      "note": "补充备注 测试"
+    }
+  ],
+  "practices": [
+    {
+      "id": "practice-record",
+      "title": "经历 / 项目名称 测试",
+      "category": "社会实践",
+      "priority": "优先呈现",
+      "role": "担任角色 测试",
+      "date": "起止时间 测试",
+      "location": "地点 / 组织 测试",
+      "action": "具体行动与成果 测试",
+      "reflection": "收获与思考 测试",
+      "note": "补充备注 测试",
+      "photos": [],
+      "attachments": []
+    }
+  ],
+  "achievements": [
+    {
+      "id": "project-record",
+      "photos": [],
+      "attachments": [],
+      "title": "成果名称 测试",
+      "category": "成果类型 测试",
+      "date": "完成 / 研究时间 测试",
+      "role": "个人角色 测试",
+      "method": "过程与方法 测试",
+      "result": "成果与展示 测试",
+      "reflection": "收获与思考 测试",
+      "note": "补充备注 测试"
+    }
+  ],
+  "exams": [
+    {
+      "id": "rmv5apjgm4ivgt89",
+      "title": "排位考试",
+      "type": "月考",
+      "date": "2026-10-08",
+      "totalScore": "600",
+      "totalFullMark": "750",
+      "rankScope": "年级",
+      "rank": "12",
+      "rankTotal": "82",
+      "note": "",
+      "subjects": [
+        {
+          "id": "rmv5apjgmybev51n",
+          "name": "语文",
+          "score": "120",
+          "fullMark": "150",
+          "rank": "12"
+        },
+        {
+          "id": "rmv5apjgmwlvt50p",
+          "name": "数学",
+          "score": "120",
+          "fullMark": "150",
+          "rank": "12"
+        },
+        {
+          "id": "rmv5apjgm1im0uhy",
+          "name": "外语",
+          "score": "120",
+          "fullMark": "150",
+          "rank": "12"
+        }
+      ]
+    }
+  ],
+  "learning": {
+    "readingNotes": "阅读随记",
+    "plan": "每周阅读",
+    "notes": "保留笔记",
+    "books": [
+      {
+        "id": "rmv5apjgm2dlnq32",
+        "title": "悉达多",
+        "author": "赫尔曼·黑塞",
+        "language": "",
+        "status": "在读",
+        "date": "",
+        "reflection": "关于成长与自我探索。"
+      }
+    ]
+  },
+  "dreamSchools": [
+    "哈尔滨工业大学",
+    "浙江大学"
+  ],
+  "awardDraft": {
+    "id": "rmv5apjgm4vqier5",
+    "title": "",
+    "scope": "",
+    "level": "",
+    "organizer": "",
+    "date": "",
+    "location": "",
+    "category": "语言与表达",
+    "priority": "优先呈现",
+    "note": "",
+    "reflection": "",
+    "photos": []
+  },
+  "experienceDraft": {
+    "id": "rmv5apjgm0rmytut",
+    "title": "",
+    "category": "社团活动",
+    "priority": "优先呈现",
+    "role": "",
+    "date": "",
+    "location": "",
+    "action": "",
+    "reflection": "",
+    "note": ""
+  },
+  "examDraft": {
+    "id": "rmv5apjgmdnff6uf",
+    "title": "",
+    "type": "月考",
+    "date": "",
+    "totalScore": "",
+    "totalFullMark": "",
+    "rankScope": "年级",
+    "rank": "",
+    "rankTotal": "",
+    "note": "",
+    "subjects": [
+      {
+        "id": "rmv5apjgmfhcob00",
+        "name": "语文",
+        "score": "",
+        "fullMark": "",
+        "rank": ""
+      },
+      {
+        "id": "rmv5apjgm7fs72mu",
+        "name": "数学",
+        "score": "",
+        "fullMark": "",
+        "rank": ""
+      },
+      {
+        "id": "rmv5apjgmrba5lzi",
+        "name": "外语",
+        "score": "",
+        "fullMark": "",
+        "rank": ""
+      }
+    ]
+  },
+  "bookDraft": {
+    "id": "rmv5apjgm9whhf8k",
+    "title": "",
+    "author": "",
+    "language": "",
+    "status": "在读",
+    "date": "",
+    "reflection": ""
+  },
+  "practiceDraft": {
+    "id": "rmv5apjgmiachq9f",
+    "title": "",
+    "category": "社会实践",
+    "priority": "优先呈现",
+    "role": "",
+    "date": "",
+    "location": "",
+    "action": "",
+    "reflection": "",
+    "note": "",
+    "photos": [],
+    "attachments": []
+  },
+  "achievementDraft": {
+    "id": "rmv5apjgmvolivfw",
+    "title": "",
+    "category": "研究与实验",
+    "date": "",
+    "role": "",
+    "method": "",
+    "result": "",
+    "reflection": "",
+    "note": "",
+    "photos": [],
+    "attachments": []
+  },
+  "avatar": null,
+  "avatarCrop": {
+    "x": 50,
+    "y": 50,
+    "zoom": 1
+  },
+  "customBlocks": [
+    {
+      "id": "custom-record",
+      "title": "自定义内容",
+      "text": "测试正文",
+      "layout": "stack",
+      "photos": [],
+      "attachments": []
+    }
+  ],
+  "media": [],
+  "versions": [
+    {
+      "id": "rmv5apjgm67rlksk",
+      "name": "我的第一份简历",
+      "purpose": "resume",
+      "filename": "我的第一份简历",
+      "target": "",
+      "order": [
+        "profile",
+        "education",
+        "statement",
+        "academics",
+        "exams",
+        "awards",
+        "experiences",
+        "practices",
+        "strengths",
+        "achievements",
+        "custom",
+        "learning"
+      ],
+      "disabled": [],
+      "excluded": [],
+      "hiddenFields": [],
+      "includedFields": [],
+      "moduleStyles": {
+        "awards": {
+          "titleSize": 14,
+          "titleAlign": "center",
+          "titleBold": true,
+          "subtitleSize": 12,
+          "subtitleAlign": "left",
+          "subtitleBold": true,
+          "labelBold": false
+        }
+      },
+      "titles": {
+        "awards": "我的荣誉"
+      },
+      "summaries": {
+        "awards:rmv5apjgmv47qljm": "补充简历表述"
+      },
+      "breaks": [],
+      "palette": "pudding",
+      "background": "accent",
+      "margin": 18,
+      "fontSize": 11,
+      "lineHeight": 1.55,
+      "gap": 10,
+      "orientation": "portrait",
+      "statementLang": "both",
+      "exportLang": "zh",
+      "photoMode": "none",
+      "photosPerRow": 2,
+      "showAvatar": false,
+      "avatarSize": 30,
+      "avatarShape": "square",
+      "avatarRatioW": 2,
+      "avatarRatioH": 3,
+      "boldLabels": true,
+      "showToc": false,
+      "wordImages": false,
+      "wordBW": true,
+      "pptMode": "editable"
+    }
+  ],
+  "activeVersion": "rmv5apjgm67rlksk",
+  "assets": [],
+  "exportHistory": [],
+  "chartExamIds": [],
+  "chartSelectionSet": false,
+  "chartMetric": "totalScore",
+  "chartSubject": "",
+  "organizeModes": {
+    "awards": "scope",
+    "experiences": "custom",
+    "practices": "custom"
+  },
+  "filePackageName": "我的个人资料",
+  "savedAt": null
+}

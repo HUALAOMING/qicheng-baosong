@@ -19,6 +19,10 @@ import { closeProvince31, updateMap31 } from './modules/map.js';
 import { VERSION, BULB, GEAR, LOGO, MODULES, NAV3, ROUTE22, blankEducation, blankSubject } from './constants.js';
 import { pwa } from './pwa.js';
 import { ctx } from './state.js';
+import { initializeResources, reloadResources, listQuizBanks, getQuotesResource, importResourceJSON, updateResources, validateResourceRecords } from './resources.js';
+import { initializeQuiz, quizPage, getRecentQuiz, validateQuizRecords } from './modules/quiz.js';
+import { homePage, backupPage, initializeHome, validateHomeRecords } from './modules/home.js';
+import { explorePage, classicPage, exploreBook } from './modules/explore.js';
 import { academicsPage, educationPage, profilePage, statementPage } from './modules/profile.js';
 import { bind } from './events.js';
 // 启程 · js/app.js
@@ -91,6 +95,9 @@ async function v2Action (a) {
 }
 
 function routeName3 (route = ctx.state.route) {
+  if (route === 'quiz') return tr ('答题训练', 'Quiz practice');
+  if (route.startsWith ('classic:')) return '《' + (exploreBook (route.slice (8))?.title || tr ('典籍', 'Classic')) + '》';
+  if (route === 'backup') return tr ('保存与备份', 'Save & backup');
   if (route.startsWith ('school:')) return tr ('院校详情', 'University details');
   for (const g of NAV3) {
     const x = g.items.find (x => x [0] === route);
@@ -100,6 +107,7 @@ function routeName3 (route = ctx.state.route) {
 }
 
 function routeGroup3 (route = ctx.state.route) {
+  if (route === 'quiz' || route.startsWith ('classic:')) return NAV3.find (g => g.id === 'start');
   return NAV3.find (g => g.items.some (x => x [0] === route)) || NAV3.find (g => g.id === 'info')
 }
 
@@ -124,33 +132,10 @@ async function navigate (section, step) {
 }
 
 function shell (content) {
-  const active = routeGroup3 (), isMobile = innerWidth <= 900;
-  return '<div class="shell3 ' + (ctx.state.sidebarHidden ? 'nav-hidden' : '') + '"><button class="nav-backdrop" data-action3="toggleNav" aria-label="' +
-  tr ('收起菜单', 'Close menu') + '"></button><aside class="sidebar3" id="sidebar3" ' + ((isMobile ? ! document.body.classList.contains ('nav-mobile-open') : ctx.state.sidebarHidden) ?
-  'inert' : '') + '><a class="brand3" href="#" data-go3="dashboard"><span class="brand-mark">' + LOGO + '</span><span><strong>启程<span class="brand-version">4.0 Beta</span></strong><small>PERSONAL STUDIO</small></span></a><div class="nav-caption">' +
-  tr ('我的成长档案', 'YOUR PERSONAL WORKSPACE') + '</div><nav aria-label="' + tr ('工作台导航', 'Workspace navigation') + '">' +
-  NAV3.map (g => '<section class="nav-group ' + (ctx.state.menuOpen.includes (g.id) ? 'is-open' : '') + '"><button class="nav-group-toggle ' +
-  (g.id === active?.id ? 'active-group' : '') + '" data-nav-group="' + g.id + '" aria-expanded="' + ctx.state.menuOpen.includes (g.id) +
-  '">' + icon3 (g.icon) + '<span>' + tr (g.zh, g.en) + '</span><i>' + icon3 ('chevron') + '</i></button><div class="nav-sub" ' +
-  (ctx.state.menuOpen.includes (g.id) ? '' : 'inert') + '><div>' + g.items.map (x => '<button data-go3="' + x [0] +
-  '" class="nav-item ' + (ctx.state.route === x [0] ? 'active' : '') + '" ' + (ctx.state.route === x [0] ? 'aria-current="page"' : '') +
-  '>' + tr (x [1], x [2]) + '</button>').join ('') + '</div></div></section>').join ('') + '</nav><div class="sidebar-tools"><div id="savedStatus" class="save-status">' +
-  tr ('本机自动保存', 'Auto-save on this device') + '</div><div class="side-actions"><button data-action="backup">' + tr ('备份进度',
-  'Back up') + '</button><button data-action="restore">' + tr ('恢复备份', 'Restore') + '</button></div><div class="md-tools31"><button data-md-template31>' +
-  icon3 ('export') + tr ('下载 Markdown 样板', 'Download Markdown template') + '</button><button data-md-import31>' + icon3 ('folder') +
-  tr ('导入 Markdown 资料', 'Import Markdown materials') + '</button></div><button class="offline-save" data-action="offlineCopy">' +
-  icon3 ('export') + '<span>' + tr ('保存可编辑离线副本', 'Save editable offline copy') + '</span></button><div class="side-actions"><button data-action="offlineHelp">' +
-  tr ('离线说明', 'Offline guide') + '</button><button data-action="backupText">' + tr ('备份文本', 'Backup text') + '</button></div><button class="clear-all" data-action="clearAll">' +
-  tr ('清空全部内容', 'Clear all content') + '</button><div class="side-setting"><button data-action="settings">' + GEAR +
-  '<span>' + tr ('设置', 'Settings') + '</span></button><small>v4.0 Beta · ' + tr ('离线版', 'OFFLINE') + '</small></div></div></aside><main class="main3"><header class="topbar3"><div class="topbar-left"><button class="menu-toggle" data-action3="toggleNav" aria-controls="sidebar3" aria-expanded="' +
-  (isMobile ? document.body.classList.contains ('nav-mobile-open') : ! ctx.state.sidebarHidden) + '" aria-label="' +
-  tr ('展开或收起菜单', 'Toggle menu') + '">' + icon3 ('menu') + '</button><span class="breadcrumb">' + tr (active?.zh || '工作台',
-  active?.en || 'Workspace') + ' <em>/</em> <strong>' + routeName3 () + '</strong></span></div><div class="topbar-actions"><button data-go3="studio">' +
-  tr ('导出成果', 'Create document') + ' ' + icon3 ('export') + '</button><button class="primary" data-action="save">' +
-  tr ('保存进度', 'Save') + '</button></div></header><div class="page-content3" id="workspaceContent">' + content + '</div><footer class="quiet-footer"><span>QICHENG PERSONAL STUDIO</span><span>' +
-  tr ('在这里，记录成长的每一步。', 'A place for every step of your growth.') + '</span></footer></main></div>' + help () + '<input type="file" id="backupInput" accept=".json,application/json" hidden><datalist id="awardCategories">' +
-  options (cats ('awards'), '') + '</datalist><datalist id="experienceCategories">' + options (cats ('experiences'),
-  '') + '</datalist><datalist id="languageList">' + options (['英语', '德语', '西班牙语', '法语', '日语', '俄语'], '') + '</datalist>'
+  const active = routeGroup3 (), isMobile = innerWidth <= 900, isHome = ctx.state.route === 'home';
+  const navVisible = isMobile ? document.body.classList.contains ('nav-mobile-open') : ! ctx.state.sidebarHidden;
+  const navigation = NAV3.map (g => '<section class="nav-group ' + (ctx.state.menuOpen.includes (g.id) ? 'is-open' : '') + '"><button class="nav-group-toggle ' + (g.id === active?.id ? 'active-group' : '') + '" data-nav-group="' + g.id + '" aria-expanded="' + ctx.state.menuOpen.includes (g.id) + '">' + icon3 (g.icon) + '<span>' + tr (g.zh, g.en) + '</span><i>' + icon3 ('chevron') + '</i></button><div class="nav-sub" ' + (ctx.state.menuOpen.includes (g.id) ? '' : 'inert') + '><div>' + g.items.map (x => '<button data-go3="' + x[0] + '" class="nav-item ' + (ctx.state.route === x[0] ? 'active' : '') + '" ' + (ctx.state.route === x[0] ? 'aria-current="page"' : '') + '>' + tr (x[1], x[2]) + '</button>').join ('') + '</div></div></section>').join ('');
+  return '<div class="shell3 ' + (ctx.state.sidebarHidden ? 'nav-hidden' : '') + '"><button class="nav-backdrop" data-action3="toggleNav" aria-label="' + tr ('收起菜单', 'Close menu') + '"></button><aside class="sidebar3" id="sidebar3" ' + (navVisible ? '' : 'inert') + '><a class="brand3" href="#" data-go3="home"><span class="brand-mark">' + LOGO + '</span><span><strong>启程<span class="brand-version">4.2</span></strong><small>PERSONAL STUDIO</small></span></a><div class="nav-caption">' + tr ('我的成长档案', 'YOUR PERSONAL WORKSPACE') + '</div><nav aria-label="' + tr ('工作台导航', 'Workspace navigation') + '">' + navigation + '</nav><div class="sidebar-tools"><div id="savedStatus" class="save-status">' + tr ('已保存', 'Saved') + '</div><button class="sidebar-bottom-link" data-action="settings">' + GEAR + '<span>' + tr ('设置', 'Settings') + '</span></button><button class="sidebar-bottom-link" data-go3="backup">' + icon3 ('folder') + '<span>' + tr ('保存与备份', 'Save & backup') + '</span></button><small class="sidebar-version">v4.2 · ' + tr ('本地优先', 'LOCAL FIRST') + '</small></div></aside><main class="main3"><header class="topbar3 ' + (isHome ? 'topbar-home' : '') + '"><div class="topbar-left"><span class="breadcrumb">' + tr (active?.zh || '工作台', active?.en || 'Workspace') + ' <em>/</em> <strong>' + routeName3 () + '</strong></span></div><div class="topbar-actions">' + (isHome ? '<span class="home-local-label">' + tr ('此刻，专注你的下一步', 'FOCUS ON YOUR NEXT STEP') + '</span>' : '<button data-go3="studio">' + tr ('导出成果', 'Create document') + ' ' + icon3 ('export') + '</button><button class="primary" data-action="save">' + tr ('保存进度', 'Save') + '</button>') + '<button class="menu-toggle" data-action3="toggleNav" aria-controls="sidebar3" aria-expanded="' + navVisible + '" aria-label="' + tr ('展开或收起菜单', 'Toggle menu') + '">' + icon3 ('menu') + '</button></div></header><div class="page-content3" id="workspaceContent">' + content + '</div><footer class="quiet-footer"><span>QICHENG PERSONAL STUDIO</span><span>' + tr ('在这里，记录成长的每一步。', 'A place for every step of your growth.') + '</span></footer></main></div>' + help () + '<input type="file" id="backupInput" accept=".json,application/json" hidden><datalist id="awardCategories">' + options (cats ('awards'), '') + '</datalist><datalist id="experienceCategories">' + options (cats ('experiences'), '') + '</datalist><datalist id="languageList">' + options (['英语', '德语', '西班牙语', '法语', '日语', '俄语'], '') + '</datalist>';
 }
 
 function render () {
@@ -162,13 +147,13 @@ function render () {
     entryPage3 ('awards'), experiences : () => entryPage3 ('experiences'), practices : () => entryPage3 ('practices'),
     'sort-awards' : () => organizationPage3 ('awards'), 'sort-experiences' : () => organizationPage3 ('experiences'),
     'sort-practices' : () => organizationPage3 ('practices'), learning : learningPage3, achievements : () => entryPage3 ('achievements'),
-    custom : customPage3, dashboard : dashboardPage3, images : () => materialsPage3 ('image'), files : () => materialsPage3 ('file'),
+    custom : customPage3, dashboard : dashboardPage3, home : homePage, explore : explorePage, quiz : quizPage, backup : backupPage, images : () => materialsPage3 ('image'), files : () => materialsPage3 ('file'),
     outputs : outputsPage3, studio : previewPage, archive : archivePage3, schools : schoolPage
   };
-  const page = ctx.state.route.startsWith ('school:') ? () => schoolDetail3 (decodeURIComponent (ctx.state.route.slice (7))) : pages3 [ctx.state.route] ||
+  const page = ctx.state.route.startsWith ('classic:') ? () => classicPage (ctx.state.route.slice (8)) : ctx.state.route.startsWith ('school:') ? () => schoolDetail3 (decodeURIComponent (ctx.state.route.slice (7))) : pages3 [ctx.state.route] ||
   profilePage;
   $ ('#app').innerHTML = shell (page ());
-  document.title = '启程 4.0 Beta · ' + routeName3 ();
+  document.title = '启程 4.2 · ' + routeName3 ();
   bind ();
   translateUI ();
   updateSaveStatus301 ();
@@ -197,7 +182,7 @@ function help () {
   'Use the menu for information, organization, personal content, dashboard, materials and export. The menu button expands or hides navigation.') +
   '</p><p>' + tr ('所有上传内容都会进入资料中心。移除记录中的附件只解除关联；在资料中心删除会二次确认并同时解除全部关联。', 'Uploads appear in Materials. Removing an attachment from a record only unlinks it. Deleting in Materials asks for confirmation and removes all links.') +
   '</p><p>' + tr ('导出内容、字段、照片、顺序与排版设置仍独立保存在每份文档版本中。导出前检查会列出缺项与重复记录。', 'Each document version keeps its own fields, photos, order and styling. Preflight checks flag omissions and repeated records.') +
-  '</p><p>' + tr ('填写后约半秒自动保存；保存失败会提示。可在设置中导出完整 JSON 备份，离线时也可编辑、预览和导出。资料中心的个人资料 ZIP 与可编辑 HTML 副本继续保留。', 'Edits save after half a second. Failures are reported. Use Settings to export a complete JSON backup; editing, previews and exports work offline. Personal archive ZIP and editable HTML copies remain available.') +
+  '</p><p>' + tr ('填写后约半秒自动保存；保存失败会提示。可在保存与备份中导出完整 JSON 备份，离线时也可编辑、预览和导出。资料中心的个人资料 ZIP 与可编辑 HTML 副本继续保留。', 'Edits save after half a second. Failures are reported. Use Save & backup to export a complete JSON backup; editing, previews and exports work offline. Personal archive ZIP and editable HTML copies remain available.') +
   '</p></aside>'
 }
 
@@ -221,6 +206,7 @@ export { confirmAction, v2Action, routeName3, routeGroup3, go3, navigate, shell,
 async function action (name) {
   if (ctx.busy && ! ['help', 'closeHelp'].includes (name)) return;
   if (name === 'settings') return openSettings ();
+  if (name === 'resources') return openSettings (false, true);
   if (name === 'save') {
     if (await save ()) toast (tr ('当前进度已保存', 'Saved'));
     return;
@@ -272,8 +258,17 @@ async function boot () {
   if (stored !== undefined) ctx.state = validateDraft (stored);
   else if (embedded && !await storage.get('__seedCleared')) {
     ctx.state = validateDraft (embedded);
-    await storage.set ('current', snapshot3 ());
+    const extra = globalThis.QICHENG_EMBEDDED.records || {};
+    validateResourceRecords (extra, {allowOfficial:true});
+    validateQuizRecords (extra); validateHomeRecords (extra);
+    await storage.setMany ({...extra, current:snapshot3 ()});
   }
+  // Startup always opens Home, regardless of the route in an old draft or backup.
+  ctx.state.route = 'home';
+  ctx.state.section = 'resume'; ctx.state.step = 0;
+  ctx.state.menuOpen = ['start']; ctx.state.sidebarHidden = true;
+  await initializeResources ();
+  await Promise.all ([initializeQuiz (), initializeHome ()]);
   await ensureFonts ();
   ctx.initialized = true;
   synchronizeEditing ();
@@ -305,6 +300,7 @@ async function boot () {
   });
   window.ResumeStudio = {
     version : VERSION, fresh, currentVersion, newVersion, validateDraft, documentPlan, pdfBytes, pptBlob, wordBlob, canvasPages,
+    listQuizBanks, getQuotesResource, getRecentQuiz, importResourceJSON, updateResources, reloadResources,
     refreshPreview, exportRows, textRows, markdown, markdownTemplate31, parseMarkdown31, applyMarkdown31, importMarkdownFile31,
     go3, snapshot3, preflight3, importAssets3, assetUsage3, filteredSchools3, toggleDream, collect, clearAll, action,
     exportFile, save, offlineHTML, avatarData, exportHTML3, render, dropRecord, moveRecord,

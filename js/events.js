@@ -11,6 +11,9 @@ import { bindUniversitiesControls } from './modules/universities.js';
 import { bindMaterialsControls } from './modules/materials.js';
 import { bindDashboardControls } from './modules/dashboard.js';
 import { bindMarkdownControls } from './modules/markdown.js';
+import { bindHomeControls } from './modules/home.js';
+import { bindQuizControls } from './modules/quiz.js';
+import { bindExploreControls } from './modules/explore.js';
 // Binding coordinator; each feature owns its controls.
 function bind () {
   bindProfileControls ();
@@ -26,5 +29,8 @@ function bind () {
   bindMaterialsControls ();
   bindDashboardControls ();
   bindMarkdownControls ();
+  bindHomeControls ();
+  bindQuizControls ();
+  bindExploreControls ();
 }
 export { bind };

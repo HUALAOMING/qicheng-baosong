@@ -7,6 +7,9 @@ import { validateDraft, assertJSON } from './utils/validation.js';
 import { fresh, snapshot3, photoRefs3, synchronizeEditing } from './model.js';
 import { confirmAction, render } from './app.js';
 import { resourceFetch } from './data.js';
+import { validateResourceRecords, reloadResources, waitForResourceWrites } from './resources.js';
+import { validateQuizRecords, initializeQuiz, waitForQuizWrites } from './modules/quiz.js';
+import { validateHomeRecords, initializeHome } from './modules/home.js';
 const BACKUP_VERSION = 1;
 function compactSnapshot (draft) {
   const copy = clone (draft);
@@ -16,13 +19,19 @@ function compactSnapshot (draft) {
 function createBackup (snapshot, otherRecords = {
 }) {
   const current = compactSnapshot (validateDraft (snapshot));
+  for (const key of ['route', 'section', 'step', 'sidebarHidden', 'menuOpen']) delete current[key];
   const data = {
-    ...clone (otherRecords), current
+    ...backupUserRecords (otherRecords), current
   };
   assertJSON (data);
+  Object.assign (data, validateResourceRecords (data));
+  validateQuizRecords (data); validateHomeRecords (data);
   return {
     app : 'Qicheng', backupVersion : BACKUP_VERSION, appVersion : VERSION, createdAt : new Date ().toISOString (), data
   };
+}
+function backupUserRecords (records) {
+  return Object.fromEntries (Object.entries (clone (records)).filter (([key]) => !key.startsWith ('resource:official:') && key !== '__seedCleared'));
 }
 function parseBackup (input) {
   let backup;
@@ -37,6 +46,8 @@ function parseBackup (input) {
   if (typeof backup.appVersion !== 'string' || ! backup.appVersion || typeof backup.createdAt !== 'string' || ! Number.isFinite (Date.parse (backup.createdAt))) throw new Error ('备份缺少有效的应用版本或备份时间。');
   if (! backup.data || typeof backup.data !== 'object' || Array.isArray (backup.data) || ! backup.data.current) throw new Error ('备份缺少必要的用户数据。');
   assertJSON (backup.data);
+  Object.assign (backup.data, validateResourceRecords (backup.data));
+  validateQuizRecords (backup.data); validateHomeRecords (backup.data);
   const draft = validateDraft (backup.data.current);
   return {
     backup, draft
@@ -54,14 +65,8 @@ function backupSummary (backup, draft) {
   'Restoring replaces all current local data.');
 }
 async function getCurrentBackup () {
-  let other = {
-  };
-  try {
-    other = await storage.getAll ();
-  }
-  catch (error) {
-    toast (tr ('数据库读取失败，将备份当前工作台内容：', 'Database read failed; backing up the current workspace: ') + error.message);
-  }
+  await Promise.all ([ctx.saveChain, waitForResourceWrites (), waitForQuizWrites ()]);
+  const other = await storage.getAll ();
   return createBackup (snapshot3 (), other);
 }
 function backupFilename () {
@@ -104,10 +109,14 @@ async function commitBackup(input) {
   cancelPendingSave();
   const previous = clone(ctx.state);
   try {
-    const records = clone(parsed.backup.data);
+    const records = backupUserRecords (parsed.backup.data);
+    parsed.draft.route = 'home'; parsed.draft.section = 'resume'; parsed.draft.step = 0;
+    parsed.draft.sidebarHidden = true; parsed.draft.menuOpen = ['start'];
     records.current = compactSnapshot(parsed.draft);
     try {
-      await ctx.saveChain;
+      await Promise.all ([ctx.saveChain, waitForResourceWrites (), waitForQuizWrites ()]);
+      const installed = await storage.getAll ();
+      for (const [key, value] of Object.entries (installed)) if (key.startsWith ('resource:official:')) records[key] = value;
       await storage.replaceAll(records);
     } catch (error) {
       ctx.state = previous; updateSaveStatus301();
@@ -115,7 +124,10 @@ async function commitBackup(input) {
     }
     // The transaction has committed; a display error must not masquerade as a failed restore.
     ctx.state = parsed.draft;
-    try { resetTransientState(); initializeSaving301(records.current); }
+    try {
+      await reloadResources (); await Promise.all ([initializeQuiz (records), initializeHome (records)]);
+      resetTransientState(); initializeSaving301(records.current);
+    }
     catch { location.reload(); }
     return true;
   } finally {
@@ -161,7 +173,7 @@ async function clearAll() {
     const empty = fresh(); empty.onboarded = true; empty.savedAt = new Date().toISOString();
     const snapshot = compactSnapshot(empty);
     try {
-      await ctx.saveChain;
+      await Promise.all ([ctx.saveChain, waitForResourceWrites (), waitForQuizWrites ()]);
       // Keep an empty workspace so reopening an editable HTML copy cannot resurrect its embedded seed.
       await storage.replaceAll({current:snapshot});
     } catch (error) {
@@ -169,6 +181,7 @@ async function clearAll() {
     }
     ctx.state = empty;
     try {
+      await reloadResources (); await Promise.all ([initializeQuiz ({}), initializeHome ({})]);
       resetTransientState(); initializeSaving301(snapshot);
       for (const dialog of document.querySelectorAll('dialog[open]')) dialog.close();
       render(); toast(tr('本地数据已清除','Local data cleared'));
@@ -222,14 +235,19 @@ async function openBackupText () {
   }
 }
 async function offlineHTML () {
+  await Promise.all ([ctx.saveChain, waitForResourceWrites (), waitForQuizWrites ()]);
   const template = globalThis.QICHENG_PORTABLE_TEMPLATE || await (await resourceFetch ('assets/editable-template.html')).text ();
+  const records = await storage.getAll ();
+  delete records.current; delete records.__seedCleared;
+  assertJSON (records); validateQuizRecords (records); validateHomeRecords (records);
+  Object.assign (records, validateResourceRecords (records, {allowOfficial:true}));
   const payload = JSON.stringify ( {
-    id : uid (), draft : snapshot3 ()
+    id : uid (), draft : snapshot3 (), records
   }).replace (/</g, '\\u003c').replace (/\u2028/g, '\\u2028').replace (/\u2029/g, '\\u2029');
   return template.replace (/(<script id="qichengEmbedded" type="application\/json">)[\s\S]*?(<\/script>)/, (_, start,
   end) => start + payload + end);
 }
-export { BACKUP_VERSION, createBackup, parseBackup, compactSnapshot, backupSummary, getCurrentBackup, backupFilename, exportBackup, commitBackup, restoreBackup, clearAll, openBackupText, offlineHTML };
+export { BACKUP_VERSION, createBackup, parseBackup, compactSnapshot, backupUserRecords, backupSummary, getCurrentBackup, backupFilename, exportBackup, commitBackup, restoreBackup, clearAll, openBackupText, offlineHTML };
 
 // All controls for this feature, in their original override order.
 function bindBackupControls () {

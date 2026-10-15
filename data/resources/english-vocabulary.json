@@ -1,0 +1,2762 @@
+{
+  "schemaVersion": 1,
+  "bank": {
+    "id": "english-vocabulary",
+    "name": "English Vocabulary",
+    "subject": "english",
+    "section": "vocabulary",
+    "version": "1.0.0"
+  },
+  "questions": [
+    {
+      "id": "MT31-11",
+      "type": "single-choice",
+      "question": "You cannot imagine how ______ I felt when I was faced with so many difficulties.",
+      "options": [
+        {
+          "id": "A",
+          "text": "overflowed"
+        },
+        {
+          "id": "B",
+          "text": "overthrown"
+        },
+        {
+          "id": "C",
+          "text": "overturned"
+        },
+        {
+          "id": "D",
+          "text": "overwhelmed"
+        }
+      ],
+      "answer": "D",
+      "explanation": "overwhelmed 被压得喘不过气、难以招架；overflowed 溢出；overthrown 被推翻；overturned 被掀翻或被撤销。"
+    },
+    {
+      "id": "MT31-13",
+      "type": "single-choice",
+      "question": "His ______ was taken as part of lawsuit between American aviation and Yahoo.",
+      "options": [
+        {
+          "id": "A",
+          "text": "desperation"
+        },
+        {
+          "id": "B",
+          "text": "depreciation"
+        },
+        {
+          "id": "C",
+          "text": "deposition"
+        },
+        {
+          "id": "D",
+          "text": "depression"
+        }
+      ],
+      "answer": "C",
+      "explanation": "deposition 法律中的宣誓证词，take a deposition 录取证词；desperation 绝望；depreciation 贬值、折旧；depression 抑郁或萧条。"
+    },
+    {
+      "id": "MT31-14",
+      "type": "single-choice",
+      "question": "In the present economic ______ we cannot make even greater progress than previously.",
+      "options": [
+        {
+          "id": "A",
+          "text": "air"
+        },
+        {
+          "id": "B",
+          "text": "area"
+        },
+        {
+          "id": "C",
+          "text": "climate"
+        },
+        {
+          "id": "D",
+          "text": "mood"
+        }
+      ],
+      "answer": "C",
+      "explanation": "economic climate 指经济环境、经济形势；其余选项不构成这里的惯用表达。"
+    },
+    {
+      "id": "MT31-15",
+      "type": "single-choice",
+      "question": "The computer revolution may well change society as ______ as did the Industrial Revolution.",
+      "options": [
+        {
+          "id": "A",
+          "text": "fundamentally"
+        },
+        {
+          "id": "B",
+          "text": "insignificantly"
+        },
+        {
+          "id": "C",
+          "text": "certainly"
+        },
+        {
+          "id": "D",
+          "text": "comparatively"
+        }
+      ],
+      "answer": "A",
+      "explanation": "fundamentally 表示从根本上，比较的是两场变革改变社会的程度。"
+    },
+    {
+      "id": "MT31-17",
+      "type": "single-choice",
+      "question": "This course ______ several different aspects of economics.",
+      "options": [
+        {
+          "id": "A",
+          "text": "embraces"
+        },
+        {
+          "id": "B",
+          "text": "elaborates"
+        },
+        {
+          "id": "C",
+          "text": "exaggerates"
+        },
+        {
+          "id": "D",
+          "text": "embarks"
+        }
+      ],
+      "answer": "A",
+      "explanation": "embrace 除“拥抱”外还指“涵盖”；elaborate 详述；exaggerate 夸大；embark on 开始从事。课程涵盖若干领域，选 embraces。"
+    },
+    {
+      "id": "MT31-18",
+      "type": "single-choice",
+      "question": "Many words in the English language are French in ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "origin"
+        },
+        {
+          "id": "B",
+          "text": "generation"
+        },
+        {
+          "id": "C",
+          "text": "descent"
+        },
+        {
+          "id": "D",
+          "text": "birth"
+        }
+      ],
+      "answer": "A",
+      "explanation": "in origin 表示在起源上；词语的法语来源用 French in origin。"
+    },
+    {
+      "id": "MT31-19",
+      "type": "single-choice",
+      "question": "She refused to ______ to my going abroad.",
+      "options": [
+        {
+          "id": "A",
+          "text": "convert"
+        },
+        {
+          "id": "B",
+          "text": "contribute"
+        },
+        {
+          "id": "C",
+          "text": "correspond"
+        },
+        {
+          "id": "D",
+          "text": "consent"
+        }
+      ],
+      "answer": "D",
+      "explanation": "consent to 表示同意，to 为介词，后接动名词 my going。"
+    },
+    {
+      "id": "MT31-20",
+      "type": "single-choice",
+      "question": "Most people who marry young start out living <u>hand to mouth</u>. The underlined part means ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "happily"
+        },
+        {
+          "id": "B",
+          "text": "poorly"
+        },
+        {
+          "id": "C",
+          "text": "intimately"
+        },
+        {
+          "id": "D",
+          "text": "carefully"
+        }
+      ],
+      "answer": "B",
+      "explanation": "live hand to mouth 指收入仅够维持生活、难有积蓄，对应 poorly。"
+    },
+    {
+      "id": "MT32-11",
+      "type": "single-choice",
+      "question": "The housing price in big cities is ______, but still many young people would rather buy a house than rent a room.",
+      "options": [
+        {
+          "id": "A",
+          "text": "sneaking"
+        },
+        {
+          "id": "B",
+          "text": "soaking"
+        },
+        {
+          "id": "C",
+          "text": "soaring"
+        },
+        {
+          "id": "D",
+          "text": "spinning"
+        }
+      ],
+      "answer": "C",
+      "explanation": "soar 表示价格迅速上涨；sneak 偷偷行动，soak 浸泡，spin 旋转。"
+    },
+    {
+      "id": "MT32-12",
+      "type": "single-choice",
+      "question": "He had a(n) ______ when he entered the hotel that the gatekeeper was a detective.",
+      "options": [
+        {
+          "id": "A",
+          "text": "fantasy"
+        },
+        {
+          "id": "B",
+          "text": "illusion"
+        },
+        {
+          "id": "C",
+          "text": "imagination"
+        },
+        {
+          "id": "D",
+          "text": "vision"
+        }
+      ],
+      "answer": "B",
+      "explanation": "illusion 对现实的错误认识；fantasy 幻想情境；imagination 想象力；vision 视力、景象或愿景。把门卫误以为侦探，选 illusion。"
+    },
+    {
+      "id": "MT32-13",
+      "type": "single-choice",
+      "question": "The campaign to stop people from smoking is in <u>full swing</u>. The underlined part means ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "progress"
+        },
+        {
+          "id": "B",
+          "text": "vain"
+        },
+        {
+          "id": "C",
+          "text": "issue"
+        },
+        {
+          "id": "D",
+          "text": "terms"
+        }
+      ],
+      "answer": "A",
+      "explanation": "in full swing 表示活动正热烈进行；这里 swing 的释义对应 progress。"
+    },
+    {
+      "id": "MT32-14",
+      "type": "single-choice",
+      "question": "The ______ law did not make a clear distinction between the new and old land boundary.",
+      "options": [
+        {
+          "id": "A",
+          "text": "adventurous"
+        },
+        {
+          "id": "B",
+          "text": "advantageous"
+        },
+        {
+          "id": "C",
+          "text": "ambitious"
+        },
+        {
+          "id": "D",
+          "text": "ambiguous"
+        }
+      ],
+      "answer": "D",
+      "explanation": "ambiguous 表示含糊、有歧义，与未作清楚区分相呼应。"
+    },
+    {
+      "id": "MT32-15",
+      "type": "single-choice",
+      "question": "These contradictions made his evidence ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "invaluable"
+        },
+        {
+          "id": "B",
+          "text": "priceless"
+        },
+        {
+          "id": "C",
+          "text": "unworthy"
+        },
+        {
+          "id": "D",
+          "text": "worthless"
+        }
+      ],
+      "answer": "D",
+      "explanation": "worthless 无价值；invaluable 极有价值，绝不是“没有价值”；priceless 无价的；unworthy 不配的，常接 of。矛盾使证据失去价值。"
+    },
+    {
+      "id": "MT32-17",
+      "type": "single-choice",
+      "question": "So many people have bought this brand of bikes that the store is now out of ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "reach"
+        },
+        {
+          "id": "B",
+          "text": "stock"
+        },
+        {
+          "id": "C",
+          "text": "business"
+        },
+        {
+          "id": "D",
+          "text": "season"
+        }
+      ],
+      "answer": "B",
+      "explanation": "out of stock 表示缺货；很多人购买导致库存售罄。"
+    },
+    {
+      "id": "MT32-19",
+      "type": "single-choice",
+      "question": "I was feeling <u>dragged out</u> so I went home. The underlined part means ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "tedious"
+        },
+        {
+          "id": "B",
+          "text": "cold"
+        },
+        {
+          "id": "C",
+          "text": "sick"
+        },
+        {
+          "id": "D",
+          "text": "exhausted"
+        }
+      ],
+      "answer": "D",
+      "explanation": "dragged out 在此指筋疲力尽，对应 exhausted；不是“被拖出去”。tedious 令人厌烦；cold 寒冷；sick 生病。"
+    },
+    {
+      "id": "MT32-20",
+      "type": "single-choice",
+      "question": "I almost sing every song out of ______ each time I try to hit the high notes.",
+      "options": [
+        {
+          "id": "A",
+          "text": "melody"
+        },
+        {
+          "id": "B",
+          "text": "music"
+        },
+        {
+          "id": "C",
+          "text": "tune"
+        },
+        {
+          "id": "D",
+          "text": "theme"
+        }
+      ],
+      "answer": "C",
+      "explanation": "out of tune 表示走调、不合音调，与唱高音时失准相呼应。"
+    },
+    {
+      "id": "MT33-11",
+      "type": "single-choice",
+      "question": "Fred and Betty finally decided to <u>tie the knot</u>. The underlined part means ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "get married"
+        },
+        {
+          "id": "B",
+          "text": "have a child"
+        },
+        {
+          "id": "C",
+          "text": "separate"
+        },
+        {
+          "id": "D",
+          "text": "compromise"
+        }
+      ],
+      "answer": "A",
+      "explanation": "tie the knot 是结婚的习语，对应 get married。"
+    },
+    {
+      "id": "MT33-13",
+      "type": "single-choice",
+      "question": "Joyce was a little ______ about whether he would marry her or not.",
+      "options": [
+        {
+          "id": "A",
+          "text": "dim"
+        },
+        {
+          "id": "B",
+          "text": "ambiguous"
+        },
+        {
+          "id": "C",
+          "text": "obscure"
+        },
+        {
+          "id": "D",
+          "text": "vague"
+        }
+      ],
+      "answer": "D",
+      "explanation": "be vague about 含糊其辞、说得不明确；ambiguous 有歧义、可作多种解释；obscure 晦涩难懂或不知名；dim 昏暗、模糊的印象。重点搭配 vague about。"
+    },
+    {
+      "id": "MT33-15",
+      "type": "single-choice",
+      "question": "It was ______ that the school discriminated against Asian students.",
+      "options": [
+        {
+          "id": "A",
+          "text": "assaulted"
+        },
+        {
+          "id": "B",
+          "text": "alleged"
+        },
+        {
+          "id": "C",
+          "text": "addicted"
+        },
+        {
+          "id": "D",
+          "text": "ascribed"
+        }
+      ],
+      "answer": "B",
+      "explanation": "It was alleged that… 表示据称、有人指称；allege 可引出未经证实的指控。"
+    },
+    {
+      "id": "MT33-17",
+      "type": "single-choice",
+      "question": "The scientists have absolute freedom as to what research they think is best to ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "pursue"
+        },
+        {
+          "id": "B",
+          "text": "devote"
+        },
+        {
+          "id": "C",
+          "text": "engage"
+        },
+        {
+          "id": "D",
+          "text": "seek"
+        }
+      ],
+      "answer": "A",
+      "explanation": "pursue research 从事研究，可直接接 research；devote…to… 献身于；engage in research 参与研究；seek 寻求，不通常用 seek research 表“开展研究”。"
+    },
+    {
+      "id": "MT33-18",
+      "type": "single-choice",
+      "question": "It's hard to change many Americans' ______ view that Germans lack a sense of humor and are always buried in work.",
+      "options": [
+        {
+          "id": "A",
+          "text": "stereotypical"
+        },
+        {
+          "id": "B",
+          "text": "religious"
+        },
+        {
+          "id": "C",
+          "text": "traditional"
+        },
+        {
+          "id": "D",
+          "text": "orthodox"
+        }
+      ],
+      "answer": "A",
+      "explanation": "stereotypical 指以固定模式概括群体的刻板看法，吻合对德国人的概括。"
+    },
+    {
+      "id": "MT33-19",
+      "type": "single-choice",
+      "question": "Shanghai's thousands of telephone ______ may be revamped to provide mobile-phone chargers and Wi-Fi.",
+      "options": [
+        {
+          "id": "A",
+          "text": "stations"
+        },
+        {
+          "id": "B",
+          "text": "booths"
+        },
+        {
+          "id": "C",
+          "text": "chambers"
+        },
+        {
+          "id": "D",
+          "text": "halls"
+        }
+      ],
+      "answer": "B",
+      "explanation": "telephone booth 指电话亭；可改造提供充电和网络服务。"
+    },
+    {
+      "id": "MT33-20",
+      "type": "single-choice",
+      "question": "We consider it quite necessary to ______ the case before doing anything else.",
+      "options": [
+        {
+          "id": "A",
+          "text": "look over"
+        },
+        {
+          "id": "B",
+          "text": "look after"
+        },
+        {
+          "id": "C",
+          "text": "look into"
+        },
+        {
+          "id": "D",
+          "text": "look through"
+        }
+      ],
+      "answer": "C",
+      "explanation": "look into a case 表示调查案件；look after 照料，look over 检查，look through 浏览。"
+    },
+    {
+      "id": "MT34-12",
+      "type": "single-choice",
+      "question": "These magnificent ______ buildings demonstrate the great intelligence of the laboring people.",
+      "options": [
+        {
+          "id": "A",
+          "text": "antique"
+        },
+        {
+          "id": "B",
+          "text": "ancient"
+        },
+        {
+          "id": "C",
+          "text": "primitive"
+        },
+        {
+          "id": "D",
+          "text": "remote"
+        }
+      ],
+      "answer": "B",
+      "explanation": "ancient buildings 指古代建筑；primitive 原始的，remote 遥远的，antique 通常用于古董物件。"
+    },
+    {
+      "id": "MT34-13",
+      "type": "single-choice",
+      "question": "These goods are ______ for export, though a few of them may be sold on the home market.",
+      "options": [
+        {
+          "id": "A",
+          "text": "essentially"
+        },
+        {
+          "id": "B",
+          "text": "completely"
+        },
+        {
+          "id": "C",
+          "text": "necessarily"
+        },
+        {
+          "id": "D",
+          "text": "remarkably"
+        }
+      ],
+      "answer": "A",
+      "explanation": "essentially 在此表示主要、基本上；少量内销使 completely 的全部出口不合语境。"
+    },
+    {
+      "id": "MT34-15",
+      "type": "single-choice",
+      "question": "Sometimes it's good to stop for a while to think about the past and ______ the future.",
+      "options": [
+        {
+          "id": "A",
+          "text": "contaminate"
+        },
+        {
+          "id": "B",
+          "text": "contemplate"
+        },
+        {
+          "id": "C",
+          "text": "consolidate"
+        },
+        {
+          "id": "D",
+          "text": "contradict"
+        }
+      ],
+      "answer": "B",
+      "explanation": "contemplate 表示认真思考、考虑；与 think about the past 并列。"
+    },
+    {
+      "id": "MT34-16",
+      "type": "single-choice",
+      "question": "School fees, illness, house repairs and other ______ have reduced his bank balance to almost nothing.",
+      "options": [
+        {
+          "id": "A",
+          "text": "payment"
+        },
+        {
+          "id": "B",
+          "text": "amount"
+        },
+        {
+          "id": "C",
+          "text": "figures"
+        },
+        {
+          "id": "D",
+          "text": "expenses"
+        }
+      ],
+      "answer": "D",
+      "explanation": "expenses 指各项开支，与学费、疾病费用和修房费用构成同类列举。"
+    },
+    {
+      "id": "MT34-17",
+      "type": "single-choice",
+      "question": "There’s no denying that as we age ______, our body ages right along with us.",
+      "options": [
+        {
+          "id": "A",
+          "text": "chronologically"
+        },
+        {
+          "id": "B",
+          "text": "significantly"
+        },
+        {
+          "id": "C",
+          "text": "deceptively"
+        },
+        {
+          "id": "D",
+          "text": "deliberately"
+        }
+      ],
+      "answer": "A",
+      "explanation": "chronologically 按时间推移，在此是“日历年龄增长”；significantly 显著地；deceptively 具有迷惑性地；deliberately 故意地。不要把 chronologically 只限于叙事排序。"
+    },
+    {
+      "id": "MT34-18",
+      "type": "single-choice",
+      "question": "We made an effort not to <u>leave</u> my friend <u>out in the cold</u> when we were planning the birthday party. The underlined part means ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "embarrass"
+        },
+        {
+          "id": "B",
+          "text": "humiliate"
+        },
+        {
+          "id": "C",
+          "text": "ignore"
+        },
+        {
+          "id": "D",
+          "text": "exhaust"
+        }
+      ],
+      "answer": "C",
+      "explanation": "leave sb out in the cold 指冷落、将某人排除在外，最接近 ignore。"
+    },
+    {
+      "id": "MT34-19",
+      "type": "single-choice",
+      "question": "The company has to make its accounts and operations as ______ as possible.",
+      "options": [
+        {
+          "id": "A",
+          "text": "distinct"
+        },
+        {
+          "id": "B",
+          "text": "evident"
+        },
+        {
+          "id": "C",
+          "text": "explicit"
+        },
+        {
+          "id": "D",
+          "text": "transparent"
+        }
+      ],
+      "answer": "D",
+      "explanation": "transparent 账目、运作公开透明；distinct 清晰可辨、不同的；evident 明显的；explicit 说法、规定明确的。公司治理中的“透明”优先选 transparent。"
+    },
+    {
+      "id": "MT35-11",
+      "type": "single-choice",
+      "question": "The police are trying to ______ who killed the old woman.",
+      "options": [
+        {
+          "id": "A",
+          "text": "ascertain"
+        },
+        {
+          "id": "B",
+          "text": "ascribe"
+        },
+        {
+          "id": "C",
+          "text": "avert"
+        },
+        {
+          "id": "D",
+          "text": "assert"
+        }
+      ],
+      "answer": "A",
+      "explanation": "ascertain 查明、确定；ascribe…to… 把……归因于；avert 避免、转移视线；assert 断言、主张。调查凶手身份选 ascertain。"
+    },
+    {
+      "id": "MT35-13",
+      "type": "single-choice",
+      "question": "The town's only claim to ______ is that Queen Elizabeth I once visited it.",
+      "options": [
+        {
+          "id": "A",
+          "text": "fame"
+        },
+        {
+          "id": "B",
+          "text": "honor"
+        },
+        {
+          "id": "C",
+          "text": "reputation"
+        },
+        {
+          "id": "D",
+          "text": "worship"
+        }
+      ],
+      "answer": "A",
+      "explanation": "claim to fame 指使人或事物出名的特点、事迹；这里是女王曾来访。"
+    },
+    {
+      "id": "MT35-14",
+      "type": "single-choice",
+      "question": "She once made a(n) ______ appearance on television before she decided to step away from the entertainment industry.",
+      "options": [
+        {
+          "id": "A",
+          "text": "brief"
+        },
+        {
+          "id": "B",
+          "text": "instant"
+        },
+        {
+          "id": "C",
+          "text": "prompt"
+        },
+        {
+          "id": "D",
+          "text": "transient"
+        }
+      ],
+      "answer": "A",
+      "explanation": "brief appearance 表示短暂露面；instant 即刻的，prompt 及时的，transient 多描述短暂存在的状态。"
+    },
+    {
+      "id": "MT35-15",
+      "type": "single-choice",
+      "question": "I am terribly ______ after a whole day’s working.",
+      "options": [
+        {
+          "id": "A",
+          "text": "worn away"
+        },
+        {
+          "id": "B",
+          "text": "worn down"
+        },
+        {
+          "id": "C",
+          "text": "worn out"
+        },
+        {
+          "id": "D",
+          "text": "worn off"
+        }
+      ],
+      "answer": "C",
+      "explanation": "worn out 筋疲力尽；worn down 被长期消磨、拖垮；worn away 磨蚀；worn off 效果消退。干了一整天后累坏了，优先 worn out。"
+    },
+    {
+      "id": "MT35-16",
+      "type": "single-choice",
+      "question": "The caterers must know ______ how many people come for dinner.",
+      "options": [
+        {
+          "id": "A",
+          "text": "abundantly"
+        },
+        {
+          "id": "B",
+          "text": "approximately"
+        },
+        {
+          "id": "C",
+          "text": "confidentially"
+        },
+        {
+          "id": "D",
+          "text": "essentially"
+        }
+      ],
+      "answer": "B",
+      "explanation": "approximately 表示大约，修饰就餐人数的估计；其余副词不符合人数估算。"
+    },
+    {
+      "id": "MT35-18",
+      "type": "single-choice",
+      "question": "This sweater is made of ______ wool and is much warmer than other kinds of sweater.",
+      "options": [
+        {
+          "id": "A",
+          "text": "sheer"
+        },
+        {
+          "id": "B",
+          "text": "utter"
+        },
+        {
+          "id": "C",
+          "text": "pure"
+        },
+        {
+          "id": "D",
+          "text": "thorough"
+        }
+      ],
+      "answer": "C",
+      "explanation": "pure wool 指纯羊毛材料；utter、thorough 不用于这里的材料纯度。"
+    },
+    {
+      "id": "MT35-19",
+      "type": "single-choice",
+      "question": "He planned to steal the money, but his ______ were discovered.",
+      "options": [
+        {
+          "id": "A",
+          "text": "arrangements"
+        },
+        {
+          "id": "B",
+          "text": "blueprints"
+        },
+        {
+          "id": "C",
+          "text": "layouts"
+        },
+        {
+          "id": "D",
+          "text": "schemes"
+        }
+      ],
+      "answer": "D",
+      "explanation": "schemes 可指秘密策划的阴谋、诡计，吻合偷钱计划被发现。"
+    },
+    {
+      "id": "MT35-20",
+      "type": "single-choice",
+      "question": "That you cannot feel the movement of earth does not mean that the earth is really ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "steady"
+        },
+        {
+          "id": "B",
+          "text": "sturdy"
+        },
+        {
+          "id": "C",
+          "text": "stubborn"
+        },
+        {
+          "id": "D",
+          "text": "stationary"
+        }
+      ],
+      "answer": "D",
+      "explanation": "stationary 静止的；steady 稳定、平稳的；sturdy 结实健壮的；stubborn 固执的。别混淆 stationary 与 stationery“文具”。"
+    },
+    {
+      "id": "MT36-11",
+      "type": "single-choice",
+      "question": "There were twenty people <u>at the very outside</u>. The underlined part means ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "at least"
+        },
+        {
+          "id": "B",
+          "text": "at most"
+        },
+        {
+          "id": "C",
+          "text": "at last"
+        },
+        {
+          "id": "D",
+          "text": "untold"
+        }
+      ],
+      "answer": "B",
+      "explanation": "at the (very) outside = 最多、顶多，等于 at most；不是“在外面”。at least 至少；at last 最后；untold 数不清的。"
+    },
+    {
+      "id": "MT36-12",
+      "type": "single-choice",
+      "question": "His car was ______ to avoid bumping against the roadblock.",
+      "options": [
+        {
+          "id": "A",
+          "text": "swerved"
+        },
+        {
+          "id": "B",
+          "text": "twisted"
+        },
+        {
+          "id": "C",
+          "text": "departed"
+        },
+        {
+          "id": "D",
+          "text": "swung"
+        }
+      ],
+      "answer": "A",
+      "explanation": "swerve 指使车辆突然改变方向、急转弯，吻合避开路障。"
+    },
+    {
+      "id": "MT36-13",
+      "type": "single-choice",
+      "question": "He will be doing his best to ______ himself on his opponent for last year's defeat.",
+      "options": [
+        {
+          "id": "A",
+          "text": "remedy"
+        },
+        {
+          "id": "B",
+          "text": "reproach"
+        },
+        {
+          "id": "C",
+          "text": "revive"
+        },
+        {
+          "id": "D",
+          "text": "revenge"
+        }
+      ],
+      "answer": "D",
+      "explanation": "revenge oneself on sb for sth 表示因某事向某人报复。"
+    },
+    {
+      "id": "MT36-14",
+      "type": "single-choice",
+      "question": "The French, long proud of their reputation for high-class cuisine, strongly ______ on the saying: they are the least attracted to quick meals.",
+      "options": [
+        {
+          "id": "A",
+          "text": "reckon"
+        },
+        {
+          "id": "B",
+          "text": "frown"
+        },
+        {
+          "id": "C",
+          "text": "speculate"
+        },
+        {
+          "id": "D",
+          "text": "figure"
+        }
+      ],
+      "answer": "B",
+      "explanation": "frown on 表示不赞同、反对；reckon on 与 figure on 表指望，speculate on 表推测或投机。此处表达对该说法的不赞同。"
+    },
+    {
+      "id": "MT36-15",
+      "type": "single-choice",
+      "question": "The prisoner was questioned for three hours but he remained ______ throughout his trial.",
+      "options": [
+        {
+          "id": "A",
+          "text": "blind"
+        },
+        {
+          "id": "B",
+          "text": "deaf"
+        },
+        {
+          "id": "C",
+          "text": "dumb"
+        },
+        {
+          "id": "D",
+          "text": "inarticulate"
+        }
+      ],
+      "answer": "C",
+      "explanation": "dumb 在此是缄口不言、沉默；inarticulate 表达不清、说不出连贯话，不必然完全不说话；blind 看不见；deaf 听不见。"
+    },
+    {
+      "id": "MT36-16",
+      "type": "single-choice",
+      "question": "The super star turned down interview requests, saying he preferred to keep a low ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "profile"
+        },
+        {
+          "id": "B",
+          "text": "tone"
+        },
+        {
+          "id": "C",
+          "text": "outline"
+        },
+        {
+          "id": "D",
+          "text": "face"
+        }
+      ],
+      "answer": "A",
+      "explanation": "keep a low profile 表示保持低调、不引人注意。"
+    },
+    {
+      "id": "MT36-18",
+      "type": "single-choice",
+      "question": "Such a decision would ______ a huge political risk in the midst of the presidential campaign.",
+      "options": [
+        {
+          "id": "A",
+          "text": "result"
+        },
+        {
+          "id": "B",
+          "text": "assure"
+        },
+        {
+          "id": "C",
+          "text": "entail"
+        },
+        {
+          "id": "D",
+          "text": "accomplish"
+        }
+      ],
+      "answer": "C",
+      "explanation": "entail 必然涉及、带来，可直接接 risk；result 要接 in 才能表示“导致”；assure 向人保证；accomplish 完成目标或任务。"
+    },
+    {
+      "id": "MT37-11",
+      "type": "single-choice",
+      "question": "Scientists first ______ the idea of atomic bomb in the 1930’s.",
+      "options": [
+        {
+          "id": "A",
+          "text": "deceived"
+        },
+        {
+          "id": "B",
+          "text": "conceived"
+        },
+        {
+          "id": "C",
+          "text": "relieved"
+        },
+        {
+          "id": "D",
+          "text": "perceived"
+        }
+      ],
+      "answer": "B",
+      "explanation": "conceive an idea 构想、提出想法；perceive 感知、察觉；deceive 欺骗；relieve 缓解。先在头脑中构思，用 conceive。"
+    },
+    {
+      "id": "MT37-12",
+      "type": "single-choice",
+      "question": "We finished all of the food <u>at a sitting</u>. The underlined part means ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "at one time"
+        },
+        {
+          "id": "B",
+          "text": "in time"
+        },
+        {
+          "id": "C",
+          "text": "on time"
+        },
+        {
+          "id": "D",
+          "text": "at a time"
+        }
+      ],
+      "answer": "A",
+      "explanation": "at a sitting 表示一口气、一次坐下来期间，最接近 at one time；in time 及时，on time 准时。"
+    },
+    {
+      "id": "MT37-15",
+      "type": "single-choice",
+      "question": "The mayor ______ his political view on the radio.",
+      "options": [
+        {
+          "id": "A",
+          "text": "set up"
+        },
+        {
+          "id": "B",
+          "text": "set forth"
+        },
+        {
+          "id": "C",
+          "text": "set about"
+        },
+        {
+          "id": "D",
+          "text": "set in"
+        }
+      ],
+      "answer": "B",
+      "explanation": "set forth 表示阐述、陈述观点；set up 建立，set about 着手，set in 开始并持续。"
+    },
+    {
+      "id": "MT37-17",
+      "type": "single-choice",
+      "question": "The Navy is warning ships to stay away from the coast of Somalia after a series of ______ attacks there.",
+      "options": [
+        {
+          "id": "A",
+          "text": "burglar"
+        },
+        {
+          "id": "B",
+          "text": "bandit"
+        },
+        {
+          "id": "C",
+          "text": "gangster"
+        },
+        {
+          "id": "D",
+          "text": "pirate"
+        }
+      ],
+      "answer": "D",
+      "explanation": "pirate 指海盗，海军警告船只避开海岸的情境对应海盗袭击。"
+    },
+    {
+      "id": "MT37-18",
+      "type": "single-choice",
+      "question": "The government ______ between the workers and the employers.",
+      "options": [
+        {
+          "id": "A",
+          "text": "mediated"
+        },
+        {
+          "id": "B",
+          "text": "reconciled"
+        },
+        {
+          "id": "C",
+          "text": "interfered"
+        },
+        {
+          "id": "D",
+          "text": "involved"
+        }
+      ],
+      "answer": "A",
+      "explanation": "mediate between A and B 在双方之间调解；reconcile A with B 或 reconcile A and B 使和解；interfere in/with 干涉；involve 牵涉。直接看 between 即可。"
+    },
+    {
+      "id": "MT38-11",
+      "type": "single-choice",
+      "question": "If you are like most people, then chances are you often ______ others while they are still talking.",
+      "options": [
+        {
+          "id": "A",
+          "text": "interfere"
+        },
+        {
+          "id": "B",
+          "text": "intervene"
+        },
+        {
+          "id": "C",
+          "text": "interrupt"
+        },
+        {
+          "id": "D",
+          "text": "disturb"
+        }
+      ],
+      "answer": "C",
+      "explanation": "interrupt others 指打断别人说话；interfere、intervene 通常还需介词，disturb 指打扰。"
+    },
+    {
+      "id": "MT38-12",
+      "type": "single-choice",
+      "question": "Benjamin was <u>sweating bullets</u> by the time the police had finished questioning him. The underlined part means ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "impatient"
+        },
+        {
+          "id": "B",
+          "text": "very frightened"
+        },
+        {
+          "id": "C",
+          "text": "speechless"
+        },
+        {
+          "id": "D",
+          "text": "very tired"
+        }
+      ],
+      "answer": "B",
+      "explanation": "sweat bullets 是极度紧张、害怕得冒汗的习语，对应 very frightened。"
+    },
+    {
+      "id": "MT38-13",
+      "type": "single-choice",
+      "question": "Frankly, I hope that we can develop a ______ quality product.",
+      "options": [
+        {
+          "id": "A",
+          "text": "durable"
+        },
+        {
+          "id": "B",
+          "text": "lasting"
+        },
+        {
+          "id": "C",
+          "text": "permanent"
+        },
+        {
+          "id": "D",
+          "text": "perpetual"
+        }
+      ],
+      "answer": "A",
+      "explanation": "durable 耐磨耐用，适合产品；lasting 持续很久，常配 impression/effect；permanent 长期固定、非临时；perpetual 不断持续或反复，常配 motion/complaints。"
+    },
+    {
+      "id": "MT38-14",
+      "type": "single-choice",
+      "question": "One third of the Chinese in the United States live in California, ______ in the San Francisco area.",
+      "options": [
+        {
+          "id": "A",
+          "text": "remarkably"
+        },
+        {
+          "id": "B",
+          "text": "severely"
+        },
+        {
+          "id": "C",
+          "text": "drastically"
+        },
+        {
+          "id": "D",
+          "text": "predominantly"
+        }
+      ],
+      "answer": "D",
+      "explanation": "predominantly 表示主要地、占绝大多数地，说明在加州的地域集中情况。"
+    },
+    {
+      "id": "MT38-15",
+      "type": "single-choice",
+      "question": "You can ______ your muscles more powerfully by linking up your breathing to the exercise.",
+      "options": [
+        {
+          "id": "A",
+          "text": "condense"
+        },
+        {
+          "id": "B",
+          "text": "compress"
+        },
+        {
+          "id": "C",
+          "text": "contract"
+        },
+        {
+          "id": "D",
+          "text": "shrink"
+        }
+      ],
+      "answer": "C",
+      "explanation": "contract muscles 收缩肌肉；condense 凝结或浓缩内容；compress 用外力压缩；shrink 体积缩小、缩水。生理上的肌肉收缩，选 contract。"
+    },
+    {
+      "id": "MT38-18",
+      "type": "single-choice",
+      "question": "The London Marathon is a difficult race. ______, thousands of runners participate every year.",
+      "options": [
+        {
+          "id": "A",
+          "text": "Therefore"
+        },
+        {
+          "id": "B",
+          "text": "Furthermore"
+        },
+        {
+          "id": "C",
+          "text": "Accordingly"
+        },
+        {
+          "id": "D",
+          "text": "Nevertheless"
+        }
+      ],
+      "answer": "D",
+      "explanation": "nevertheless 表示尽管如此，连接比赛艰难与仍有大量参与者的转折关系。"
+    },
+    {
+      "id": "MT38-19",
+      "type": "single-choice",
+      "question": "The deal ______ before it was signed and sealed, even after the Letter of Intent was drawn up.",
+      "options": [
+        {
+          "id": "A",
+          "text": "fell in with"
+        },
+        {
+          "id": "B",
+          "text": "fell for"
+        },
+        {
+          "id": "C",
+          "text": "fell through"
+        },
+        {
+          "id": "D",
+          "text": "fell out"
+        }
+      ],
+      "answer": "C",
+      "explanation": "fall through 计划、交易落空；fall for 上当或迷恋；fall in with 偶遇、同意；fall out 争吵失和或掉落。交易未签成，选 fell through。"
+    },
+    {
+      "id": "MT38-20",
+      "type": "single-choice",
+      "question": "No matter how hard you try, you can find no <u>parallel</u> existing between them. The underlined part means ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "analogy"
+        },
+        {
+          "id": "B",
+          "text": "ambition"
+        },
+        {
+          "id": "C",
+          "text": "conflict"
+        },
+        {
+          "id": "D",
+          "text": "contradiction"
+        }
+      ],
+      "answer": "A",
+      "explanation": "parallel 作名词可指相似或可比之处，对应 analogy；不是平行线的字面义。"
+    },
+    {
+      "id": "MT39-11",
+      "type": "single-choice",
+      "question": "Alan argued that the best teachers should be rewarded with salaries <u>on a par with</u> doctors and lawyers. The underlined part means ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "parallel with"
+        },
+        {
+          "id": "B",
+          "text": "equivalent to"
+        },
+        {
+          "id": "C",
+          "text": "identical with"
+        },
+        {
+          "id": "D",
+          "text": "distinct from"
+        }
+      ],
+      "answer": "B",
+      "explanation": "on a par with 指与……处于同等水平，最接近 equivalent to，不要求完全一模一样。"
+    },
+    {
+      "id": "MT39-12",
+      "type": "single-choice",
+      "question": "We ______ to refund your money if you are not satisfied with your purchase.",
+      "options": [
+        {
+          "id": "A",
+          "text": "assure"
+        },
+        {
+          "id": "B",
+          "text": "ensure"
+        },
+        {
+          "id": "C",
+          "text": "insure"
+        },
+        {
+          "id": "D",
+          "text": "guarantee"
+        }
+      ],
+      "answer": "D",
+      "explanation": "guarantee to do 承诺做；assure sb of/that 使人放心；ensure that 确保结果；insure 给……保险。能直接接 to refund 表承诺的是 guarantee。"
+    },
+    {
+      "id": "MT39-13",
+      "type": "single-choice",
+      "question": "The official ______ the interview on the sensitive issue.",
+      "options": [
+        {
+          "id": "A",
+          "text": "turned down"
+        },
+        {
+          "id": "B",
+          "text": "turned back"
+        },
+        {
+          "id": "C",
+          "text": "turned around"
+        },
+        {
+          "id": "D",
+          "text": "turned out"
+        }
+      ],
+      "answer": "A",
+      "explanation": "turn down an interview 表示拒绝采访；turn back 返回，turn around 转向，turn out 结果是。"
+    },
+    {
+      "id": "MT39-14",
+      "type": "single-choice",
+      "question": "Fiber-optic cables can carry hundreds of telephone conversations ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "homogeneously"
+        },
+        {
+          "id": "B",
+          "text": "spontaneously"
+        },
+        {
+          "id": "C",
+          "text": "simultaneously"
+        },
+        {
+          "id": "D",
+          "text": "ingeniously"
+        }
+      ],
+      "answer": "C",
+      "explanation": "simultaneously 指同时地，说明光纤能同时传输大量通话。"
+    },
+    {
+      "id": "MT39-15",
+      "type": "single-choice",
+      "question": "He was reading excitedly the book published by his company in ______ with a famous press.",
+      "options": [
+        {
+          "id": "A",
+          "text": "collection"
+        },
+        {
+          "id": "B",
+          "text": "connection"
+        },
+        {
+          "id": "C",
+          "text": "collaboration"
+        },
+        {
+          "id": "D",
+          "text": "common"
+        }
+      ],
+      "answer": "C",
+      "explanation": "in collaboration with 表示与……合作，吻合联合出版。"
+    },
+    {
+      "id": "MT39-17",
+      "type": "single-choice",
+      "question": "American History is one of the elective studies in the university ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "schedule"
+        },
+        {
+          "id": "B",
+          "text": "syllabus"
+        },
+        {
+          "id": "C",
+          "text": "course"
+        },
+        {
+          "id": "D",
+          "text": "curriculum"
+        }
+      ],
+      "answer": "D",
+      "explanation": "curriculum 学校或专业的整体课程体系；syllabus 某课程的教学大纲；course 一门课程；schedule 时间表。大学全部课程中的选修科目，选 curriculum。"
+    },
+    {
+      "id": "MT39-18",
+      "type": "single-choice",
+      "question": "Our neighbours are so <u>reserved</u> and unfriendly that they never speak to us. The underlined part means ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "aloof"
+        },
+        {
+          "id": "B",
+          "text": "relieved"
+        },
+        {
+          "id": "C",
+          "text": "airy"
+        },
+        {
+          "id": "D",
+          "text": "resistant"
+        }
+      ],
+      "answer": "A",
+      "explanation": "reserved 在此指少言、疏离，最接近 aloof；relieved 如释重负，resistant 抵抗的。"
+    },
+    {
+      "id": "MT39-19",
+      "type": "single-choice",
+      "question": "The vase he bought at the street market yesterday was a ______ forgery.",
+      "options": [
+        {
+          "id": "A",
+          "text": "man-made"
+        },
+        {
+          "id": "B",
+          "text": "crude"
+        },
+        {
+          "id": "C",
+          "text": "natural"
+        },
+        {
+          "id": "D",
+          "text": "real"
+        }
+      ],
+      "answer": "B",
+      "explanation": "crude forgery 指粗劣的仿品；crude 在此强调制作粗糙、伪造拙劣。"
+    },
+    {
+      "id": "MT40-11",
+      "type": "single-choice",
+      "question": "Being ______ about food can not only make children suffer from malnutrition but also influence their growth of intelligence.",
+      "options": [
+        {
+          "id": "A",
+          "text": "peculiar"
+        },
+        {
+          "id": "B",
+          "text": "partial"
+        },
+        {
+          "id": "C",
+          "text": "pathetic"
+        },
+        {
+          "id": "D",
+          "text": "particular"
+        }
+      ],
+      "answer": "D",
+      "explanation": "be particular about food 表示挑食；partial 常与 to 搭配，peculiar 奇特，pathetic 可怜。"
+    },
+    {
+      "id": "MT40-12",
+      "type": "single-choice",
+      "question": "Mary was <u>in a lather</u> when she heard that she would be transferred to another department. The underlined part means ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "scared"
+        },
+        {
+          "id": "B",
+          "text": "hesitant"
+        },
+        {
+          "id": "C",
+          "text": "agitated"
+        },
+        {
+          "id": "D",
+          "text": "shocked"
+        }
+      ],
+      "answer": "C",
+      "explanation": "in a lather 焦躁不安、激动，选 agitated；scared 害怕；hesitant 犹豫；shocked 震惊。字面是“泡沫”，此处是习语。"
+    },
+    {
+      "id": "MT40-13",
+      "type": "single-choice",
+      "question": "Many remarkable people deal with depression and anxiety all the time because they see the world differently than ______ people do.",
+      "options": [
+        {
+          "id": "A",
+          "text": "average"
+        },
+        {
+          "id": "B",
+          "text": "moderate"
+        },
+        {
+          "id": "C",
+          "text": "general"
+        },
+        {
+          "id": "D",
+          "text": "universal"
+        }
+      ],
+      "answer": "A",
+      "explanation": "average people 指普通人，与 remarkable people 对比；moderate 温和，general 一般性的，universal 普遍的。"
+    },
+    {
+      "id": "MT40-14",
+      "type": "single-choice",
+      "question": "Under no ______ should we seek temporary economic development at the expense of the environment and resources.",
+      "options": [
+        {
+          "id": "A",
+          "text": "background"
+        },
+        {
+          "id": "B",
+          "text": "circumstances"
+        },
+        {
+          "id": "C",
+          "text": "setting"
+        },
+        {
+          "id": "D",
+          "text": "surroundings"
+        }
+      ],
+      "answer": "B",
+      "explanation": "under no circumstances 表示绝不、无论如何都不；否定短语前置，引起 should we 部分倒装。"
+    },
+    {
+      "id": "MT40-16",
+      "type": "single-choice",
+      "question": "They <u>are at odds</u> over the funding for the project. The underlined part means ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "contend"
+        },
+        {
+          "id": "B",
+          "text": "quarrel"
+        },
+        {
+          "id": "C",
+          "text": "disagree"
+        },
+        {
+          "id": "D",
+          "text": "debate"
+        }
+      ],
+      "answer": "C",
+      "explanation": "be at odds 表示意见不一致，对应 disagree；不必已经争吵或公开辩论。"
+    },
+    {
+      "id": "MT40-17",
+      "type": "single-choice",
+      "question": "The police have received ______ information that the wanted murderer is still on the run.",
+      "options": [
+        {
+          "id": "A",
+          "text": "credible"
+        },
+        {
+          "id": "B",
+          "text": "chaotic"
+        },
+        {
+          "id": "C",
+          "text": "chronic"
+        },
+        {
+          "id": "D",
+          "text": "cautious"
+        }
+      ],
+      "answer": "A",
+      "explanation": "credible information 指可信的信息；chaotic 混乱，chronic 长期的，cautious 谨慎的。"
+    },
+    {
+      "id": "MT40-18",
+      "type": "single-choice",
+      "question": "If you are not sure of the address, call and ask ______ to the interview.",
+      "options": [
+        {
+          "id": "A",
+          "text": "former"
+        },
+        {
+          "id": "B",
+          "text": "preceding"
+        },
+        {
+          "id": "C",
+          "text": "previous"
+        },
+        {
+          "id": "D",
+          "text": "prior"
+        }
+      ],
+      "answer": "D",
+      "explanation": "prior to = before，作为介词短语表示“在面试之前”。former 前任、前者；preceding 紧前的；previous 先前的，都不直接构成这里的 ______ to。"
+    },
+    {
+      "id": "MT40-20",
+      "type": "single-choice",
+      "question": "This film documents the President Teddy Roosevelt’s ______ to what is now Kenya in 1909.",
+      "options": [
+        {
+          "id": "A",
+          "text": "cruise"
+        },
+        {
+          "id": "B",
+          "text": "excursion"
+        },
+        {
+          "id": "C",
+          "text": "expedition"
+        },
+        {
+          "id": "D",
+          "text": "voyage"
+        }
+      ],
+      "answer": "C",
+      "explanation": "expedition 有组织、为探险或考察等目的进行的远行；cruise 海上游览；excursion 短途出游；voyage 航海或太空等长途旅行。明确探险情境选 expedition。"
+    },
+    {
+      "id": "MT41-11",
+      "type": "single-choice",
+      "question": "The newly built school offers courses in every subject ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "imagined"
+        },
+        {
+          "id": "B",
+          "text": "imaginable"
+        },
+        {
+          "id": "C",
+          "text": "imaginary"
+        },
+        {
+          "id": "D",
+          "text": "imaginative"
+        }
+      ],
+      "answer": "B",
+      "explanation": "every subject imaginable 一切能想得到的学科，imaginable 常后置；imaginary 虚构的；imaginative 富有想象力的；imagined 被设想出来的。"
+    },
+    {
+      "id": "MT41-17",
+      "type": "single-choice",
+      "question": "Forty people were killed in a ______ on the railway yesterday.",
+      "options": [
+        {
+          "id": "A",
+          "text": "collision"
+        },
+        {
+          "id": "B",
+          "text": "collapse"
+        },
+        {
+          "id": "C",
+          "text": "corrosion"
+        },
+        {
+          "id": "D",
+          "text": "confrontation"
+        }
+      ],
+      "answer": "A",
+      "explanation": "collision 指碰撞，吻合铁路撞车事故；collapse 坍塌，corrosion 腐蚀，confrontation 对抗。"
+    },
+    {
+      "id": "MT41-18",
+      "type": "single-choice",
+      "question": "I have an <u>itch</u> to go fishing this summer. The underlined word means ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "desire"
+        },
+        {
+          "id": "B",
+          "text": "chance"
+        },
+        {
+          "id": "C",
+          "text": "appointment"
+        },
+        {
+          "id": "D",
+          "text": "plan"
+        }
+      ],
+      "answer": "A",
+      "explanation": "an itch to do 表示想做某事的强烈愿望；itch 在此不是皮肤发痒。"
+    },
+    {
+      "id": "MT41-19",
+      "type": "single-choice",
+      "question": "On further examination it was found that the signature was not ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "genetic"
+        },
+        {
+          "id": "B",
+          "text": "genial"
+        },
+        {
+          "id": "C",
+          "text": "generic"
+        },
+        {
+          "id": "D",
+          "text": "genuine"
+        }
+      ],
+      "answer": "D",
+      "explanation": "genuine signature 指真实、非伪造的签名；genetic 遗传的，genial 和蔼的，generic 通用的。"
+    },
+    {
+      "id": "MT41-20",
+      "type": "single-choice",
+      "question": "Having recurrent dreams is not necessarily ______ of any psychological problem.",
+      "options": [
+        {
+          "id": "A",
+          "text": "indicative"
+        },
+        {
+          "id": "B",
+          "text": "positive"
+        },
+        {
+          "id": "C",
+          "text": "revealing"
+        },
+        {
+          "id": "D",
+          "text": "evident"
+        }
+      ],
+      "answer": "A",
+      "explanation": "be indicative of 是……的迹象、表明……；positive of/about 确信；revealing 有启示的、揭露性的；evident 明显的。这里看固定搭配 indicative of。"
+    },
+    {
+      "id": "MT42-11",
+      "type": "single-choice",
+      "question": "A similar approach can be ______ to innovation.",
+      "options": [
+        {
+          "id": "A",
+          "text": "used"
+        },
+        {
+          "id": "B",
+          "text": "applied"
+        },
+        {
+          "id": "C",
+          "text": "tried"
+        },
+        {
+          "id": "D",
+          "text": "employed"
+        }
+      ],
+      "answer": "B",
+      "explanation": "apply an approach to sth 表示把方法应用于某事；这里为被动 applied to。"
+    },
+    {
+      "id": "MT42-12",
+      "type": "single-choice",
+      "question": "Can you imagine that the apparently ______ man does such nasty things?",
+      "options": [
+        {
+          "id": "A",
+          "text": "respective"
+        },
+        {
+          "id": "B",
+          "text": "respectable"
+        },
+        {
+          "id": "C",
+          "text": "respectful"
+        },
+        {
+          "id": "D",
+          "text": "realistic"
+        }
+      ],
+      "answer": "B",
+      "explanation": "respectable 体面、值得尊敬；respectful 对别人恭敬；respective 各自的；realistic 现实的。apparently 与 nasty 形成“看起来体面，却做坏事”的反差。"
+    },
+    {
+      "id": "MT42-14",
+      "type": "single-choice",
+      "question": "The place did not appear to be popular, for it was completely deserted, and in any case ______ to traffic.",
+      "options": [
+        {
+          "id": "A",
+          "text": "inadequate"
+        },
+        {
+          "id": "B",
+          "text": "inaccessible"
+        },
+        {
+          "id": "C",
+          "text": "incompatible"
+        },
+        {
+          "id": "D",
+          "text": "untouchable"
+        }
+      ],
+      "answer": "B",
+      "explanation": "inaccessible to traffic 表示交通无法到达；incompatible with 才表示不相容。"
+    },
+    {
+      "id": "MT42-16",
+      "type": "single-choice",
+      "question": "The ______ heat has dried up the pond.",
+      "options": [
+        {
+          "id": "A",
+          "text": "concentrated"
+        },
+        {
+          "id": "B",
+          "text": "extensive"
+        },
+        {
+          "id": "C",
+          "text": "intense"
+        },
+        {
+          "id": "D",
+          "text": "intensive"
+        }
+      ],
+      "answer": "C",
+      "explanation": "intense 强烈的程度：intense heat/pain；intensive 高强度、密集投入的方式：intensive training/course；extensive 广泛的；concentrated 集中的、浓缩的。"
+    },
+    {
+      "id": "MT42-19",
+      "type": "single-choice",
+      "question": "Never believe Tom, who was such a ______ character.",
+      "options": [
+        {
+          "id": "A",
+          "text": "suspicious"
+        },
+        {
+          "id": "B",
+          "text": "gracious"
+        },
+        {
+          "id": "C",
+          "text": "conspicuous"
+        },
+        {
+          "id": "D",
+          "text": "minutious"
+        }
+      ],
+      "answer": "A",
+      "explanation": "suspicious 可表示令人怀疑、不可信的，与 Never believe 相呼应；gracious 亲切，conspicuous 显眼。"
+    },
+    {
+      "id": "MT42-20",
+      "type": "single-choice",
+      "question": "In order to ______ the identity of a candidate, we may ask you to show your ID.",
+      "options": [
+        {
+          "id": "A",
+          "text": "ensure"
+        },
+        {
+          "id": "B",
+          "text": "examine"
+        },
+        {
+          "id": "C",
+          "text": "verify"
+        },
+        {
+          "id": "D",
+          "text": "testify"
+        }
+      ],
+      "answer": "C",
+      "explanation": "verify 核实是否属实；examine 检查研究；ensure 确保某结果；testify 提供证言、作证，常用 testify to/that。凭证件核实身份，用 verify。"
+    },
+    {
+      "id": "MT43-12",
+      "type": "single-choice",
+      "question": "Dreams are ______ in themselves, but, when combined with other data, they can tell us much about the dreamer.",
+      "options": [
+        {
+          "id": "A",
+          "text": "startling"
+        },
+        {
+          "id": "B",
+          "text": "harmless"
+        },
+        {
+          "id": "C",
+          "text": "uninformative"
+        },
+        {
+          "id": "D",
+          "text": "uncontrollable"
+        }
+      ],
+      "answer": "C",
+      "explanation": "uninformative 表示不能提供多少信息，与结合其他资料后能说明很多情况形成对比。"
+    },
+    {
+      "id": "MT43-13",
+      "type": "single-choice",
+      "question": "Our journey was slow because the train stopped ______ at different villages.",
+      "options": [
+        {
+          "id": "A",
+          "text": "unceasingly"
+        },
+        {
+          "id": "B",
+          "text": "gradually"
+        },
+        {
+          "id": "C",
+          "text": "continuously"
+        },
+        {
+          "id": "D",
+          "text": "continually"
+        }
+      ],
+      "answer": "D",
+      "explanation": "continually 一次又一次，允许间断；continuously 连续不断；unceasingly 不停歇；gradually 逐渐。火车是走一段停一次，属于反复而非始终停止。"
+    },
+    {
+      "id": "MT43-14",
+      "type": "single-choice",
+      "question": "The tuition fees are ______ to students coming from low-income families.",
+      "options": [
+        {
+          "id": "A",
+          "text": "approachable"
+        },
+        {
+          "id": "B",
+          "text": "payable"
+        },
+        {
+          "id": "C",
+          "text": "affordable"
+        },
+        {
+          "id": "D",
+          "text": "reachable"
+        }
+      ],
+      "answer": "C",
+      "explanation": "affordable 表示负担得起，适合描述学费相对学生家庭收入的可承受性。"
+    },
+    {
+      "id": "MT43-15",
+      "type": "single-choice",
+      "question": "Thousands of ______ at the stadium came to their feet to pay tribute to an outstanding performance.",
+      "options": [
+        {
+          "id": "A",
+          "text": "audience"
+        },
+        {
+          "id": "B",
+          "text": "spectators"
+        },
+        {
+          "id": "C",
+          "text": "participants"
+        },
+        {
+          "id": "D",
+          "text": "observers"
+        }
+      ],
+      "answer": "B",
+      "explanation": "spectators 是体育场的观众，可直接作可数复数；audience 为集合名词，不能在此表示数千名个人观众。"
+    },
+    {
+      "id": "MT43-16",
+      "type": "single-choice",
+      "question": "I’m supposed to go to the meeting, but I have an <u>out</u>—Sam invited me first to come to his wedding. The underlined word means ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "plan"
+        },
+        {
+          "id": "B",
+          "text": "problem"
+        },
+        {
+          "id": "C",
+          "text": "trouble"
+        },
+        {
+          "id": "D",
+          "text": "excuse"
+        }
+      ],
+      "answer": "D",
+      "explanation": "an out = 脱身的办法、退出的借口；这里有婚礼邀请可作为不参加会议的理由。out 不只是副词“出去”。"
+    },
+    {
+      "id": "MT43-18",
+      "type": "single-choice",
+      "question": "He was accepted as a(n) ______ member of staff after three months' probation.",
+      "options": [
+        {
+          "id": "A",
+          "text": "eternal"
+        },
+        {
+          "id": "B",
+          "text": "permanent"
+        },
+        {
+          "id": "C",
+          "text": "perpetual"
+        },
+        {
+          "id": "D",
+          "text": "lasting"
+        }
+      ],
+      "answer": "B",
+      "explanation": "permanent member of staff 表示正式、长期雇用的员工，与试用期结束相呼应。"
+    },
+    {
+      "id": "MT43-19",
+      "type": "single-choice",
+      "question": "These low-budget animated films are the main source of ______ of this independent studio.",
+      "options": [
+        {
+          "id": "A",
+          "text": "pay"
+        },
+        {
+          "id": "B",
+          "text": "income"
+        },
+        {
+          "id": "C",
+          "text": "salary"
+        },
+        {
+          "id": "D",
+          "text": "wage"
+        }
+      ],
+      "answer": "B",
+      "explanation": "income 指工作室的收入来源；pay、salary、wage 通常指个人工作报酬。"
+    },
+    {
+      "id": "MT44-11",
+      "type": "single-choice",
+      "question": "The boy will be in <u>deep water</u> if he does not tell us where he spent the money. The underlined part means ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "pain"
+        },
+        {
+          "id": "B",
+          "text": "sight"
+        },
+        {
+          "id": "C",
+          "text": "trouble"
+        },
+        {
+          "id": "D",
+          "text": "danger"
+        }
+      ],
+      "answer": "C",
+      "explanation": "in deep water 是陷入困境、遇上麻烦的习语，对应 trouble。"
+    },
+    {
+      "id": "MT44-12",
+      "type": "single-choice",
+      "question": "I hope to ______ my umbrella which I left in the taxi.",
+      "options": [
+        {
+          "id": "A",
+          "text": "restore"
+        },
+        {
+          "id": "B",
+          "text": "retain"
+        },
+        {
+          "id": "C",
+          "text": "repel"
+        },
+        {
+          "id": "D",
+          "text": "retrieve"
+        }
+      ],
+      "answer": "D",
+      "explanation": "retrieve 找回、取回遗失物；restore 恢复原状态、修复；retain 保留；repel 排斥、击退。伞留在出租车上，希望“找回”，选 retrieve。"
+    },
+    {
+      "id": "MT44-13",
+      "type": "single-choice",
+      "question": "A teacher who is skillful in delivering his lecture can undoubtedly ______ the mind of students.",
+      "options": [
+        {
+          "id": "A",
+          "text": "encourage"
+        },
+        {
+          "id": "B",
+          "text": "inspire"
+        },
+        {
+          "id": "C",
+          "text": "motivate"
+        },
+        {
+          "id": "D",
+          "text": "promote"
+        }
+      ],
+      "answer": "B",
+      "explanation": "inspire 启发思想、激起灵感；encourage 鼓励、给予信心；motivate 提供行动动力；promote 促进或晋升。这里 the mind 与启发思维相连，选 inspire。"
+    },
+    {
+      "id": "MT44-15",
+      "type": "single-choice",
+      "question": "This program can help freshmen make a successful ______ into college life.",
+      "options": [
+        {
+          "id": "A",
+          "text": "transformation"
+        },
+        {
+          "id": "B",
+          "text": "transmission"
+        },
+        {
+          "id": "C",
+          "text": "transition"
+        },
+        {
+          "id": "D",
+          "text": "transaction"
+        }
+      ],
+      "answer": "C",
+      "explanation": "transition into/to 过渡到新阶段；transformation 形态或性质转变；transmission 传输；transaction 交易。新生适应大学是 transition。"
+    },
+    {
+      "id": "MT44-16",
+      "type": "single-choice",
+      "question": "Will the widening ______ between the rich and poor reverse?",
+      "options": [
+        {
+          "id": "A",
+          "text": "cheat"
+        },
+        {
+          "id": "B",
+          "text": "charm"
+        },
+        {
+          "id": "C",
+          "text": "chase"
+        },
+        {
+          "id": "D",
+          "text": "chasm"
+        }
+      ],
+      "answer": "D",
+      "explanation": "chasm 裂隙、鸿沟，也指巨大差距；widening chasm 越来越大的鸿沟。cheat 欺骗者或欺骗；charm 魅力；chase 追逐。"
+    },
+    {
+      "id": "MT44-17",
+      "type": "single-choice",
+      "question": "Time is a ______ performer. It flies, marches on, heals all wounds, runs out and will tell.",
+      "options": [
+        {
+          "id": "A",
+          "text": "fertile"
+        },
+        {
+          "id": "B",
+          "text": "fruitful"
+        },
+        {
+          "id": "C",
+          "text": "productive"
+        },
+        {
+          "id": "D",
+          "text": "versatile"
+        }
+      ],
+      "answer": "D",
+      "explanation": "versatile 多才多艺、用途多样，吻合时间会“飞、前进、疗伤、耗尽、揭示”；fertile 富有创造力或肥沃；fruitful 有成果；productive 多产。"
+    },
+    {
+      "id": "MT44-18",
+      "type": "single-choice",
+      "question": "You shouldn’t ______ your father’s advice. Anyway he is much more experienced than you in this matter.",
+      "options": [
+        {
+          "id": "A",
+          "text": "deduce"
+        },
+        {
+          "id": "B",
+          "text": "deliberate"
+        },
+        {
+          "id": "C",
+          "text": "defy"
+        },
+        {
+          "id": "D",
+          "text": "denounce"
+        }
+      ],
+      "answer": "C",
+      "explanation": "defy 违抗、不遵从；denounce 公开谴责；deduce 推断；deliberate 深思、商议。题意是不要违背父亲的建议，不是公开谴责建议。"
+    },
+    {
+      "id": "MT44-19",
+      "type": "single-choice",
+      "question": "After three hours of questioning the suspect broke down and ______.",
+      "options": [
+        {
+          "id": "A",
+          "text": "acknowledged"
+        },
+        {
+          "id": "B",
+          "text": "recognized"
+        },
+        {
+          "id": "C",
+          "text": "conceded"
+        },
+        {
+          "id": "D",
+          "text": "confessed"
+        }
+      ],
+      "answer": "D",
+      "explanation": "confess 可不带宾语表示“认罪”，也可 confess to doing；acknowledge 承认事实，常接宾语；recognize 认出、认可；concede 勉强承认或让步。嫌疑人崩溃后招供，选 confessed。"
+    },
+    {
+      "id": "MT44-20",
+      "type": "single-choice",
+      "question": "This is a long ______—roughly 20 miles down a beautiful valley to the little village below.",
+      "options": [
+        {
+          "id": "A",
+          "text": "terrain"
+        },
+        {
+          "id": "B",
+          "text": "descent"
+        },
+        {
+          "id": "C",
+          "text": "degeneration"
+        },
+        {
+          "id": "D",
+          "text": "tumble"
+        }
+      ],
+      "answer": "B",
+      "explanation": "descent 表示下行路程；down、below 与向山谷下方行进的含义相呼应。"
+    },
+    {
+      "id": "MT45-11",
+      "type": "single-choice",
+      "question": "These cameras do not take a ______ photograph but a series of images or scans indicating when each athlete crosses the finishing line.",
+      "options": [
+        {
+          "id": "A",
+          "text": "classical"
+        },
+        {
+          "id": "B",
+          "text": "conservative"
+        },
+        {
+          "id": "C",
+          "text": "conventional"
+        },
+        {
+          "id": "D",
+          "text": "formal"
+        }
+      ],
+      "answer": "C",
+      "explanation": "conventional 常规、传统方式的；classical 古典的、经典艺术体系的；conservative 保守的；formal 正式的。与扫描序列相对的是常规照片。"
+    },
+    {
+      "id": "MT45-12",
+      "type": "single-choice",
+      "question": "Topics for composition should be ______ to the experiences and interests of students.",
+      "options": [
+        {
+          "id": "A",
+          "text": "concerned"
+        },
+        {
+          "id": "B",
+          "text": "relevant"
+        },
+        {
+          "id": "C",
+          "text": "connecting"
+        },
+        {
+          "id": "D",
+          "text": "dependent"
+        }
+      ],
+      "answer": "B",
+      "explanation": "be relevant to 表示与……相关；写作主题应与学生的经历、兴趣相关。"
+    },
+    {
+      "id": "MT45-13",
+      "type": "single-choice",
+      "question": "The computer can be programmed to ______ a whole variety of tasks.",
+      "options": [
+        {
+          "id": "A",
+          "text": "solve"
+        },
+        {
+          "id": "B",
+          "text": "tackle"
+        },
+        {
+          "id": "C",
+          "text": "realize"
+        },
+        {
+          "id": "D",
+          "text": "assign"
+        }
+      ],
+      "answer": "B",
+      "explanation": "tackle tasks 表示处理任务；solve 常接问题，realize 实现或意识到，assign 分配。"
+    },
+    {
+      "id": "MT45-14",
+      "type": "single-choice",
+      "question": "Kelsey likes eating very much, but he isn’t very ______ about the food he eats.",
+      "options": [
+        {
+          "id": "A",
+          "text": "particular"
+        },
+        {
+          "id": "B",
+          "text": "peculiar"
+        },
+        {
+          "id": "C",
+          "text": "special"
+        },
+        {
+          "id": "D",
+          "text": "specific"
+        }
+      ],
+      "answer": "A",
+      "explanation": "be particular about 对……挑剔讲究；peculiar 奇怪或特有，常见 peculiar to；special 特别的；specific 明确具体的。爱吃但不挑食，选 particular。"
+    },
+    {
+      "id": "MT45-16",
+      "type": "single-choice",
+      "question": "What you say is not ______ with what you do.",
+      "options": [
+        {
+          "id": "A",
+          "text": "relevant"
+        },
+        {
+          "id": "B",
+          "text": "simultaneous"
+        },
+        {
+          "id": "C",
+          "text": "consistent"
+        },
+        {
+          "id": "D",
+          "text": "practical"
+        }
+      ],
+      "answer": "C",
+      "explanation": "be consistent with 表示与……一致，句意为言行不一致。"
+    },
+    {
+      "id": "MT45-17",
+      "type": "single-choice",
+      "question": "The Tibet Autonomous Region is 1.22 million sq.km. in area, with an average ______ of over 4,000m above sea level.",
+      "options": [
+        {
+          "id": "A",
+          "text": "aptitude"
+        },
+        {
+          "id": "B",
+          "text": "latitude"
+        },
+        {
+          "id": "C",
+          "text": "altitude"
+        },
+        {
+          "id": "D",
+          "text": "gratitude"
+        }
+      ],
+      "answer": "C",
+      "explanation": "altitude 指海拔高度，与 above sea level 呼应；latitude 纬度，aptitude 天资，gratitude 感激。"
+    },
+    {
+      "id": "MT45-18",
+      "type": "single-choice",
+      "question": "Have you ever received ______ of what has happened to her?",
+      "options": [
+        {
+          "id": "A",
+          "text": "the word"
+        },
+        {
+          "id": "B",
+          "text": "words"
+        },
+        {
+          "id": "C",
+          "text": "word"
+        },
+        {
+          "id": "D",
+          "text": "the words"
+        }
+      ],
+      "answer": "C",
+      "explanation": "word 作“消息、音信”时通常不可数且不用冠词：receive/get word of/about…。word 作“单词”时才常是可数名词，不要机械加 the 或 s。"
+    },
+    {
+      "id": "MT45-19",
+      "type": "single-choice",
+      "question": "The layout can be finished the day after tomorrow at a ______, but that would mean I must lose my weekend.",
+      "options": [
+        {
+          "id": "A",
+          "text": "trust"
+        },
+        {
+          "id": "B",
+          "text": "push"
+        },
+        {
+          "id": "C",
+          "text": "impetus"
+        },
+        {
+          "id": "D",
+          "text": "drive"
+        }
+      ],
+      "answer": "B",
+      "explanation": "at a push = 勉强、加把劲的话（英式），与牺牲周末才能赶完相符。impetus 推动力；drive 冲劲、驱动力，但不组成这里的习语。"
+    },
+    {
+      "id": "MT45-20",
+      "type": "single-choice",
+      "question": "Tom was trying to sort through his ______ and bring them to some sort of order.",
+      "options": [
+        {
+          "id": "A",
+          "text": "assets"
+        },
+        {
+          "id": "B",
+          "text": "belongings"
+        },
+        {
+          "id": "C",
+          "text": "fortunes"
+        },
+        {
+          "id": "D",
+          "text": "property"
+        }
+      ],
+      "answer": "B",
+      "explanation": "belongings 随身或个人物品，复数对应 them；assets 资产；fortunes 财富或命运；property 财产，通常不可数。整理个人东西最贴近 belongings。"
+    }
+  ]
+}

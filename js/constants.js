@@ -1,7 +1,7 @@
 import { uid } from './utils/helpers.js';
 // 启程 · js/constants.js
 
-const VERSION = '4.0.0-beta.1';
+const VERSION = '4.2.0';
 
 const THEMES = {
   pudding : '布丁奶油', obsidian : '黑橙质感', blue : '墨蓝学院', jade : '深海翡翠', berry : '莓果银白'
@@ -98,6 +98,8 @@ const blanks = {
 };
 
 const NAV3 = [ {
+  id : 'start', zh : '启程', en : 'Qicheng', icon : 'layers', items : [['home', '首页', 'Home'], ['explore', '学习拓展中心', 'Learning center']]
+}, {
   id : 'entry', zh : '信息录入', en : 'Information', icon : 'edit', items : [['profile', '个人基本信息', 'Basic information'],
   ['education', '教育经历', 'Education'], ['statement', '个人陈述', 'Personal statement'], ['academics', '语言与考试成绩', 'Languages & exams'],
   ['awards', '荣誉录入', 'Honors & awards'], ['experiences', '个人经历录入', 'Experience'], ['practices', '社会实践录入', 'Social practice']]

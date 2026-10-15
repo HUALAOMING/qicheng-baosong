@@ -1,0 +1,186 @@
+{
+  "date": "2026-10-16",
+  "timezone": "Asia/Shanghai",
+  "applicationVersion": "4.2.0",
+  "automaticTests": {
+    "total": 111,
+    "passed": 111,
+    "failed": 0
+  },
+  "browser": "155.0.4283.45",
+  "browserTests": {
+    "total": 25,
+    "passed": 25,
+    "failed": 0
+  },
+  "checks": [
+    {
+      "name": "cold boot opens home and makes no manifest update request",
+      "status": "PASS",
+      "milliseconds": 1057
+    },
+    {
+      "name": "old current record persists files, export history, theme, drafts while startup returns home",
+      "status": "PASS",
+      "milliseconds": 765
+    },
+    {
+      "name": "navigation, legacy pages and menu toggle remain usable",
+      "status": "PASS",
+      "milliseconds": 615
+    },
+    {
+      "name": "4.2 home and menu open the learning center with quiz and four classics",
+      "status": "PASS",
+      "milliseconds": 310
+    },
+    {
+      "name": "Guanzi reader preserves 100 passages and source, filters chapters and downloads the exact Markdown",
+      "status": "PASS",
+      "milliseconds": 822
+    },
+    {
+      "name": "settings retains themes and Markdown template/import/export through existing controls",
+      "status": "PASS",
+      "milliseconds": 1666
+    },
+    {
+      "name": "countdown saved through UI and day-based quote functions",
+      "status": "PASS",
+      "milliseconds": 133
+    },
+    {
+      "name": "activity rail changes only on manual paging",
+      "status": "PASS",
+      "milliseconds": 1242
+    },
+    {
+      "name": "english-grammar 10 grouped questions with delayed grading",
+      "status": "PASS",
+      "milliseconds": 920
+    },
+    {
+      "name": "english-vocabulary 20 grouped questions with delayed grading",
+      "status": "PASS",
+      "milliseconds": 1516
+    },
+    {
+      "name": "wrong-answer and favorite practice reuse recorded marks",
+      "status": "PASS",
+      "milliseconds": 717
+    },
+    {
+      "name": "english-grammar 20 alternate size works",
+      "status": "PASS",
+      "milliseconds": 1469
+    },
+    {
+      "name": "english-vocabulary 10 alternate size works",
+      "status": "PASS",
+      "milliseconds": 898
+    },
+    {
+      "name": "Chinese starter banks empty and custom true-false JSON works",
+      "status": "PASS",
+      "milliseconds": 575
+    },
+    {
+      "name": "invalid resource JSON is rejected without changing IDB",
+      "status": "PASS",
+      "milliseconds": 107
+    },
+    {
+      "name": "online update button downloads verified bank and daily quotes; failure keeps every old resource",
+      "status": "PASS",
+      "milliseconds": 383
+    },
+    {
+      "name": "backup download contains all user records and excludes official resources",
+      "status": "PASS",
+      "milliseconds": 190
+    },
+    {
+      "name": "backup restore through file input preserves official installed bank",
+      "status": "PASS",
+      "milliseconds": 424
+    },
+    {
+      "name": "portable file download bundles user and installed resource records",
+      "status": "PASS",
+      "milliseconds": 363
+    },
+    {
+      "name": "service worker, install manifest, offline fresh page and downloaded IDB reuse",
+      "status": "PASS",
+      "milliseconds": 1955
+    },
+    {
+      "name": "Windows Edge installability has no errors in an isolated normal profile",
+      "status": "PASS",
+      "milliseconds": 3605
+    },
+    {
+      "name": "portable file works under file URL offline with all learning state",
+      "status": "PASS",
+      "milliseconds": 3400
+    },
+    {
+      "name": "three themes at desktop tablet and mobile widths include center and classics without overflow",
+      "status": "PASS",
+      "milliseconds": 3317
+    },
+    {
+      "name": "touch device can open menu and manually page activity cards",
+      "status": "PASS",
+      "milliseconds": 1454
+    },
+    {
+      "name": "no unexpected browser console or uncaught errors",
+      "status": "PASS",
+      "milliseconds": 0
+    }
+  ],
+  "consoleErrors": [],
+  "normalProfileInstallability": {
+    "installabilityErrors": []
+  },
+  "limits": [
+    "Headless desktop Edge with emulated viewport/touch; no actual iPhone, Safari or installed-app shell.",
+    "Resource update responses are intercepted fixtures; no production service is contacted."
+  ],
+  "sourceQuizSHA256": "64d520fa506de3de60629ec2872900c4010d3b15102da2071125fff9e1f46177",
+  "questionCounts": {
+    "grammar": 118,
+    "vocabulary": 110,
+    "ancient-culture": 0,
+    "chinese-usage": 0
+  },
+  "resourceVersions": {
+    "english": "1.0.0",
+    "chinese": "1.0.0",
+    "quotes": "1.0.0 (empty)"
+  },
+  "staticRevision": "e3e7e63f8db5",
+  "classics": {
+    "titles": [
+      "论语",
+      "道德经",
+      "管子",
+      "庄子"
+    ],
+    "guanzi": {
+      "passages": 100,
+      "chapters": 26,
+      "source": {
+        "filename": "管子百句必背_中华书局底本校订最终版.md",
+        "sha256": "0822133bfe03e4b1d2dfd20c3b35139d47c6bbf01699eab18974d26fb600c8c5",
+        "encoding": "UTF-8",
+        "statementCount": 100
+      },
+      "browserDownloadMatchesSource": true,
+      "offlinePWA": true,
+      "offlineHTML": true
+    }
+  },
+  "responsiveScreenshots": 45
+}
