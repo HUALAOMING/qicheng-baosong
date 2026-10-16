@@ -1,0 +1,150 @@
+{
+  "startedAt": "2026-10-16T16:09:48.318Z",
+  "base": "https://hualaoming.github.io/qicheng-baosong/",
+  "browser": "155.0.4283.45",
+  "isolatedSyntheticData": true,
+  "checks": [
+    {
+      "name": "HTTPS production files exactly match the prepared 4.2 runtime",
+      "status": "PASS",
+      "milliseconds": 3996
+    },
+    {
+      "name": "Live cold launch opens home, 228 English questions, no automatic resource manifest request",
+      "status": "PASS",
+      "milliseconds": 8190,
+      "detail": [
+        {
+          "id": "english-grammar",
+          "count": 118
+        },
+        {
+          "id": "english-vocabulary",
+          "count": 110
+        },
+        {
+          "id": "chinese-ancient-culture",
+          "count": 0
+        },
+        {
+          "id": "chinese-usage",
+          "count": 0
+        }
+      ]
+    },
+    {
+      "name": "Live navigation does not save and immediate content navigation still commits",
+      "status": "PASS",
+      "milliseconds": 1584
+    },
+    {
+      "name": "Live Settings is a reusable page with offline import guide and versions only at the bottom",
+      "status": "PASS",
+      "milliseconds": 116
+    },
+    {
+      "name": "Legacy current record, uploads and theme survive reload at the original origin; startup returns home",
+      "status": "PASS",
+      "milliseconds": 2973
+    },
+    {
+      "name": "Live learning hub and complete Guanzi reader, search and exact Markdown download",
+      "status": "PASS",
+      "milliseconds": 747
+    },
+    {
+      "name": "Live 10-question grammar group hides answers until submission and retains edits",
+      "status": "PASS",
+      "milliseconds": 835
+    },
+    {
+      "name": "Live 20-question vocabulary group uses the same submission engine",
+      "status": "PASS",
+      "milliseconds": 1199
+    },
+    {
+      "name": "Wrong questions and favorites survive a live reload; Chinese empty bank is safe",
+      "status": "PASS",
+      "milliseconds": 1123
+    },
+    {
+      "name": "Real online manifest update bypasses SW and downloads, validates and commits the official bank",
+      "status": "PASS",
+      "milliseconds": 1048,
+      "detail": [
+        {
+          "url": "https://hualaoming.github.io/qicheng-baosong/data/resources/manifest.json",
+          "status": 200,
+          "fromServiceWorker": false
+        },
+        {
+          "url": "https://hualaoming.github.io/qicheng-baosong/data/resources/english-grammar.json",
+          "status": 200,
+          "fromServiceWorker": false
+        }
+      ]
+    },
+    {
+      "name": "Live countdown and personal backup retain data and omit official resources/navigation",
+      "status": "PASS",
+      "milliseconds": 108
+    },
+    {
+      "name": "Production PWA has all 112 cached assets and no Edge installation eligibility errors",
+      "status": "PASS",
+      "milliseconds": 8216,
+      "detail": {
+        "installability": {
+          "installabilityErrors": []
+        },
+        "caches": [
+          {
+            "name": "qicheng-static-%2Fqicheng-baosong%2F-v4-2aaa1c7acf6a",
+            "count": 112
+          }
+        ]
+      }
+    },
+    {
+      "name": "Offline fresh page opens home, full Guanzi and downloaded quiz; failed update preserves old bank",
+      "status": "PASS",
+      "milliseconds": 1442,
+      "detail": {
+        "rejected": true,
+        "unchanged": true,
+        "records": 2
+      }
+    },
+    {
+      "name": "No unexpected console errors or uncaught runtime exceptions",
+      "status": "PASS",
+      "milliseconds": 1
+    }
+  ],
+  "errors": [],
+  "networkFailures": [
+    {
+      "url": "https://hualaoming.github.io/qicheng-baosong/data/resources/manifest.json",
+      "error": "net::ERR_INTERNET_DISCONNECTED"
+    }
+  ],
+  "limitations": [
+    "Checks installation eligibility; does not install an OS shortcut or use a real user profile."
+  ],
+  "installability": {
+    "installabilityErrors": []
+  },
+  "caches": [
+    {
+      "name": "qicheng-static-%2Fqicheng-baosong%2F-v4-2aaa1c7acf6a",
+      "count": 112
+    }
+  ],
+  "finishedAt": "2026-10-16T16:10:20.525Z",
+  "passed": 14,
+  "failed": 0,
+  "result": "PASS",
+  "applicationVersion": "4.2.1",
+  "applicationCommit": "bb906881b6624fc616d222c4d9d787e9f722fde9",
+  "deploymentRun": "https://github.com/HUALAOMING/qicheng-baosong/actions/runs/38928979559"
+}

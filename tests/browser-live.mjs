@@ -14,15 +14,25 @@ await mkdir(output,{recursive:true});
 const {chromium}=await import(pathToFileURL(process.env.QICHENG_PLAYWRIGHT || 'C:/Users/LHM66/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright/index.mjs').href);
 const profile=await mkdtemp(path.join(os.tmpdir(),'qicheng-live-'));
 const context=await chromium.launchPersistentContext(profile,{executablePath:process.env.QICHENG_BROWSER || 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless:true,viewport:{width:1280,height:900},locale:'zh-CN',timezoneId:'Asia/Shanghai',acceptDownloads:true,reducedMotion:'reduce'});
-const page=context.pages()[0];page.setDefaultTimeout(20000);
-const errors=[],requests=[],checks=[];
+const page=context.pages()[0];page.setDefaultTimeout(30000);page.setDefaultNavigationTimeout(60000);
+const errors=[],requests=[],checks=[];const networkFailures=[];context.on('requestfailed',r=>networkFailures.push({url:r.url(),error:r.failure()?.errorText}));
 let expectedNetworkFailure=false;
 page.on('pageerror',error=>errors.push(error.message));
 page.on('console',msg=>{if(msg.type()==='error'&&!expectedNetworkFailure)errors.push(msg.text());});
 page.on('request',request=>requests.push({url:request.url(),cacheControl:request.headers()['cache-control']}));
-const report={startedAt:new Date().toISOString(),base,browser:context.browser()?.version(),isolatedSyntheticData:true,checks,errors,limitations:['Checks installation eligibility; does not install an OS shortcut or use a real user profile.']};
-async function check(name,fn){const start=Date.now();try{const detail=await fn();checks.push({name,status:'PASS',milliseconds:Date.now()-start,detail});console.log('PASS '+name);}catch(e){checks.push({name,status:'FAIL',milliseconds:Date.now()-start,error:e.stack});console.log('FAIL '+name+': '+e.message);await page.screenshot({path:path.join(output,'failure-'+checks.length+'.png')}).catch(()=>{});await page.evaluate(()=>document.querySelectorAll('dialog[open]').forEach(d=>d.close())).catch(()=>{});}await writeFile(path.join(output,'summary.json'),JSON.stringify(report,null,2));}
+const report={startedAt:new Date().toISOString(),base,browser:context.browser()?.version(),isolatedSyntheticData:true,checks,errors,networkFailures,limitations:['Checks installation eligibility; does not install an OS shortcut or use a real user profile.']};
+async function check(name,fn){const start=Date.now();try{const detail=await fn();checks.push({name,status:'PASS',milliseconds:Date.now()-start,detail});console.log('PASS '+name);}catch(e){checks.push({name,status:'FAIL',milliseconds:Date.now()-start,error:e.stack});console.log('FAIL '+name+': '+e.message);await page.screenshot({path:path.join(output,'failure-'+checks.length+'.png'),timeout:5000}).catch(()=>{});await page.evaluate(()=>document.querySelectorAll('dialog[open]').forEach(d=>d.close())).catch(()=>{});}await writeFile(path.join(output,'summary.json'),JSON.stringify(report,null,2));}
 async function ready(target=page){await target.waitForSelector('#workspaceContent');await target.waitForFunction(async base=>(await import(new URL('js/state.js',base).href)).ctx.initialized,base);}
+async function offlineReady(){
+  let info;
+  for(let attempt=0;attempt<120;attempt++){
+    info=await page.evaluate(async()=>{const r=await navigator.serviceWorker.getRegistration();const names=await caches.keys();return {active:r?.active?.state,installing:r?.installing?.state,waiting:r?.waiting?.state,caches:await Promise.all(names.map(async n=>({name:n,count:(await(await caches.open(n)).keys()).length}))),status:document.querySelector('[data-pwa-status]')?.textContent};});
+    if(info.active==='activated' && info.caches.some(c=>c.count===112))return info;
+    if(attempt%20===0)console.log('Waiting for complete offline cache '+JSON.stringify(info));
+    await new Promise(r=>setTimeout(r,1000));
+  }
+  throw new Error('Offline cache not complete: '+JSON.stringify(info));
+}
 async function go(route,target=page){await target.evaluate(async({base,route})=>(await import(new URL('js/app.js',base).href)).go3(route),{base,route});}
 async function records(){return page.evaluate(async base=>(await import(new URL('js/storage.js',base).href)).storage.getAll(),base);}
 async function startGroup(bank,size,mode='random'){
@@ -60,7 +70,7 @@ try{
     }
   });
   await check('Live cold launch opens home, 228 English questions, no automatic resource manifest request',async()=>{
-    await page.goto(base);await ready();if(await page.locator('#finishSettings').isVisible())await go('home');
+    await page.goto(base,{waitUntil:"domcontentloaded"});await ready();if(await page.locator('#finishSettings').isVisible())await go('home');
     assert.equal(await page.title(),'启程 · 首页');assert.equal(await page.locator('.home-shortcuts [data-go3="explore"]').count(),1);
     assert.equal(requests.filter(r=>r.url.includes('data/resources/manifest.json')).length,0);
     const banks=await page.evaluate(async base=>(await import(new URL('js/resources.js',base).href)).listQuizBanks().map(b=>({id:b.bank.id,count:b.questions.length})),base);
@@ -80,9 +90,9 @@ try{
     const fixture=JSON.parse(await readFile(path.join(root,'tests/fixtures/input.json'),'utf8'));fixture.theme='obsidian';fixture.route='profile';
     fixture.assets=[{id:'live-retained',name:'retained.txt',mime:'text/plain',kind:'file',data:'data:text/plain;base64,aGVsbG8=',size:5,createdAt:'2026-10-12T00:00:00Z',source:'synthetic acceptance'}];
     await page.evaluate(async({base,fixture})=>{const {storage}=await import(new URL('js/storage.js',base).href);const {validateDraft}=await import(new URL('js/utils/validation.js',base).href);await storage.set('current',validateDraft(fixture));await storage.set('resource:official:daily-quotes',{schemaVersion:1,version:'1.0.0',quotes:[],origin:'official'});},{base,fixture});
-    await page.reload();await ready();const actual=await page.evaluate(()=>window.ResumeStudio.getState());assert.equal(actual.route,'home');assert.equal(actual.theme,'obsidian');assert.deepEqual(actual.assets,fixture.assets);assert.deepEqual(actual.profile,fixture.profile);assert.equal((await records())['resource:official:daily-quotes'].quotes.length,100);assert.match(await page.locator('.home-goals').textContent(),/哈尔滨工业大学/);
+    await page.reload({waitUntil:"domcontentloaded"});await ready();const actual=await page.evaluate(()=>window.ResumeStudio.getState());assert.equal(actual.route,'home');assert.equal(actual.theme,'obsidian');assert.deepEqual(actual.assets,fixture.assets);assert.deepEqual(actual.profile,fixture.profile);assert.equal((await records())['resource:official:daily-quotes'].quotes.length,100);assert.match(await page.locator('.home-goals').textContent(),/哈尔滨工业大学/);
     await go('profile');await page.locator('[data-bind="profile.name"]').fill('线上验收测试同学');await page.locator('[data-bind="profile.name"]').blur();await page.evaluate(async base=>(await import(new URL('js/autosave.js',base).href)).save(),base);
-    await page.reload();await ready();assert.equal(await page.evaluate(()=>window.ResumeStudio.getState().profile.name),'线上验收测试同学');
+    await page.reload({waitUntil:"domcontentloaded"});await ready();assert.equal(await page.evaluate(()=>window.ResumeStudio.getState().profile.name),'线上验收测试同学');
   });
   await check('Live learning hub and complete Guanzi reader, search and exact Markdown download',async()=>{
     await page.locator('.home-shortcuts [data-go3="explore"]').click();assert.equal(await page.locator('.explore-book').count(),4);
@@ -97,7 +107,7 @@ try{
   await check('Live 10-question grammar group hides answers until submission and retains edits',async()=>{await startGroup('english-grammar',10);await answerGroup('english-grammar',10,true);});
   await check('Live 20-question vocabulary group uses the same submission engine',async()=>{await startGroup('english-vocabulary',20);await answerGroup('english-vocabulary',20);});
   await check('Wrong questions and favorites survive a live reload; Chinese empty bank is safe',async()=>{
-    await page.reload();await ready();const marks=Object.entries(await records()).filter(([k])=>k.startsWith('quiz:mark:'));assert.equal(marks.filter(([,v])=>v.wrong).length,1);assert.equal(marks.filter(([,v])=>v.favorite).length,1);
+    await page.reload({waitUntil:"domcontentloaded"});await ready();const marks=Object.entries(await records()).filter(([k])=>k.startsWith('quiz:mark:'));assert.equal(marks.filter(([,v])=>v.wrong).length,1);assert.equal(marks.filter(([,v])=>v.favorite).length,1);
     await startGroup('english-grammar',10,'wrong');assert.equal(await page.locator('[data-quiz-jump]').count(),1);
     await go('quiz');await page.locator('[data-quiz-back]').click();await page.locator('[data-quiz-bank="chinese-ancient-culture"]').click();assert.equal(await page.locator('[data-quiz-start]').isDisabled(),true);
   });
@@ -115,13 +125,13 @@ try{
     await page.screenshot({path:path.join(output,'live-home.png')});
   });
   await check('Production PWA has all 112 cached assets and no Edge installation eligibility errors',async()=>{
-    await page.evaluate(async()=>{await navigator.serviceWorker.ready;});await page.reload();await ready();await page.waitForFunction(()=>!!navigator.serviceWorker.controller);
+    await offlineReady();await page.reload({waitUntil:"domcontentloaded"});await ready();await page.waitForFunction(()=>!!navigator.serviceWorker.controller);
     const cdp=await context.newCDPSession(page);const result=await cdp.send('Page.getInstallabilityErrors');assert.deepEqual(result.installabilityErrors,[]);report.installability=result;await cdp.detach();
     const offline=await page.evaluate(async()=>{const names=await caches.keys();return Promise.all(names.map(async n=>({name:n,count:(await (await caches.open(n)).keys()).length})));});assert.ok(offline.some(c=>c.count===112));report.caches=offline;
     const manifest=await page.evaluate(async()=>await(await fetch(document.querySelector('link[rel="manifest"]').href)).json());assert.equal(manifest.id,'./');assert.equal(manifest.display,'standalone');assert.equal(manifest.scope,'./');assert.ok(manifest.icons.some(i=>i.sizes==='512x512'));return {installability:result,caches:offline};
   });
   await check('Offline fresh page opens home, full Guanzi and downloaded quiz; failed update preserves old bank',async()=>{
-    expectedNetworkFailure=true;await context.setOffline(true);await page.close();const offlinePage=await context.newPage();await offlinePage.goto(base);await ready(offlinePage);
+    expectedNetworkFailure=true;await context.setOffline(true);await page.close();const offlinePage=await context.newPage();await offlinePage.goto(base,{waitUntil:"domcontentloaded"});await ready(offlinePage);
     assert.ok((await offlinePage.locator('.home-quote blockquote').textContent()).length>5);assert.match(await offlinePage.locator('.home-countdown').textContent(),/线上验收目标/);
     await go('classic:guanzi',offlinePage);assert.equal(await offlinePage.locator('.classic-passage').count(),100);await go('quiz',offlinePage);await offlinePage.locator('[data-quiz-bank="english-grammar"]').click();await offlinePage.locator('[data-quiz-start]').click();await offlinePage.waitForSelector('#quizQuestion');
     const detail=await offlinePage.evaluate(async base=>{const r=await import(new URL('js/resources.js',base).href);const before=JSON.stringify(r.listQuizBanks());let rejected=false;try{await r.updateResources();}catch{rejected=true;}return {rejected,unchanged:before===JSON.stringify(r.listQuizBanks()),records:Object.keys(await(await import(new URL('js/storage.js',base).href)).storage.getAll()).filter(k=>k.startsWith('quiz:record:')).length};},base);
