@@ -56,7 +56,7 @@ test('old quiz routes remain valid while new center and all four classic pages v
     const state = fresh();state.route=route;assert.equal(validateDraft(state).route,route);
     assert.equal(routeGroup3(route).id,'start');
   }
-  const bad = fresh();bad.route='classic:unknown';assert.throws(()=>validateDraft(bad));
+  const bad = fresh();bad.route='classic:<invalid>';assert.throws(()=>validateDraft(bad));
   assert.equal(routeName3('classic:guanzi'),'《管子》');assert.equal(routeName3('quiz'),'答题训练');
 });
 test('uninstalled classics show an honest empty state; static texts do not enter personal backups',()=>{

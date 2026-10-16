@@ -1,4 +1,4 @@
-# 启程 4.2.0
+# 启程 4.2.1
 
 在已完成的 4.1.0 工程上增量升级，继续使用原生 HTML/CSS/JavaScript 和原有 IndexedDB。保留资料录入、资料中心、院校地图、成长看板、文档编排、主题与全部导出。运行时无需服务器端程序或构建依赖。
 
@@ -18,19 +18,19 @@ node scripts/serve.mjs
 
 打开 `http://127.0.0.1:4173/`。也可以运行 `python -m http.server 8000 --bind 127.0.0.1`，打开 `http://localhost:8000/`。
 
-PWA 需要 HTTPS 或 localhost；双击 `index.html` 不能运行 PWA。设置显示“离线资源已就绪”后，可以断网启动，通过浏览器菜单安装。“保存与备份 → 保存本地文件”会生成可直接离线打开的可编辑 HTML。
+PWA 需要 HTTPS 或 localhost；双击 `index.html` 不能运行 PWA。设置显示“离线资源已就绪”后，可以断网启动，通过浏览器菜单安装。“设置 → 保存与备份 → 保存本地文件”会生成可直接离线打开的可编辑 HTML。
 
 ## 功能
 
-- 每次正常启动固定首页，右上角菜单保留全部原导航。首页直接读取原目标院校和梦想院校字段。
-- 信息录入与学习拓展中心快捷入口、持久倒计时、手动滑动的三页近期信息、每日一句。
+- 每次正常启动固定首页，左侧菜单保留全部原导航。首页直接读取原目标院校和梦想院校字段。
+- 信息录入与学习拓展中心快捷入口、持久倒计时、每日一句；已移除近期信息滑动栏。
 - 学习拓展中心提供答题与中华文化典籍入口。典籍包括《论语》《道德经》《管子》《庄子》；《管子》完整接入用户指定的百句必背文档，另三部显示待收录状态。
 - 《管子》100 句、26 篇目提供原文/简释、搜索、篇目筛选、底本校勘说明、背诵建议和原 Markdown 下载，支持离线与完整 HTML 副本。
 - 唯一答题引擎支持单选、判断、10/20 题、随机、错题与收藏复练。完成整组后点击“提交本组”才保存成绩、显示答案与解析；作答期间可以切换题目和修改答案。
 - 正式英语 228 题：Grammar 118、Vocabulary 110。使用已审核的 Model Test 31–45 JSON，原 ID、题干、选项、答案和解析保持不变。
-- 中文仅中国古代文化常识、汉语易错知识，初始均 0 题；每日一句为空，优雅显示未安装状态。
+- 中文仅中国古代文化常识、汉语易错知识，初始均 0 题；每日一句内置管子 100 句，每日按本地日期选句并链接原文。
 - 在原设置中集中外观、语言、Markdown 工具、题库资源管理、安装离线与原兼容数据工具。
-- 菜单底部只有设置和保存与备份；备份页仅恢复备份、备份数据、保存本地文件。
+- 菜单左下角只有设置入口。普通设置页面集中外观、Markdown、三类资源导入、备份、安装与离线；版本信息只在页底显示。
 
 ## 数据与兼容
 
@@ -73,7 +73,7 @@ node --experimental-vm-modules --test tests/*.test.mjs
 
 ## 验证与源码
 
-111 项自动化检查、25 项开发阶段真实 Edge 浏览器验收，以及 12 项发布后的线上 Edge 验收全部通过。完整结果见 `TEST_REPORT.md`、`docs/TEST_EVIDENCE.json`；交付摘要见 `docs/UPGRADE_REPORT.md`；基线和题库来源见 `docs/BASELINE_AUDIT.md`；上线记录与安装条件见 `docs/DEPLOYMENT_REPORT.md`。
+4.2.1 的 117 项自动化检查、29 项完整本地 Edge 验收全部通过；4.2 的历史上线记录仍保留。完整结果见 `TEST_REPORT.md`、`docs/TEST_EVIDENCE.json`；交付摘要见 `docs/UPGRADE_REPORT.md`；基线和题库来源见 `docs/BASELINE_AUDIT.md`；上线记录与安装条件见 `docs/DEPLOYMENT_REPORT.md`，本次修正见 `docs/REFINEMENT_REPORT_4.2.1.md`。
 
 4.2 主要新增 `js/modules/explore.js`、`data/classics.json`，接入原导航、首页和离线打包；4.1 已有 `js/resources.js`、`js/modules/home.js`、`js/modules/quiz.js`、`css/workflow.css`、`data/resources/`；主要修改 `js/app.js`、`js/events.js`、`js/backup.js`、`js/modules/settings.js`、`js/storage.js`、`js/utils/validation.js`、`scripts/package.mjs`。
 
@@ -82,3 +82,9 @@ node --experimental-vm-modules --test tests/*.test.mjs
 ## 典籍内容维护
 
 `data/classics.json` 将四部典籍的书目与 Markdown 内容集中保存，正文不写在页面组件里。《管子》保留原文档内容及来源 SHA-256；新增或更换资料后重新执行 `node scripts/package.mjs`，即可同时更新 PWA 离线缓存和完整 HTML 模板。典籍是应用内置内容，不重复进入用户 JSON 备份。版本 4.2 不增加用户字段或更改数据库结构。原 `quiz` 路由仍兼容，首页和主菜单改从学习拓展中心进入答题。
+
+## 4.2.1 保存与资源导入
+
+纯页面、菜单、临时标签、图表筛选和文档切换不触发自动保存。真实内容和设置编辑继续使用 500 ms 防抖，导航不会取消未完成的保存；失败提示与完整备份恢复保留。
+
+设置的资源区提供离线 JSON 导入、三类可下载样例和面向千问、DeepSeek、GLM 等 AI 的格式说明。以 bank、book、quotes 自动识别题库、典籍或每日一句；自定义资源均进入备份。格式见 `docs/RESOURCE_FORMATS.md`。

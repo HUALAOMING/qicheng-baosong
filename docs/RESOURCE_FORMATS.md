@@ -1,4 +1,4 @@
-# 题库与每日一句资源格式
+# 题库、典籍与每日一句资源格式
 
 资源与个人资料、练习记录分开存放。应用启动只读取随应用打包的本地资源和已保存的资源，不访问更新清单。用户手动点击更新时才请求清单；导入本地 JSON 完全离线可用。
 
@@ -74,3 +74,35 @@ ID 长 1–120 字符，以英文字母或数字开头，其余可用英文字�
 单文件离线副本通过 `globalThis.QICHENG_RESOURCE_SEEDS = {banks:[...],quotes:{...}}` 提供内置资源，不执行网络请求；首次初始化后 `listQuizBanks()`、`getQuotesResource()`、`getResourceVersions()` 均同步读取内存。
 
 `getResourceVersions()` 返回 `{banks:[{id,name,subject,section,version,origin,questionCount}],quotes:{id:"daily-quotes",version,origin,count}}`。`listQuizBanks()` 返回 `{schemaVersion,bank,questions,origin}` 数组；`getQuotesResource()` 返回 `{schemaVersion,version,quotes,origin}`。`updateResources()` 返回 `{updated:[资源ID],versions:版本信息}`。
+
+## 4.2.1 典籍 JSON 与三类样例
+
+设置页会按顶层 bank、book、quotes 识别，三者必须且只能出现一种；导入和识别可完全离线。下载样例与 AI 格式说明的数据源是 `data/resource-examples.json`，其中 samples.quiz / samples.classic / samples.quotes 的 data 对象均可单独保存为 JSON 并直接导入。
+
+典籍示例：
+
+```json
+{
+  "schemaVersion": 1,
+  "book": {
+    "id": "my-classic",
+    "title": "我的典籍资料（样例）",
+    "version": "1.0.0",
+    "subtitle": "请替换为经核对的资料"
+  },
+  "passages": [
+    {
+      "id": "P0001",
+      "chapter": "第一篇",
+      "text": "请在此填写经核对的原文。",
+      "explanation": "请在此填写简释。"
+    }
+  ]
+}
+```
+
+相同 book.id 再导入会替换该自定义典籍，其他新 ID 自动新增入口。每段 id 稳定且唯一，text 必须有正文，chapter 与 explanation 可选。内置空书目的 ID 为 lunyu、daodejing、zhuangzi。
+
+每日一句每条可增加 bookId / passageId，必须同时提供有效标识，对应已安装典籍和段落的 ID。缺少目标时仍显示句子，点击进入每日一句阅读页。导入自定义 quotes 会替换原自定义句库，不与官方句库混合；自定义资源均进入用户备份。
+
+官方 manifest 新增 type: classic，id 为 book.id，其他字段 version/url/sha256 与题库相同。将新 JSON 放入 data/resources，再执行 package，清单会自动收录；用户主动点击在线获取后才下载。新增内容不需要改答题或典籍页面代码。

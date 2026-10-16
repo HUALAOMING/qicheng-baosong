@@ -14,7 +14,7 @@
         if (!Object.keys(data).length) throw new Error('没有可导出的本地数据。');
         for (const key of Object.keys(data)) if (key.startsWith('resource:official:') || key === '__seedCleared') delete data[key];
         if (data.current) for (const key of ['route','section','step','sidebarHidden','menuOpen']) delete data.current[key];
-        const content = {app:'Qicheng',backupVersion:1,appVersion:'4.2.0',createdAt:new Date().toISOString(),data};
+        const content = {app:'Qicheng',backupVersion:1,appVersion:'4.2.1',createdAt:new Date().toISOString(),data};
         const blob = new Blob([JSON.stringify(content,null,2)],{type:'application/json'});
         const url = URL.createObjectURL(blob), a = document.createElement('a');
         a.href = url; a.download = 'Qicheng_Emergency_Backup.json'; a.textContent = '保存紧急备份';

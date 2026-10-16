@@ -10,7 +10,7 @@ import { loadBuiltinData, SCHOOL_DETAILS3 } from './data.js';
 import { validateDraft } from './utils/validation.js';
 import { save, initializeSaving301, scheduleSave, updateSaveStatus301 } from './autosave.js';
 import { clearAll, exportBackup, offlineHTML, openBackupText } from './backup.js';
-import { openSettings, openOfflineGuide } from './modules/settings.js';
+import { openSettings, openOfflineGuide, settingsPage } from './modules/settings.js';
 import { markdown, markdownTemplate31, parseMarkdown31, applyMarkdown31, importMarkdownFile31 } from './modules/markdown.js';
 import { exportRows, textRows, preflight3, allPhotos, customPage3, previewPage } from './modules/resume.js';
 import { filteredSchools3, toggleDream, schoolDetail3, schoolPage, bindSchoolCards3, schoolCards } from './modules/universities.js';
@@ -21,7 +21,7 @@ import { pwa } from './pwa.js';
 import { ctx } from './state.js';
 import { initializeResources, reloadResources, listQuizBanks, getQuotesResource, importResourceJSON, updateResources, validateResourceRecords } from './resources.js';
 import { initializeQuiz, quizPage, getRecentQuiz, validateQuizRecords } from './modules/quiz.js';
-import { homePage, backupPage, initializeHome, validateHomeRecords } from './modules/home.js';
+import { homePage, dailyQuotePage, dailyQuoteMarkup, initializeHome, validateHomeRecords } from './modules/home.js';
 import { explorePage, classicPage, exploreBook } from './modules/explore.js';
 import { academicsPage, educationPage, profilePage, statementPage } from './modules/profile.js';
 import { bind } from './events.js';
@@ -97,7 +97,8 @@ async function v2Action (a) {
 function routeName3 (route = ctx.state.route) {
   if (route === 'quiz') return tr ('答题训练', 'Quiz practice');
   if (route.startsWith ('classic:')) return '《' + (exploreBook (route.slice (8))?.title || tr ('典籍', 'Classic')) + '》';
-  if (route === 'backup') return tr ('保存与备份', 'Save & backup');
+  if (route === 'settings' || route === 'backup') return tr ('设置', 'Settings');
+  if (route === 'daily-quote') return tr ('每日一句', 'Daily quote');
   if (route.startsWith ('school:')) return tr ('院校详情', 'University details');
   for (const g of NAV3) {
     const x = g.items.find (x => x [0] === route);
@@ -113,6 +114,7 @@ function routeGroup3 (route = ctx.state.route) {
 
 async function go3 (route) {
   if (ctx.busy || ctx.uploadBusy) return;
+  if (route === 'backup') route = 'settings';
   ctx.state.route = route;
   ctx.state.section = route === 'schools' || route.startsWith ('school:') ? 'schools' : route === 'learning' ? 'learning' : 'resume';
   const i = ROUTE22.indexOf (route);
@@ -120,7 +122,6 @@ async function go3 (route) {
   const g = routeGroup3 (route);
   if (g && ! ctx.state.menuOpen.includes (g.id)) ctx.state.menuOpen.push (g.id);
   if (innerWidth <= 900) document.body.classList.remove ('nav-mobile-open');
-  scheduleSave ();
   render ();
   window.scrollTo ( {
     top : 0, behavior : 'auto'
@@ -132,10 +133,10 @@ async function navigate (section, step) {
 }
 
 function shell (content) {
-  const active = routeGroup3 (), isMobile = innerWidth <= 900, isHome = ctx.state.route === 'home';
+  const active = routeGroup3 (), isMobile = innerWidth <= 900, isHome = ctx.state.route === 'home', isSettings = ['settings','backup'].includes(ctx.state.route);
   const navVisible = isMobile ? document.body.classList.contains ('nav-mobile-open') : ! ctx.state.sidebarHidden;
   const navigation = NAV3.map (g => '<section class="nav-group ' + (ctx.state.menuOpen.includes (g.id) ? 'is-open' : '') + '"><button class="nav-group-toggle ' + (g.id === active?.id ? 'active-group' : '') + '" data-nav-group="' + g.id + '" aria-expanded="' + ctx.state.menuOpen.includes (g.id) + '">' + icon3 (g.icon) + '<span>' + tr (g.zh, g.en) + '</span><i>' + icon3 ('chevron') + '</i></button><div class="nav-sub" ' + (ctx.state.menuOpen.includes (g.id) ? '' : 'inert') + '><div>' + g.items.map (x => '<button data-go3="' + x[0] + '" class="nav-item ' + (ctx.state.route === x[0] ? 'active' : '') + '" ' + (ctx.state.route === x[0] ? 'aria-current="page"' : '') + '>' + tr (x[1], x[2]) + '</button>').join ('') + '</div></div></section>').join ('');
-  return '<div class="shell3 ' + (ctx.state.sidebarHidden ? 'nav-hidden' : '') + '"><button class="nav-backdrop" data-action3="toggleNav" aria-label="' + tr ('收起菜单', 'Close menu') + '"></button><aside class="sidebar3" id="sidebar3" ' + (navVisible ? '' : 'inert') + '><a class="brand3" href="#" data-go3="home"><span class="brand-mark">' + LOGO + '</span><span><strong>启程<span class="brand-version">4.2</span></strong><small>PERSONAL STUDIO</small></span></a><div class="nav-caption">' + tr ('我的成长档案', 'YOUR PERSONAL WORKSPACE') + '</div><nav aria-label="' + tr ('工作台导航', 'Workspace navigation') + '">' + navigation + '</nav><div class="sidebar-tools"><div id="savedStatus" class="save-status">' + tr ('已保存', 'Saved') + '</div><button class="sidebar-bottom-link" data-action="settings">' + GEAR + '<span>' + tr ('设置', 'Settings') + '</span></button><button class="sidebar-bottom-link" data-go3="backup">' + icon3 ('folder') + '<span>' + tr ('保存与备份', 'Save & backup') + '</span></button><small class="sidebar-version">v4.2 · ' + tr ('本地优先', 'LOCAL FIRST') + '</small></div></aside><main class="main3"><header class="topbar3 ' + (isHome ? 'topbar-home' : '') + '"><div class="topbar-left"><span class="breadcrumb">' + tr (active?.zh || '工作台', active?.en || 'Workspace') + ' <em>/</em> <strong>' + routeName3 () + '</strong></span></div><div class="topbar-actions">' + (isHome ? '<span class="home-local-label">' + tr ('此刻，专注你的下一步', 'FOCUS ON YOUR NEXT STEP') + '</span>' : '<button data-go3="studio">' + tr ('导出成果', 'Create document') + ' ' + icon3 ('export') + '</button><button class="primary" data-action="save">' + tr ('保存进度', 'Save') + '</button>') + '<button class="menu-toggle" data-action3="toggleNav" aria-controls="sidebar3" aria-expanded="' + navVisible + '" aria-label="' + tr ('展开或收起菜单', 'Toggle menu') + '">' + icon3 ('menu') + '</button></div></header><div class="page-content3" id="workspaceContent">' + content + '</div><footer class="quiet-footer"><span>QICHENG PERSONAL STUDIO</span><span>' + tr ('在这里，记录成长的每一步。', 'A place for every step of your growth.') + '</span></footer></main></div>' + help () + '<input type="file" id="backupInput" accept=".json,application/json" hidden><datalist id="awardCategories">' + options (cats ('awards'), '') + '</datalist><datalist id="experienceCategories">' + options (cats ('experiences'), '') + '</datalist><datalist id="languageList">' + options (['英语', '德语', '西班牙语', '法语', '日语', '俄语'], '') + '</datalist>';
+  return '<div class="shell3 '+(ctx.state.sidebarHidden?'nav-hidden':'')+'"><button class="nav-backdrop" data-action3="toggleNav" aria-label="'+tr('收起菜单','Close menu')+'"></button><aside class="sidebar3" id="sidebar3" '+(navVisible?'':'inert')+'><a class="brand3" href="#" data-go3="home"><span class="brand-mark">'+LOGO+'</span><span><strong>启程</strong><small>PERSONAL STUDIO</small></span></a><div class="nav-caption">'+tr('我的成长档案','YOUR PERSONAL WORKSPACE')+'</div><nav aria-label="'+tr('工作台导航','Workspace navigation')+'">'+navigation+'</nav><div class="sidebar-tools"><div id="savedStatus" class="save-status">'+tr('已保存','Saved')+'</div><button class="sidebar-bottom-link" data-go3="settings">'+GEAR+'<span>'+tr('设置','Settings')+'</span></button></div></aside><main class="main3"><header class="topbar3"><div class="topbar-left"><button class="menu-toggle" data-action3="toggleNav" aria-controls="sidebar3" aria-expanded="'+navVisible+'" aria-label="'+tr('展开或收起菜单','Toggle menu')+'">'+icon3('menu')+'</button><div class="topbar-context"><span class="breadcrumb">'+tr(active?.zh||'工作台',active?.en||'Workspace')+' <em>/</em> <strong>'+routeName3()+'</strong></span>'+(isSettings?'':dailyQuoteMarkup(true))+'</div></div><div class="topbar-actions">'+(isHome||isSettings?'':'<button data-go3="studio">'+tr('导出成果','Create document')+' '+icon3('export')+'</button><button class="primary" data-action="save">'+tr('保存进度','Save')+'</button>')+'</div></header><div class="page-content3" id="workspaceContent">'+content+'</div><footer class="quiet-footer"><span>QICHENG PERSONAL STUDIO</span><span>'+tr('在这里，记录成长的每一步。','A place for every step of your growth.')+'</span></footer></main></div>'+help()+'<input type="file" id="backupInput" accept=".json,application/json" hidden><datalist id="awardCategories">'+options(cats('awards'),'')+'</datalist><datalist id="experienceCategories">'+options(cats('experiences'),'')+'</datalist><datalist id="languageList">'+options(['英语','德语','西班牙语','法语','日语','俄语'],'')+'</datalist>';
 }
 
 function render () {
@@ -147,13 +148,13 @@ function render () {
     entryPage3 ('awards'), experiences : () => entryPage3 ('experiences'), practices : () => entryPage3 ('practices'),
     'sort-awards' : () => organizationPage3 ('awards'), 'sort-experiences' : () => organizationPage3 ('experiences'),
     'sort-practices' : () => organizationPage3 ('practices'), learning : learningPage3, achievements : () => entryPage3 ('achievements'),
-    custom : customPage3, dashboard : dashboardPage3, home : homePage, explore : explorePage, quiz : quizPage, backup : backupPage, images : () => materialsPage3 ('image'), files : () => materialsPage3 ('file'),
+    custom : customPage3, dashboard : dashboardPage3, home : homePage, explore : explorePage, quiz : quizPage, settings : settingsPage, backup : settingsPage, 'daily-quote' : dailyQuotePage, images : () => materialsPage3 ('image'), files : () => materialsPage3 ('file'),
     outputs : outputsPage3, studio : previewPage, archive : archivePage3, schools : schoolPage
   };
   const page = ctx.state.route.startsWith ('classic:') ? () => classicPage (ctx.state.route.slice (8)) : ctx.state.route.startsWith ('school:') ? () => schoolDetail3 (decodeURIComponent (ctx.state.route.slice (7))) : pages3 [ctx.state.route] ||
   profilePage;
   $ ('#app').innerHTML = shell (page ());
-  document.title = '启程 4.2 · ' + routeName3 ();
+  document.title = '启程 · ' + routeName3 ();
   bind ();
   translateUI ();
   updateSaveStatus301 ();
@@ -182,7 +183,7 @@ function help () {
   'Use the menu for information, organization, personal content, dashboard, materials and export. The menu button expands or hides navigation.') +
   '</p><p>' + tr ('所有上传内容都会进入资料中心。移除记录中的附件只解除关联；在资料中心删除会二次确认并同时解除全部关联。', 'Uploads appear in Materials. Removing an attachment from a record only unlinks it. Deleting in Materials asks for confirmation and removes all links.') +
   '</p><p>' + tr ('导出内容、字段、照片、顺序与排版设置仍独立保存在每份文档版本中。导出前检查会列出缺项与重复记录。', 'Each document version keeps its own fields, photos, order and styling. Preflight checks flag omissions and repeated records.') +
-  '</p><p>' + tr ('填写后约半秒自动保存；保存失败会提示。可在保存与备份中导出完整 JSON 备份，离线时也可编辑、预览和导出。资料中心的个人资料 ZIP 与可编辑 HTML 副本继续保留。', 'Edits save after half a second. Failures are reported. Use Save & backup to export a complete JSON backup; editing, previews and exports work offline. Personal archive ZIP and editable HTML copies remain available.') +
+  '</p><p>' + tr ('填写后约半秒自动保存；保存失败会提示。可在设置中的保存与备份区域导出完整 JSON 备份，离线时也可编辑、预览和导出。资料中心的个人资料 ZIP 与可编辑 HTML 副本继续保留。', 'Edits save after half a second. Failures are reported. Use Save & backup to export a complete JSON backup; editing, previews and exports work offline. Personal archive ZIP and editable HTML copies remain available.') +
   '</p></aside>'
 }
 
@@ -196,8 +197,7 @@ function toggleNav3 () {
     ctx.state.sidebarHidden = ! ctx.state.sidebarHidden;
     $ ('.shell3')?.classList.toggle ('nav-hidden', ctx.state.sidebarHidden);
     $ ('.menu-toggle')?.setAttribute ('aria-expanded', String (! ctx.state.sidebarHidden));
-    $ ('#sidebar3').inert = ctx.state.sidebarHidden;
-    scheduleSave ()
+    $ ('#sidebar3').inert = ctx.state.sidebarHidden
   }
 }
 
@@ -280,9 +280,9 @@ async function boot () {
     }
   });
   document.addEventListener ('visibilitychange', () => {
-    if (document.visibilityState === 'hidden') save ();
+    if (document.visibilityState === 'hidden' && (ctx.dirty301 || ctx.saveError)) save ();
   });
-  window.addEventListener ('pagehide', () => save ());
+  window.addEventListener ('pagehide', () => { if (ctx.dirty301 || ctx.saveError) save (); });
   window.addEventListener ('unhandledrejection', event => {
     toast (tr ('操作未完成：', 'Operation failed: ') + (event.reason?.message || String (event.reason)));
   });
@@ -312,7 +312,7 @@ async function boot () {
       changed ();
     }
   };
-  if (! ctx.state.onboarded) openSettings (true);
+  // First launch stays on Home; appearance is available on the regular Settings page.
   pwa.init ().catch (error => toast (tr ('离线支持初始化失败：', 'Offline support failed: ') + error.message));
   return window.ResumeStudio;
 }
@@ -328,7 +328,7 @@ function bindAppControls () {
   });
   $$ ('[data-nav-group]').forEach (b => b.onclick = () => {
     const id = b.dataset.navGroup, open = ! b.closest ('.nav-group').classList.contains ('is-open'); flip (ctx.state.menuOpen,
-    id, open); b.closest ('.nav-group').classList.toggle ('is-open', open); b.setAttribute ('aria-expanded', String (open)); b.nextElementSibling.inert = ! open; scheduleSave ()
+    id, open); b.closest ('.nav-group').classList.toggle ('is-open', open); b.setAttribute ('aria-expanded', String (open)); b.nextElementSibling.inert = ! open
   });
   $$ ('[data-action3]').forEach (b => b.onclick = () => {
     const a = b.dataset.action3; if (a === 'toggleNav') toggleNav3 (); else if (a === 'archive') exportArchive3 (); else if (a === 'dreamFilter') {

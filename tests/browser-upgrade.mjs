@@ -75,7 +75,7 @@ let oldFixture,backupFile,portableFile;
 try{
   await check('cold boot opens home and makes no manifest update request',async()=>{
     await page.goto(base);await ready();assert.equal(await page.evaluate(async()=>(await import('/js/state.js')).ctx.state.route),'home');
-    if(await page.locator('#finishSettings').isVisible())await page.locator('#finishSettings').click();
+    
     assert.equal(requests.filter(url=>/\/data\/resources\/manifest\.json/.test(url)).length,0);
     assert.equal(requests.filter(url=>!url.startsWith(base)&&!url.startsWith('data:')&&!url.startsWith('blob:')).length,0);
   });
@@ -115,12 +115,12 @@ try{
   });
   await check('settings retains themes and Markdown template/import/export through existing controls',async()=>{
     await page.evaluate(()=>window.ResumeStudio.openSettings());
-    assert.equal(await page.locator('.sidebar-tools button').count(),2);
-    const template=await saveDownload(()=>page.locator('#settingsDialog [data-md-template31]').click(),'template.md');assert.match(await readFile(template,'utf8'),/基本信息/);
-    await page.locator('#settingsDialog [data-md-import31]').click();await page.locator('#mdFile31').setInputFiles({name:'materials.md',mimeType:'text/markdown',buffer:Buffer.from('## 基本信息\n- 姓名：浏览器导入同学\n','utf8')});
+    assert.equal(await page.locator('.sidebar-tools button').count(),1);
+    const template=await saveDownload(()=>page.locator('.settings-page [data-md-template31]').click(),'template.md');assert.match(await readFile(template,'utf8'),/基本信息/);
+    await page.locator('.settings-page [data-md-import31]').click();await page.locator('#mdFile31').setInputFiles({name:'materials.md',mimeType:'text/markdown',buffer:Buffer.from('## 基本信息\n- 姓名：浏览器导入同学\n','utf8')});
     await page.waitForFunction(()=>window.ResumeStudio.getState().profile.name==='浏览器导入同学');await page.waitForFunction(async()=>!document.querySelector('#mdImport31[open]')&&!(await import('/js/state.js')).ctx.busy);
     await page.evaluate(()=>window.ResumeStudio.openSettings());
-    const exported=await saveDownload(()=>page.locator('#settingsDialog [data-settings-md-export]').click(),'exported.md');assert.match(await readFile(exported,'utf8'),/浏览器导入同学/);
+    const exported=await saveDownload(()=>page.locator('.settings-page [data-settings-md-export]').click(),'exported.md');assert.match(await readFile(exported,'utf8'),/浏览器导入同学/);
   });
   await check('countdown saved through UI and day-based quote functions',async()=>{
     await go('home');await page.locator('.home-countdown-editor summary').click();await page.locator('#homeCountdownForm input[name="name"]').fill('验收目标');await page.locator('#homeCountdownForm input[name="date"]').fill('2027-01-01');await page.locator('#homeCountdownForm button').click();
@@ -129,8 +129,37 @@ try{
     const result=await page.evaluate(async()=>{const h=await import('/js/modules/home.js');const r={quotes:[{text:'first'},{text:'second'},{text:'third'}]};const day=new Date(2026,9,13,1);return{a:h.homeQuoteForDate(r,day),b:h.homeQuoteForDate(r,new Date(2026,9,13,23)),next:h.homeQuoteForDate(r,new Date(2026,9,14,1)),today:h.homeCountdownDays(new Date(2027,0,1)),after:h.homeCountdownDays(new Date(2027,0,2))};});
     assert.deepEqual(result.a,result.b);assert.notDeepEqual(result.a,result.next);assert.equal(result.today,0);assert.equal(result.after,-1);
   });
-  await check('activity rail changes only on manual paging',async()=>{
-    await go('home');await page.locator('[data-home-card="2"]').click();await page.waitForFunction(()=>document.querySelector('[data-home-card="2"]').getAttribute('aria-pressed')==='true');const before=await page.locator('#homeCardRail').evaluate(el=>el.scrollLeft);await wait(1200);assert.equal(await page.locator('#homeCardRail').evaluate(el=>el.scrollLeft),before);
+  await check('home has no rail or version badges; daily text links to the exact Guanzi passage',async()=>{
+    await go('home');assert.equal(await page.locator('#homeCardRail,.brand-version,.sidebar-version,.home-versions').count(),0);
+    const daily=await page.evaluate(async()=>{const r=await import('/js/resources.js');const h=await import('/js/modules/home.js');return {count:r.getQuotesResource().quotes.length,quote:h.homeQuoteForDate(r.getQuotesResource())};});
+    assert.equal(daily.count,100);assert.equal((await page.locator('.topbar-quote').textContent()).trim(),daily.quote.text);
+    await page.locator('.topbar-quote').click();await page.waitForSelector('#'+daily.quote.passageId+'.quote-target');assert.equal(await page.locator('#'+daily.quote.passageId).count(),1);
+  });
+  await check('navigation and temporary UI write nothing; an edit followed immediately by navigation saves exactly once',async()=>{
+    await page.evaluate(async()=>{await window.ResumeStudio.save();const {storage}=await import('/js/storage.js');window.__currentWrites=0;window.__originalSet=storage.set;storage.set=async function(key,value){if(key==='current')window.__currentWrites++;return window.__originalSet(key,value);};});
+    for(const route of ['profile','home','explore','studio'])await go(route);
+    await page.locator('.menu-toggle').click();await page.locator('[data-nav-group]').first().click();await page.locator('[data-nav-group]').first().click();await page.locator('.menu-toggle').click();
+    for(const button of await page.locator('[data-studio-tab]').all())await button.click();
+    await wait(700);assert.equal(await page.evaluate(()=>window.__currentWrites),0);
+    await go('profile');await page.locator('[data-bind="profile.name"]').fill('立即切页仍保存');await go('explore');
+    await page.waitForFunction(()=>window.__currentWrites===1);assert.equal((await getRecords()).current.profile.name,'立即切页仍保存');
+    for(const route of ['home','profile','settings','quiz'])await go(route);await wait(650);assert.equal(await page.evaluate(()=>window.__currentWrites),1);
+    await page.evaluate(async()=>{(await import('/js/storage.js')).storage.set=window.__originalSet;});
+  });
+  await check('settings repeatedly opens as a working page, scrolls normally and saves only changed theme/language',async()=>{
+    for(const route of ['home','profile','explore','quiz','home']){await go(route);await page.evaluate(()=>window.ResumeStudio.openSettings());assert.equal(await page.locator('dialog#settingsDialog').count(),0);assert.equal(await page.locator('.settings-page').count(),1);assert.equal(await page.locator('.topbar-quote').count(),0);await page.locator('[data-setting-theme="blue"]').click();assert.equal(await page.locator('body').getAttribute('data-theme'),'blue');await page.locator('[data-setting-theme="obsidian"]').click();}
+    await page.locator('#uiLanguage').selectOption('en');assert.equal(await page.locator('.settings-page h1').textContent(),'Settings');await page.locator('#uiLanguage').selectOption('zh');
+    await page.locator('.settings-versions').scrollIntoViewIfNeeded();const before=await page.evaluate(()=>scrollY);await page.mouse.move(800,400);await page.mouse.wheel(0,-400);await wait(100);assert.ok(await page.evaluate(()=>scrollY)<before);assert.match(await page.locator('.settings-versions').textContent(),/4\.2\.1/);
+  });
+  await check('file upload, confirmed deletion and layout edits persist while subsequent navigation stays clean',async()=>{
+    await go('files');await page.locator('[data-import3="center"]').setInputFiles({name:'save-check.txt',mimeType:'text/plain',buffer:Buffer.from('persist this file')});
+    await page.waitForFunction(async()=>!(await import('/js/state.js')).ctx.uploadBusy && window.ResumeStudio.getState().assets.some(a=>a.name==='save-check.txt'));
+    assert.ok((await getRecords()).current.assets.some(a=>a.name==='save-check.txt'));
+    const asset=await page.evaluate(()=>window.ResumeStudio.getState().assets.find(a=>a.name==='save-check.txt'));
+    await page.locator('[data-delete-asset3="'+asset.id+'"]').click();await page.locator('#confirmAccept').click();await page.waitForFunction(()=>!window.ResumeStudio.getState().assets.some(a=>a.name==='save-check.txt'));
+    await go('studio');await page.locator('[data-studio-tab="style"]').click();await page.locator('[data-v-number="fontSize"]').fill('14');await go('settings');
+    for(let attempt=0;attempt<60;attempt++){const current=(await getRecords()).current;if(current.versions.find(v=>v.id===current.activeVersion).fontSize===14)break;await wait(50);}
+    const snapshot=(await getRecords()).current;assert.ok(!snapshot.assets.some(a=>a.name==='save-check.txt'));assert.equal(snapshot.versions.find(v=>v.id===snapshot.activeVersion).fontSize,14);
   });
   for(const [bank,size] of [['english-grammar',10],['english-vocabulary',20]])await check(bank+' '+size+' grouped questions with delayed grading',async()=>{await startGroup(bank,size);return completeGroup(bank,size,{wrongFirst:true,favoriteFirst:true});});
   await check('wrong-answer and favorite practice reuse recorded marks',async()=>{
@@ -142,7 +171,7 @@ try{
   await check('Chinese starter banks empty and custom true-false JSON works',async()=>{
     await go('quiz');await backToBanks();await page.locator('[data-quiz-bank="chinese-ancient-culture"]').click();assert.equal(await page.locator('[data-quiz-start]').isDisabled(),true);
     const resource={schemaVersion:1,bank:{id:'browser-chinese-tf',name:'验收判断题',subject:'chinese',section:'ancient-culture',version:'1.0.0'},questions:[{id:'browser-tf-1',type:'true-false',question:'验收用判断题：请选择正确。',answer:true,explanation:'用于交互验证的合成题。'},{id:'browser-tf-2',type:'true-false',question:'验收用判断题：请选择错误。',answer:false,explanation:'用于交互验证的合成题。'}]};
-    await page.evaluate(()=>window.ResumeStudio.openSettings(false,true));await page.locator('#resourceJSONInput').setInputFiles({name:'custom.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(resource))});await page.waitForFunction(()=>document.querySelector('#resourceResult')?.textContent.includes('已导入并保存'));await page.locator('#finishSettings').click();
+    await page.evaluate(()=>window.ResumeStudio.openSettings(false,true));await page.locator('#resourceJSONInput').setInputFiles({name:'custom.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(resource))});await page.waitForFunction(()=>document.querySelector('#resourceResult')?.textContent.includes('已导入并保存'));await go('home');
     await startGroup('browser-chinese-tf',10);await completeGroup('browser-chinese-tf',2);
   });
   await check('invalid resource JSON is rejected without changing IDB',async()=>{
@@ -151,11 +180,11 @@ try{
   await check('online update button downloads verified bank and daily quotes; failure keeps every old resource',async()=>{
     const bank=await page.evaluate(async()=>(await import('/js/resources.js')).listQuizBanks().find(item=>item.bank.id==='english-grammar'));
     delete bank.origin;bank.bank.version='1.0.1';
-    const quotes={schemaVersion:1,version:'1.0.1',quotes:[{id:'QA-Q1',text:'浏览器验收用每日一句甲',source:'合成测试资源'},{id:'QA-Q2',text:'浏览器验收用每日一句乙',source:'合成测试资源'},{id:'QA-Q3',text:'浏览器验收用每日一句丙',source:'合成测试资源'}]};
+    const quotes={schemaVersion:1,version:'2.0.0',quotes:[{id:'QA-Q1',text:'浏览器验收用每日一句甲',source:'合成测试资源'},{id:'QA-Q2',text:'浏览器验收用每日一句乙',source:'合成测试资源'},{id:'QA-Q3',text:'浏览器验收用每日一句丙',source:'合成测试资源'}]};
     const payloads={'english-grammar':JSON.stringify(bank),'daily-quotes':JSON.stringify(quotes)};
     let corrupt=false;
     await context.route('**/data/resources/manifest.json',async route=>{
-      const resources=Object.entries(payloads).map(([id,bytes])=>({id,type:id==='daily-quotes'?'quotes':'quiz-bank',version:corrupt?'1.0.2':'1.0.1',url:'https://qicheng-test.invalid/'+id+'.json',sha256:corrupt&&id==='daily-quotes'?'0'.repeat(64):createHash('sha256').update(bytes).digest('hex')}));
+      const resources=Object.entries(payloads).map(([id,bytes])=>({id,type:id==='daily-quotes'?'quotes':'quiz-bank',version:id==='daily-quotes'?(corrupt?'2.0.1':'2.0.0'):(corrupt?'1.0.2':'1.0.1'),url:'https://qicheng-test.invalid/'+id+'.json',sha256:corrupt&&id==='daily-quotes'?'0'.repeat(64):createHash('sha256').update(bytes).digest('hex')}));
       await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({schemaVersion:1,resources})});
     });
     await context.route('https://qicheng-test.invalid/**',async route=>route.fulfill({status:200,contentType:'application/json',body:payloads[new URL(route.request().url()).pathname.slice(1,-5)]}));
@@ -168,7 +197,7 @@ try{
     bank.bank.version='1.0.2';payloads['english-grammar']=JSON.stringify(bank);
     await page.locator('[data-resource-update]').click();await page.waitForFunction(()=>document.querySelector('#resourceResult')?.textContent.includes('更新失败'));
     assert.match(await page.locator('#resourceResult').textContent(),/SHA-256/);assert.deepEqual(await getRecords(),before);
-    await page.locator('#finishSettings').click();await go('home');assert.match(await page.locator('.home-quote').textContent(),/浏览器验收用每日一句/);
+    await go('home');await go('home');assert.match(await page.locator('.home-quote').textContent(),/浏览器验收用每日一句/);
   });
   await check('backup download contains all user records and excludes official resources',async()=>{
     await go('backup');backupFile=await saveDownload(()=>page.locator('#workspaceContent [data-action="backup"]').click(),'backup.json');
@@ -203,23 +232,37 @@ try{
   });
   await check('portable file works under file URL offline with all learning state',async()=>{
     const offline=await browser.newContext({offline:true,viewport:{width:1280,height:900}});const portable=await offline.newPage();const portableErrors=[];portable.on('pageerror',error=>portableErrors.push(error.message));
-    try{await portable.goto(pathToFileURL(portableFile).href);await portable.waitForSelector('.home-dashboard');assert.match(await portable.locator('.home-countdown').textContent(),/验收目标/);assert.match(await portable.locator('.home-versions').textContent(),/1\.0\.1/);await openQuizFromHome(portable);assert.ok(await portable.locator('[data-quiz-bank="browser-chinese-tf"]').count());assert.ok(await portable.locator('[data-quiz-review]').count());await portable.evaluate(()=>window.ResumeStudio.go3('classic:guanzi'));assert.equal(await portable.locator('.classic-passage').count(),100);assert.match(await portable.locator('#guanzi-061').textContent(),/政平则人安；士教和/);assert.deepEqual(portableErrors,[]);await portable.screenshot({path:path.join(output,'portable-offline.png'),fullPage:true});}finally{await offline.close();}
+    try{await portable.goto(pathToFileURL(portableFile).href);await portable.waitForSelector('.home-dashboard');assert.match(await portable.locator('.home-countdown').textContent(),/验收目标/);assert.equal(await portable.evaluate(()=>window.ResumeStudio.listQuizBanks()[0].bank.version),'1.0.1');await openQuizFromHome(portable);assert.ok(await portable.locator('[data-quiz-bank="browser-chinese-tf"]').count());assert.ok(await portable.locator('[data-quiz-review]').count());await portable.evaluate(()=>window.ResumeStudio.go3('classic:guanzi'));assert.equal(await portable.locator('.classic-passage').count(),100);assert.match(await portable.locator('#guanzi-061').textContent(),/政平则人安；士教和/);assert.deepEqual(portableErrors,[]);await portable.screenshot({path:path.join(output,'portable-offline.png'),fullPage:true});}finally{await offline.close();}
   });
   await check('three themes at desktop tablet and mobile widths include center and classics without overflow',async()=>{
     for(const [device,width,height] of [['desktop',1280,900],['tablet',820,1180],['mobile',390,844]]){
       await page.setViewportSize({width,height});
       for(const theme of ['pudding','obsidian','blue']){
         await page.evaluate(async theme=>{const {ctx}=await import('/js/state.js');ctx.state.theme=theme;(await import('/js/app.js')).render();},theme);
-        for(const route of ['home','profile','quiz','explore','classic:guanzi']){
+        for(const route of ['home','profile','quiz','explore','classic:guanzi','settings']){
           await go(route);if(route==='quiz')await backToBanks();const dimensions=await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,client:document.documentElement.clientWidth}));assert.ok(dimensions.scroll<=dimensions.client+1,device+' '+theme+' '+route+' '+JSON.stringify(dimensions));
           const name=device+'-'+theme+'-'+route.replace(':','-')+'.png';await page.screenshot({path:path.join(output,name),fullPage:!route.startsWith('classic:')});report.screenshots.push(name);
         }
       }
     }
   });
-  await check('touch device can open menu and manually page activity cards',async()=>{
+  await check('touch device opens the left menu and regular settings without an overlay',async()=>{
     const touch=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:1});const mobile=await touch.newPage();
-    try{await mobile.goto(base);await mobile.waitForSelector('.home-dashboard');if(await mobile.locator('#finishSettings').isVisible())await mobile.locator('#finishSettings').tap();await mobile.locator('.menu-toggle').tap();assert.equal(await mobile.locator('.menu-toggle').getAttribute('aria-expanded'),'true');await mobile.locator('.menu-toggle').tap();await mobile.locator('[data-home-card="1"]').tap();await mobile.waitForFunction(()=>document.querySelector('[data-home-card="1"]').getAttribute('aria-pressed')==='true');await mobile.screenshot({path:path.join(output,'mobile-touch.png'),fullPage:true});}finally{await touch.close();}
+    try{await mobile.goto(base);await mobile.waitForSelector('.home-dashboard');await mobile.locator('.menu-toggle').tap();assert.equal(await mobile.locator('.menu-toggle').getAttribute('aria-expanded'),'true');await mobile.locator('.sidebar-tools [data-go3="settings"]').tap();await mobile.waitForSelector('.settings-page');assert.equal(await mobile.locator('.menu-toggle').getAttribute('aria-expanded'),'false');await mobile.locator('[data-setting-theme="blue"]').tap();assert.equal(await mobile.locator('body').getAttribute('data-theme'),'blue');await mobile.locator('.settings-versions').scrollIntoViewIfNeeded();await mobile.screenshot({path:path.join(output,'mobile-touch.png'),fullPage:true});}finally{await touch.close();}
+  });
+  await check('downloaded samples import offline into quiz, classics and daily quotes, then survive full backup restore',async()=>{
+    await page.setViewportSize({width:1280,height:900});await go('settings');await page.locator('.resource-guide summary').click();
+    const samples={};for(const kind of ['quiz','classic','quotes']){const file=await saveDownload(()=>page.locator('[data-resource-sample="'+kind+'"]').click(),kind+'-sample.json');samples[kind]=JSON.parse(await readFile(file,'utf8'));}
+    const guide=await saveDownload(()=>page.locator('[data-resource-sample="ai"]').click(),'AI-guide.md');const guideText=await readFile(guide,'utf8');assert.match(guideText,/DeepSeek/);assert.match(guideText,/GLM/);assert.match(guideText,/千问/);
+    await context.setOffline(true);
+    for(const kind of ['quiz','classic','quotes']){await go('settings');await page.locator('#resourceJSONInput').setInputFiles({name:kind+'.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(samples[kind]))});await page.waitForFunction(()=>document.querySelector('#resourceResult')?.textContent.includes('已导入并保存'));}
+    await go('explore');await page.locator('[data-go3="classic:my-classic"]').click();assert.match(await page.locator('.classic-passage').textContent(),/请在此填写经核对的原文/);
+    await startGroup('my-english-grammar',10);await completeGroup('my-english-grammar',2);
+    await go('home');assert.ok(await page.locator('.topbar-quote').textContent());
+    const file=await page.evaluate(async()=>JSON.stringify(await(await import('/js/backup.js')).getCurrentBackup()));const content=JSON.parse(file);assert.ok(content.data['resource:custom:classic:my-classic']);assert.ok(content.data['resource:custom:daily-quotes']);
+    await page.evaluate(async file=>(await import('/js/backup.js')).commitBackup(file),file);await go('classic:my-classic');assert.equal(await page.locator('.classic-passage').count(),1);
+    await go('settings');const before=await getRecords();await page.locator('#resourceJSONInput').setInputFiles({name:'bad.json',mimeType:'application/json',buffer:Buffer.from('{broken')});await page.waitForFunction(()=>document.querySelector('#resourceResult')?.textContent.includes('导入失败'));assert.deepEqual(await getRecords(),before);
+    await context.setOffline(false);
   });
   await check('no unexpected browser console or uncaught errors',async()=>{assert.deepEqual(errors,[]);});
 }finally{

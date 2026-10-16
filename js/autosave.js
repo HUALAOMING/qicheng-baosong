@@ -4,7 +4,8 @@ import { snapshot3 } from './model.js';
 import { savedStatus, toast, tr } from './utils/helpers.js';
 function fingerprint301 (snapshot) {
   const {
-    savedAt, ...data
+    savedAt, route, section, step, sidebarHidden, menuOpen,
+    chartExamIds, chartSelectionSet, chartMetric, chartSubject, activeVersion, ...data
   }
   = snapshot;
   return JSON.stringify (data);
@@ -57,6 +58,8 @@ function save () {
     }
     ctx.saving = true;
     updateSaveStatus301 ();
+    // Keep compatibility with old drafts without persisting the current navigation.
+    Object.assign(snapshot, {route:'home',section:'resume',step:0,sidebarHidden:true,menuOpen:['start']});
     snapshot.savedAt = new Date ().toISOString ();
     try {
       await storage.set ('current', snapshot);

@@ -1,3 +1,4 @@
+import { render } from '../app.js';
 import { $, $$, checkbox, esc, heading3, icon3, options, tr, translateLabel, flip } from '../utils/helpers.js';
 import { ctx } from '../state.js';
 import { changed } from '../app.js';
@@ -133,16 +134,16 @@ function bindDashboardControls () {
     if (! ctx.state.chartSelectionSet) {
       ctx.state.chartExamIds = ctx.state.exams.map (x => x.id); ctx.state.chartSelectionSet = true
     }
-    flip (ctx.state.chartExamIds, e.dataset.chartExam3, e.checked); changed ()
+    flip (ctx.state.chartExamIds, e.dataset.chartExam3, e.checked); render ()
   });
   if ($ ('#chartMetric3')) $ ('#chartMetric3').onchange = e => {
     ctx.state.chartMetric = e.target.value;
     if (! ctx.state.chartSubject) ctx.state.chartSubject = $ ('#chartSubject3').value;
-    changed ()
+    render ()
   };
   if ($ ('#chartSubject3')) $ ('#chartSubject3').onchange = e => {
     ctx.state.chartSubject = e.target.value;
-    changed ()
+    render ()
   };
 }
 export { bindDashboardControls };

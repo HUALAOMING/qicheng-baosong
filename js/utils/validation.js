@@ -86,8 +86,8 @@ function validateDraft (input) {
   stringList (s.menuOpen, 'menuOpen', NAV3.length);
   s.menuOpen.forEach (k => choice (k, NAV3.map (g => g.id), 'menuOpen'));
   text (s.route, 'route');
-  const routes = [...NAV3.flatMap (g => g.items.map (i => i [0])), 'backup', 'quiz', ...CLASSICS.books.map (book => 'classic:' + book.id)];
-  if (! routes.includes (s.route)) {
+  const routes = [...NAV3.flatMap (g => g.items.map (i => i [0])), 'backup', 'settings', 'daily-quote', 'quiz', ...CLASSICS.books.map (book => 'classic:' + book.id)];
+  if (! routes.includes (s.route) && !/^classic:[A-Za-z0-9][A-Za-z0-9._-]{0,119}$/.test(s.route)) {
     try {
       if (! s.route.startsWith ('school:') || ! SCHOOLS.some (x => x.name === decodeURIComponent (s.route.slice (7)))) fail ('route');
     }

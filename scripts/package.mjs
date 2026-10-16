@@ -17,7 +17,7 @@ const modules = [
 ];
 const runtimeModules = (await walk('js')).filter(name => name !== 'js/bootstrap.js');
 for (const name of runtimeModules) if (!modules.includes(name)) throw new Error('离线副本缺少模块：' + name + '。请更新 package.mjs 中的模块列表。');
-const dataNames = ['universities','schools','china-map','university-exams','university-dates','translations','classics'];
+const dataNames = ['universities','schools','china-map','university-exams','university-dates','translations','classics','resource-examples'];
 const data = await Promise.all(dataNames.map(name => json('data/' + name + '.json')));
 for (const university of data[0]) {
   if (!university.logo?.startsWith('assets/')) continue;

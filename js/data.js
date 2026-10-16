@@ -6,9 +6,10 @@ let SCHOOL_DETAILS3 = [], SCHOOLS = [], CHINA_VECTOR31 = {
 }, EN = {
 };
 let FONT_LATIN = '', FONT_CJK = '';
+let RESOURCE_EXAMPLES = {samples:{},aiGuide:''};
 let CLASSICS = {schemaVersion:1,version:'1.0.0',books:[]};
 const BUILTIN_PATHS = ['data/universities.json', 'data/schools.json', 'data/china-map.json', 'data/university-exams.json',
-'data/university-dates.json', 'data/translations.json', 'data/classics.json'];
+'data/university-dates.json', 'data/translations.json', 'data/classics.json', 'data/resource-examples.json'];
 async function resourceFetch (path) {
   const controller = new AbortController ();
   const timeout = setTimeout (() => controller.abort (), 20000);
@@ -32,15 +33,15 @@ function bytesToDataURL (buffer, mime) {
 async function loadBuiltinData () {
   const bundled = globalThis.QICHENG_STATIC;
   if (bundled) {
-    [SCHOOL_DETAILS3, SCHOOLS, CHINA_VECTOR31, SCHOOL_EXAMS302, SCHOOL_DATES31, EN, CLASSICS = {schemaVersion:1,version:'1.0.0',books:[]}] = bundled.data;
+    [SCHOOL_DETAILS3, SCHOOLS, CHINA_VECTOR31, SCHOOL_EXAMS302, SCHOOL_DATES31, EN, CLASSICS = {schemaVersion:1,version:'1.0.0',books:[]}, RESOURCE_EXAMPLES = {samples:{},aiGuide:''}] = bundled.data;
     FONT_LATIN = bundled.fonts [0];
     FONT_CJK = bundled.fonts [1];
     return;
   }
   const data = await Promise.all (BUILTIN_PATHS.map (async path => (await resourceFetch (path)).json ()));
-  [SCHOOL_DETAILS3, SCHOOLS, CHINA_VECTOR31, SCHOOL_EXAMS302, SCHOOL_DATES31, EN, CLASSICS] = data;
+  [SCHOOL_DETAILS3, SCHOOLS, CHINA_VECTOR31, SCHOOL_EXAMS302, SCHOOL_DATES31, EN, CLASSICS, RESOURCE_EXAMPLES] = data;
   const fonts = await Promise.all (['latin', 'cjk'].map (async name => bytesToDataURL (await (await resourceFetch ('assets/fonts/' +
   name + '.ttf')).arrayBuffer (), 'font/ttf')));
   [FONT_LATIN, FONT_CJK] = fonts;
 }
-export { APP_BASE, SCHOOL_DETAILS3, SCHOOLS, CHINA_VECTOR31, SCHOOL_EXAMS302, SCHOOL_DATES31, EN, FONT_LATIN, FONT_CJK, CLASSICS, loadBuiltinData, resourceFetch, bytesToDataURL };
+export { APP_BASE, SCHOOL_DETAILS3, SCHOOLS, CHINA_VECTOR31, SCHOOL_EXAMS302, SCHOOL_DATES31, EN, FONT_LATIN, FONT_CJK, CLASSICS, RESOURCE_EXAMPLES, loadBuiltinData, resourceFetch, bytesToDataURL };

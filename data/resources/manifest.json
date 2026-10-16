@@ -2,20 +2,6 @@
   "schemaVersion": 1,
   "resources": [
     {
-      "id": "english-grammar",
-      "type": "quiz-bank",
-      "version": "1.0.0",
-      "url": "english-grammar.json",
-      "sha256": "e7bc9d610d55b80319b0d437c7f925f34f1ecef56f530dd94fb4ee1c3a4dc0b7"
-    },
-    {
-      "id": "english-vocabulary",
-      "type": "quiz-bank",
-      "version": "1.0.0",
-      "url": "english-vocabulary.json",
-      "sha256": "5a3338eca6276dbd0705634ea2093db0cf21a78d075d850b491398940b2ab7bf"
-    },
-    {
       "id": "chinese-ancient-culture",
       "type": "quiz-bank",
       "version": "1.0.0",
@@ -32,9 +18,23 @@
     {
       "id": "daily-quotes",
       "type": "quotes",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "url": "daily-quotes.json",
-      "sha256": "d8ddcd9036cfda1c0a155efc3addaec665a50041af13afc9cc3db6cee5dc6d37"
+      "sha256": "afdfe63bd8e2a8423a7c422040e0c5f2b90eb9761a2e712891f70a06cc92720f"
+    },
+    {
+      "id": "english-grammar",
+      "type": "quiz-bank",
+      "version": "1.0.0",
+      "url": "english-grammar.json",
+      "sha256": "e7bc9d610d55b80319b0d437c7f925f34f1ecef56f530dd94fb4ee1c3a4dc0b7"
+    },
+    {
+      "id": "english-vocabulary",
+      "type": "quiz-bank",
+      "version": "1.0.0",
+      "url": "english-vocabulary.json",
+      "sha256": "5a3338eca6276dbd0705634ea2093db0cf21a78d075d850b491398940b2ab7bf"
     }
   ]
 }

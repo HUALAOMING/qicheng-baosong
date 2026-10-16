@@ -1,5 +1,5 @@
 {
-  "revision": "e3e7e63f8db5",
+  "revision": "2aaa1c7acf6a",
   "assets": [
     "assets/editable-template.html",
     "assets/fonts/cjk.ttf",
@@ -71,6 +71,7 @@
     "css/workflow.css",
     "data/china-map.json",
     "data/classics.json",
+    "data/resource-examples.json",
     "data/resources/chinese-ancient-culture.json",
     "data/resources/chinese-usage.json",
     "data/resources/daily-quotes.json",

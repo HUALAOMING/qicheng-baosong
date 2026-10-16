@@ -1,1 +1,706 @@
-{"schemaVersion":1,"version":"1.0.0","quotes":[]}
+{
+  "schemaVersion": 1,
+  "version": "1.1.0",
+  "quotes": [
+    {
+      "id": "GZ0001",
+      "text": "凡有地牧民者，务在四时，守在仓廪。国多财，则远者来；地辟举，则民留处。",
+      "source": "《管子》· 一、牧民第一",
+      "bookId": "guanzi",
+      "passageId": "guanzi-001"
+    },
+    {
+      "id": "GZ0002",
+      "text": "仓廪实，则知礼节；衣食足，则知荣辱。",
+      "source": "《管子》· 一、牧民第一",
+      "bookId": "guanzi",
+      "passageId": "guanzi-002"
+    },
+    {
+      "id": "GZ0003",
+      "text": "上服度，则六亲固；四维张，则君令行。",
+      "source": "《管子》· 一、牧民第一",
+      "bookId": "guanzi",
+      "passageId": "guanzi-003"
+    },
+    {
+      "id": "GZ0004",
+      "text": "国有四维，一维绝则倾，二维绝则危，三维绝则覆，四维绝则灭。倾可正也，危可安也，覆可起也，灭不可复错也。何谓四维？一曰礼，二曰义，三曰廉，四曰耻。",
+      "source": "《管子》· 一、牧民第一",
+      "bookId": "guanzi",
+      "passageId": "guanzi-004"
+    },
+    {
+      "id": "GZ0005",
+      "text": "政之所兴，在顺民心；政之所废，在逆民心。",
+      "source": "《管子》· 一、牧民第一",
+      "bookId": "guanzi",
+      "passageId": "guanzi-005"
+    },
+    {
+      "id": "GZ0006",
+      "text": "下令于流水之原者，令顺民心也。",
+      "source": "《管子》· 一、牧民第一",
+      "bookId": "guanzi",
+      "passageId": "guanzi-006"
+    },
+    {
+      "id": "GZ0007",
+      "text": "民恶忧劳，我佚乐之；民恶贫贱，我富贵之；民恶危坠，我存安之；民恶灭绝，我生育之。",
+      "source": "《管子》· 一、牧民第一",
+      "bookId": "guanzi",
+      "passageId": "guanzi-007"
+    },
+    {
+      "id": "GZ0008",
+      "text": "怠倦者不及，无广者疑神。",
+      "source": "《管子》· 二、形势第二",
+      "bookId": "guanzi",
+      "passageId": "guanzi-008"
+    },
+    {
+      "id": "GZ0009",
+      "text": "上下不和，令乃不行。",
+      "source": "《管子》· 二、形势第二",
+      "bookId": "guanzi",
+      "passageId": "guanzi-009"
+    },
+    {
+      "id": "GZ0010",
+      "text": "且怀且威，则君道备矣。",
+      "source": "《管子》· 二、形势第二",
+      "bookId": "guanzi",
+      "passageId": "guanzi-010"
+    },
+    {
+      "id": "GZ0011",
+      "text": "欲王天下，而失天之道，天下不可得而王也。得天之道，其事若自然；失天之道，虽立不安。",
+      "source": "《管子》· 二、形势第二",
+      "bookId": "guanzi",
+      "passageId": "guanzi-011"
+    },
+    {
+      "id": "GZ0012",
+      "text": "疑今者察之古；不知来者视之往。万事之生也，异趣而同归，古今一也。",
+      "source": "《管子》· 二、形势第二",
+      "bookId": "guanzi",
+      "passageId": "guanzi-012"
+    },
+    {
+      "id": "GZ0013",
+      "text": "毋与不可，毋强不能，毋告不知。与不可，强不能，告不知，谓之劳而无功。",
+      "source": "《管子》· 二、形势第二",
+      "bookId": "guanzi",
+      "passageId": "guanzi-013"
+    },
+    {
+      "id": "GZ0014",
+      "text": "言而不可复者，君不言也；行而不可再者，君不行也。凡言而不可复，行而不可再者，有国者之大禁也。",
+      "source": "《管子》· 二、形势第二",
+      "bookId": "guanzi",
+      "passageId": "guanzi-014"
+    },
+    {
+      "id": "GZ0015",
+      "text": "天不变其常，地不易其则，春秋冬夏，不更其节，古今一也。",
+      "source": "《管子》· 二、形势第二",
+      "bookId": "guanzi",
+      "passageId": "guanzi-015"
+    },
+    {
+      "id": "GZ0016",
+      "text": "万乘之国，兵不可以无主；土地博大，野不可以无吏；百姓殷众，官不可以无长；操民之命，朝不可以无政。",
+      "source": "《管子》· 三、权修第三",
+      "bookId": "guanzi",
+      "passageId": "guanzi-016"
+    },
+    {
+      "id": "GZ0017",
+      "text": "地辟而国贫者，舟舆饰、台榭广也；赏罚信而兵弱者，轻用众、使民劳也。",
+      "source": "《管子》· 三、权修第三",
+      "bookId": "guanzi",
+      "passageId": "guanzi-017"
+    },
+    {
+      "id": "GZ0018",
+      "text": "赋敛厚，则下怨上矣；民力竭，则令不行矣。下怨上，令不行，而求敌之勿谋己，不可得也。",
+      "source": "《管子》· 三、权修第三",
+      "bookId": "guanzi",
+      "passageId": "guanzi-018"
+    },
+    {
+      "id": "GZ0019",
+      "text": "有地不务本事，君国不能壹民，而求宗庙社稷之无危，不可得也。",
+      "source": "《管子》· 三、权修第三",
+      "bookId": "guanzi",
+      "passageId": "guanzi-019"
+    },
+    {
+      "id": "GZ0020",
+      "text": "一年之计，莫如树谷；十年之计，莫如树木；终身之计，莫如树人。",
+      "source": "《管子》· 三、权修第三",
+      "bookId": "guanzi",
+      "passageId": "guanzi-020"
+    },
+    {
+      "id": "GZ0021",
+      "text": "一树一获者，谷也；一树十获者，木也；一树百获者，人也。",
+      "source": "《管子》· 三、权修第三",
+      "bookId": "guanzi",
+      "passageId": "guanzi-021"
+    },
+    {
+      "id": "GZ0022",
+      "text": "国之所以治乱者三，杀戮刑罚，不足用也。国之所以安危者四，城郭险阻，不足守也。国之所以富贫者五，轻税租，薄赋敛，不足恃也。",
+      "source": "《管子》· 四、立政第四",
+      "bookId": "guanzi",
+      "passageId": "guanzi-022"
+    },
+    {
+      "id": "GZ0023",
+      "text": "君之所审者三：一曰德不当其位，二曰功不当其禄，三曰能不当其官。此三本者，治乱之原也。",
+      "source": "《管子》· 四、立政第四",
+      "bookId": "guanzi",
+      "passageId": "guanzi-023"
+    },
+    {
+      "id": "GZ0024",
+      "text": "凡立国都，非于大山之下，必于广川之上。高毋近旱而水用足，下毋近水而沟防省。因天材，就地利，故城郭不必中规矩，道路不必中准绳。",
+      "source": "《管子》· 五、乘马第五",
+      "bookId": "guanzi",
+      "passageId": "guanzi-024"
+    },
+    {
+      "id": "GZ0025",
+      "text": "无为者帝，为而无以为者王，为而不贵者霸。不自以为所贵，则君道也；贵而不过度，则臣道也。",
+      "source": "《管子》· 五、乘马第五",
+      "bookId": "guanzi",
+      "passageId": "guanzi-025"
+    },
+    {
+      "id": "GZ0026",
+      "text": "治民有器，为兵有数，胜敌国有理，正天下有分。",
+      "source": "《管子》· 六、七法第六",
+      "bookId": "guanzi",
+      "passageId": "guanzi-026"
+    },
+    {
+      "id": "GZ0027",
+      "text": "不明于化，而欲变俗易教，犹朝揉轮而夕欲乘车。",
+      "source": "《管子》· 六、七法第六",
+      "bookId": "guanzi",
+      "passageId": "guanzi-027"
+    },
+    {
+      "id": "GZ0028",
+      "text": "不明于计数，而欲举大事，犹无舟楫而欲经于水险也。",
+      "source": "《管子》· 六、七法第六",
+      "bookId": "guanzi",
+      "passageId": "guanzi-028"
+    },
+    {
+      "id": "GZ0029",
+      "text": "论功计劳，未尝失法律也。便辟、左右、大族、尊贵、大臣，不得增其功焉；疏远、卑贱、隐不知之人，不忘其劳。",
+      "source": "《管子》· 六、七法第六",
+      "bookId": "guanzi",
+      "passageId": "guanzi-029"
+    },
+    {
+      "id": "GZ0030",
+      "text": "成功立事，必顺于礼义，故不礼不胜天下，不义不胜人。",
+      "source": "《管子》· 六、七法第六",
+      "bookId": "guanzi",
+      "passageId": "guanzi-030"
+    },
+    {
+      "id": "GZ0031",
+      "text": "喜无以赏，怒无以杀。喜以赏，怒以杀，怨乃起，令乃废。",
+      "source": "《管子》· 七、版法第七",
+      "bookId": "guanzi",
+      "passageId": "guanzi-031"
+    },
+    {
+      "id": "GZ0032",
+      "text": "举所美必观其所终；废所恶必计其所穷。",
+      "source": "《管子》· 七、版法第七",
+      "bookId": "guanzi",
+      "passageId": "guanzi-032"
+    },
+    {
+      "id": "GZ0033",
+      "text": "兼爱无遗，是谓君心。",
+      "source": "《管子》· 七、版法第七",
+      "bookId": "guanzi",
+      "passageId": "guanzi-033"
+    },
+    {
+      "id": "GZ0034",
+      "text": "取人以己，成事以质。",
+      "source": "《管子》· 七、版法第七",
+      "bookId": "guanzi",
+      "passageId": "guanzi-034"
+    },
+    {
+      "id": "GZ0035",
+      "text": "用财不可以啬，用力不可以苦。用财啬则费，用力苦则劳。",
+      "source": "《管子》· 七、版法第七",
+      "bookId": "guanzi",
+      "passageId": "guanzi-035"
+    },
+    {
+      "id": "GZ0036",
+      "text": "修长在乎任贤，高安在乎同利。",
+      "source": "《管子》· 七、版法第七",
+      "bookId": "guanzi",
+      "passageId": "guanzi-036"
+    },
+    {
+      "id": "GZ0037",
+      "text": "数战则士疲，数胜则君骄，骄君使疲民则国危。",
+      "source": "《管子》· 八、幼官第八、幼官图第九",
+      "bookId": "guanzi",
+      "passageId": "guanzi-037"
+    },
+    {
+      "id": "GZ0038",
+      "text": "至善不战，其次一之。",
+      "source": "《管子》· 八、幼官第八、幼官图第九",
+      "bookId": "guanzi",
+      "passageId": "guanzi-038"
+    },
+    {
+      "id": "GZ0039",
+      "text": "然则得人之道，莫如利之；利之之道，莫如教之以政。",
+      "source": "《管子》· 九、五辅第十",
+      "bookId": "guanzi",
+      "passageId": "guanzi-039"
+    },
+    {
+      "id": "GZ0040",
+      "text": "故善为政者，田畴垦而国邑实，朝廷闲而官府治，公法行而私曲止，仓廪实而囹圄空，贤人进而奸民退。",
+      "source": "《管子》· 九、五辅第十",
+      "bookId": "guanzi",
+      "passageId": "guanzi-040"
+    },
+    {
+      "id": "GZ0041",
+      "text": "德有六兴，义有七体，礼有八经，法有五务，权有三度。",
+      "source": "《管子》· 九、五辅第十",
+      "bookId": "guanzi",
+      "passageId": "guanzi-041"
+    },
+    {
+      "id": "GZ0042",
+      "text": "养长老，慈幼孤，恤鳏寡，问疾病，吊祸丧，此谓匡其急。",
+      "source": "《管子》· 九、五辅第十",
+      "bookId": "guanzi",
+      "passageId": "guanzi-042"
+    },
+    {
+      "id": "GZ0043",
+      "text": "夫民必知务，然后心一，心一然后意专，心一而意专，然后功足观也。",
+      "source": "《管子》· 九、五辅第十",
+      "bookId": "guanzi",
+      "passageId": "guanzi-043"
+    },
+    {
+      "id": "GZ0044",
+      "text": "上度之天祥，下度之地宜，中度之人顺，此所谓三度。",
+      "source": "《管子》· 九、五辅第十",
+      "bookId": "guanzi",
+      "passageId": "guanzi-044"
+    },
+    {
+      "id": "GZ0045",
+      "text": "明王之务，在于强本事，去无用，然后民可使富；论贤人，用有能，而民可使治；薄税敛，毋苟于民，待以忠爱，而民可使亲。",
+      "source": "《管子》· 九、五辅第十",
+      "bookId": "guanzi",
+      "passageId": "guanzi-045"
+    },
+    {
+      "id": "GZ0046",
+      "text": "事有本，而仁义其要也。",
+      "source": "《管子》· 九、五辅第十",
+      "bookId": "guanzi",
+      "passageId": "guanzi-046"
+    },
+    {
+      "id": "GZ0047",
+      "text": "故圣人博闻多见，畜道以待物。物至而对形，曲均存矣。",
+      "source": "《管子》· 十、宙合第十一",
+      "bookId": "guanzi",
+      "passageId": "guanzi-047"
+    },
+    {
+      "id": "GZ0048",
+      "text": "爵尊则肃士，禄丰则务施，功大而不伐，业明而不矜。",
+      "source": "《管子》· 十、宙合第十一",
+      "bookId": "guanzi",
+      "passageId": "guanzi-048"
+    },
+    {
+      "id": "GZ0049",
+      "text": "苟大意得，不以小缺为伤。",
+      "source": "《管子》· 十、宙合第十一",
+      "bookId": "guanzi",
+      "passageId": "guanzi-049"
+    },
+    {
+      "id": "GZ0050",
+      "text": "天不一时，地不一利；人不一事。",
+      "source": "《管子》· 十、宙合第十一",
+      "bookId": "guanzi",
+      "passageId": "guanzi-050"
+    },
+    {
+      "id": "GZ0051",
+      "text": "帝王者，审所先所后，先民与地则得矣，先贵与骄则失矣。",
+      "source": "《管子》· 十一、枢言第十二",
+      "bookId": "guanzi",
+      "passageId": "guanzi-051"
+    },
+    {
+      "id": "GZ0052",
+      "text": "先王贵诚信；诚信者，天下之结也。",
+      "source": "《管子》· 十一、枢言第十二",
+      "bookId": "guanzi",
+      "passageId": "guanzi-052"
+    },
+    {
+      "id": "GZ0053",
+      "text": "信之者，仁也；不可欺者，智也；既智且仁，是谓成人。",
+      "source": "《管子》· 十一、枢言第十二",
+      "bookId": "guanzi",
+      "passageId": "guanzi-053"
+    },
+    {
+      "id": "GZ0054",
+      "text": "凡国之亡也，以其长者也；人之自失也，以其所长者也。故善游者死于梁池，善射者死于中野。",
+      "source": "《管子》· 十一、枢言第十二",
+      "bookId": "guanzi",
+      "passageId": "guanzi-054"
+    },
+    {
+      "id": "GZ0055",
+      "text": "命属于食，治属于事。无善事而有善治者，自古及今，未尝之有也。",
+      "source": "《管子》· 十一、枢言第十二",
+      "bookId": "guanzi",
+      "passageId": "guanzi-055"
+    },
+    {
+      "id": "GZ0056",
+      "text": "行其田野，视其耕芸，计其农事，而饥饱之国可以知也。",
+      "source": "《管子》· 十二、八观第十三",
+      "bookId": "guanzi",
+      "passageId": "guanzi-056"
+    },
+    {
+      "id": "GZ0057",
+      "text": "凡民从上也，不从口之所言，从情之所好者也。上好勇，则民轻死；上好仁，则民轻财。故上之所好，民必甚焉。",
+      "source": "《管子》· 十三、法法第十六",
+      "bookId": "guanzi",
+      "passageId": "guanzi-057"
+    },
+    {
+      "id": "GZ0058",
+      "text": "是故明君知民之必以上为心也，故置法以自治，立仪以自正也。故上不行，则民不从。",
+      "source": "《管子》· 十三、法法第十六",
+      "bookId": "guanzi",
+      "passageId": "guanzi-058"
+    },
+    {
+      "id": "GZ0059",
+      "text": "规矩者，方圜之正也。虽有巧目利手，不如拙规矩之正方圜也。故巧者能生规矩，不能废规矩而正方圜。虽圣人能生法，不能废法而治国。",
+      "source": "《管子》· 十三、法法第十六",
+      "bookId": "guanzi",
+      "passageId": "guanzi-059"
+    },
+    {
+      "id": "GZ0060",
+      "text": "夫霸王之所始也，以人为本。本理则国固，本乱则国危。",
+      "source": "《管子》· 十四、霸言第二十三",
+      "bookId": "guanzi",
+      "passageId": "guanzi-060"
+    },
+    {
+      "id": "GZ0061",
+      "text": "故上明则下敬，政平则人安；士教和，则兵胜敌；使能则百事理，亲仁则上不危，任贤则诸侯服。",
+      "source": "《管子》· 十四、霸言第二十三",
+      "bookId": "guanzi",
+      "passageId": "guanzi-061"
+    },
+    {
+      "id": "GZ0062",
+      "text": "心之在体，君之位也；九窍之有职，官之分也。心处其道，九窍循理。",
+      "source": "《管子》· 十五、心术上第三十六",
+      "bookId": "guanzi",
+      "passageId": "guanzi-062"
+    },
+    {
+      "id": "GZ0063",
+      "text": "毋先物动，以观其则。动则失位，静乃自得。",
+      "source": "《管子》· 十五、心术上第三十六",
+      "bookId": "guanzi",
+      "passageId": "guanzi-063"
+    },
+    {
+      "id": "GZ0064",
+      "text": "虚其欲，神将入舍；扫除不洁，神乃留处。",
+      "source": "《管子》· 十五、心术上第三十六",
+      "bookId": "guanzi",
+      "passageId": "guanzi-064"
+    },
+    {
+      "id": "GZ0065",
+      "text": "虚无无形谓之道，化育万物谓之德。",
+      "source": "《管子》· 十五、心术上第三十六",
+      "bookId": "guanzi",
+      "passageId": "guanzi-065"
+    },
+    {
+      "id": "GZ0066",
+      "text": "君臣父子人间之事谓之义，登降揖让、贵贱有等、亲疏之体谓之礼。",
+      "source": "《管子》· 十五、心术上第三十六",
+      "bookId": "guanzi",
+      "passageId": "guanzi-066"
+    },
+    {
+      "id": "GZ0067",
+      "text": "礼者，因人之情，缘义之理，而为之节文者也。",
+      "source": "《管子》· 十五、心术上第三十六",
+      "bookId": "guanzi",
+      "passageId": "guanzi-067"
+    },
+    {
+      "id": "GZ0068",
+      "text": "故礼出乎义，义出乎理，理因乎宜者也。",
+      "source": "《管子》· 十五、心术上第三十六",
+      "bookId": "guanzi",
+      "passageId": "guanzi-068"
+    },
+    {
+      "id": "GZ0069",
+      "text": "法者所以同出，不得不然者也，故杀僇禁诛以一之也。故事督乎法，法出乎权，权出于道。",
+      "source": "《管子》· 十五、心术上第三十六",
+      "bookId": "guanzi",
+      "passageId": "guanzi-069"
+    },
+    {
+      "id": "GZ0070",
+      "text": "形不正者德不来，中不精者心不治。正形饰德，万物毕得。",
+      "source": "《管子》· 十六、心术下第三十七",
+      "bookId": "guanzi",
+      "passageId": "guanzi-070"
+    },
+    {
+      "id": "GZ0071",
+      "text": "无以物乱官，毋以官乱心，此之谓内德。",
+      "source": "《管子》· 十六、心术下第三十七",
+      "bookId": "guanzi",
+      "passageId": "guanzi-071"
+    },
+    {
+      "id": "GZ0072",
+      "text": "非吾仪，虽利不为；非吾当，虽利不行；非吾道，虽利不取。",
+      "source": "《管子》· 十七、白心第三十八",
+      "bookId": "guanzi",
+      "passageId": "guanzi-072"
+    },
+    {
+      "id": "GZ0073",
+      "text": "天不为一物枉其时，明君圣人亦不为一人枉其法。",
+      "source": "《管子》· 十七、白心第三十八",
+      "bookId": "guanzi",
+      "passageId": "guanzi-073"
+    },
+    {
+      "id": "GZ0074",
+      "text": "是以圣人之治也，静身以待之，物至而名自治之。",
+      "source": "《管子》· 十七、白心第三十八",
+      "bookId": "guanzi",
+      "passageId": "guanzi-074"
+    },
+    {
+      "id": "GZ0075",
+      "text": "名正法备，则圣人无事。",
+      "source": "《管子》· 十七、白心第三十八",
+      "bookId": "guanzi",
+      "passageId": "guanzi-075"
+    },
+    {
+      "id": "GZ0076",
+      "text": "圣君任法而不任智，任数而不任说，任公而不任私，任大道而不任小物，然后身佚而天下治。",
+      "source": "《管子》· 十八、任法第四十五",
+      "bookId": "guanzi",
+      "passageId": "guanzi-076"
+    },
+    {
+      "id": "GZ0077",
+      "text": "舍法而任智，故民舍事而好誉；舍数而任说，故民舍实而好言；舍公而好私，故民离法而妄行。",
+      "source": "《管子》· 十八、任法第四十五",
+      "bookId": "guanzi",
+      "passageId": "guanzi-077"
+    },
+    {
+      "id": "GZ0078",
+      "text": "故法者，天下之至道也，圣君之实用也。",
+      "source": "《管子》· 十八、任法第四十五",
+      "bookId": "guanzi",
+      "passageId": "guanzi-078"
+    },
+    {
+      "id": "GZ0079",
+      "text": "古之欲正世调天下者，必先观国政，料事务，察民俗，本治乱之所生，知得失之所在，然后从事。故法可立而治可行。",
+      "source": "《管子》· 十九、正世第四十七",
+      "bookId": "guanzi",
+      "passageId": "guanzi-079"
+    },
+    {
+      "id": "GZ0080",
+      "text": "重赋敛，得民财，急使令，罢民力。财竭则不能毋侵夺，力罢则不能毋堕倪。",
+      "source": "《管子》· 十九、正世第四十七",
+      "bookId": "guanzi",
+      "passageId": "guanzi-080"
+    },
+    {
+      "id": "GZ0081",
+      "text": "民已侵夺堕倪，因以法随而诛之，则是诛罚重而乱愈起。",
+      "source": "《管子》· 十九、正世第四十七",
+      "bookId": "guanzi",
+      "passageId": "guanzi-081"
+    },
+    {
+      "id": "GZ0082",
+      "text": "凡治国之道，必先富民。民富则易治也，民贫则难治也。",
+      "source": "《管子》· 二十、治国第四十八",
+      "bookId": "guanzi",
+      "passageId": "guanzi-082"
+    },
+    {
+      "id": "GZ0083",
+      "text": "凡道无根无茎，无叶无荣，万物以生，万物以成，命之曰道。",
+      "source": "《管子》· 二十一、内业第四十九",
+      "bookId": "guanzi",
+      "passageId": "guanzi-083"
+    },
+    {
+      "id": "GZ0084",
+      "text": "凡道无所，善心安爱，心静气理，道乃可止。",
+      "source": "《管子》· 二十一、内业第四十九",
+      "bookId": "guanzi",
+      "passageId": "guanzi-084"
+    },
+    {
+      "id": "GZ0085",
+      "text": "凡人之生也，必以平正。所以失之，必以喜怒忧患。",
+      "source": "《管子》· 二十一、内业第四十九",
+      "bookId": "guanzi",
+      "passageId": "guanzi-085"
+    },
+    {
+      "id": "GZ0086",
+      "text": "是故止怒莫若诗，去忧莫若乐，节乐莫若礼，守礼莫若敬，守敬莫若静。内静外敬，能反其性，性将大定。",
+      "source": "《管子》· 二十一、内业第四十九",
+      "bookId": "guanzi",
+      "passageId": "guanzi-086"
+    },
+    {
+      "id": "GZ0087",
+      "text": "思之思之，又重思之。思之而不通，鬼神将通之。非鬼神之力也，精气之极也。",
+      "source": "《管子》· 二十一、内业第四十九",
+      "bookId": "guanzi",
+      "passageId": "guanzi-087"
+    },
+    {
+      "id": "GZ0088",
+      "text": "我心治，官乃治；我心安，官乃安。治之者心也，安之者心也。",
+      "source": "《管子》· 二十一、内业第四十九",
+      "bookId": "guanzi",
+      "passageId": "guanzi-088"
+    },
+    {
+      "id": "GZ0089",
+      "text": "心能执静，道将自定。",
+      "source": "《管子》· 二十一、内业第四十九",
+      "bookId": "guanzi",
+      "passageId": "guanzi-089"
+    },
+    {
+      "id": "GZ0090",
+      "text": "入国四旬，五行九惠之教。一曰老老，二曰慈幼，三曰恤孤，四曰养疾，五曰合独，六曰问疾，七曰通穷，八曰振困，九曰接绝。",
+      "source": "《管子》· 二十二、入国第五十四",
+      "bookId": "guanzi",
+      "passageId": "guanzi-090"
+    },
+    {
+      "id": "GZ0091",
+      "text": "目贵明，耳贵聪，心贵智。以天下之目视则无不见也，以天下之耳听则无不闻也，以天下之心虑则无不知也。",
+      "source": "《管子》· 二十三、九守第五十五",
+      "bookId": "guanzi",
+      "passageId": "guanzi-091"
+    },
+    {
+      "id": "GZ0092",
+      "text": "听之术，曰勿望而距，勿望而许。许之则失守，距之则闭塞。",
+      "source": "《管子》· 二十三、九守第五十五",
+      "bookId": "guanzi",
+      "passageId": "guanzi-092"
+    },
+    {
+      "id": "GZ0093",
+      "text": "修名而督实，按实而定名。名实相生，反相为情。名实当则治，不当则乱。",
+      "source": "《管子》· 二十三、九守第五十五",
+      "bookId": "guanzi",
+      "passageId": "guanzi-093"
+    },
+    {
+      "id": "GZ0094",
+      "text": "先生施教，弟子是则。温恭自虚，所受是极。见善从之，闻义则服。",
+      "source": "《管子》· 二十四、弟子职第五十九",
+      "bookId": "guanzi",
+      "passageId": "guanzi-094"
+    },
+    {
+      "id": "GZ0095",
+      "text": "朝益暮习，小心翼翼。一此不解，是谓学则。",
+      "source": "《管子》· 二十四、弟子职第五十九",
+      "bookId": "guanzi",
+      "passageId": "guanzi-095"
+    },
+    {
+      "id": "GZ0096",
+      "text": "先生既息，各就其友。相切相磋，各长其仪。",
+      "source": "《管子》· 二十四、弟子职第五十九",
+      "bookId": "guanzi",
+      "passageId": "guanzi-096"
+    },
+    {
+      "id": "GZ0097",
+      "text": "五谷食米，民之司命也；黄金刀币，民之通施也。",
+      "source": "《管子》· 二十五、国蓄第七十三",
+      "bookId": "guanzi",
+      "passageId": "guanzi-097"
+    },
+    {
+      "id": "GZ0098",
+      "text": "岁有凶穰，故谷有贵贱；令有缓急，故物有轻重。",
+      "source": "《管子》· 二十五、国蓄第七十三",
+      "bookId": "guanzi",
+      "passageId": "guanzi-098"
+    },
+    {
+      "id": "GZ0099",
+      "text": "夫民有余则轻之，故人君敛之以轻；民不足则重之，故人君散之以重。敛积之以轻，散行之以重。",
+      "source": "《管子》· 二十五、国蓄第七十三",
+      "bookId": "guanzi",
+      "passageId": "guanzi-099"
+    },
+    {
+      "id": "GZ0100",
+      "text": "轻重无数。物发而应之，闻声而乘之。",
+      "source": "《管子》· 二十六、轻重甲第八十",
+      "bookId": "guanzi",
+      "passageId": "guanzi-100"
+    }
+  ]
+}

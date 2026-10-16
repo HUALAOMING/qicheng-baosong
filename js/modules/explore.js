@@ -1,11 +1,12 @@
 import { $, $$, esc, tr, icon3, download } from '../utils/helpers.js';
-import { CLASSICS } from '../data.js';
+import { getClassicBooks } from '../resources.js';
+import { go3 } from '../app.js';
 import { ctx } from '../state.js';
 
 let exploreBookID = '', exploreQuery = '', exploreChapter = '';
 const exploreParsedBooks = new Map();
 
-function exploreBook(id) { return CLASSICS.books.find(book => book.id === id); }
+function exploreBook(id) { return getClassicBooks().find(book => book.id === id); }
 function exploreInline(text) {
   return esc(text).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
 }
@@ -35,6 +36,7 @@ function exploreMarkdown(markdown) {
 }
 function exploreParseBook(book) {
   if (!book) return {intro:'',entries:[],chapters:[],afterword:''};
+  if(book.passages)return {intro:'',entries:book.passages.map((p,i)=>({id:p.id,number:i+1,chapter:p.chapter,text:p.text,explanation:p.explanation})),chapters:[...new Set(book.passages.map(p=>p.chapter).filter(Boolean))],afterword:''};
   const prior = exploreParsedBooks.get(book.id);
   if (prior?.markdown === book.markdown) return prior.parsed;
   const lines = book.markdown.replace(/^\uFEFF/,'').replace(/\r\n?/g,'\n').split('\n');
@@ -67,17 +69,17 @@ function exploreParseBook(book) {
 function explorePage() {
   return '<div class="explore-center"><header class="explore-heading"><p class="eyebrow">QICHENG / LEARNING</p><h1>'+tr('学习拓展中心','Learning center')+'</h1><p>'+tr('练习语言，读懂经典。把知识积累，融入每一天。','Practice languages and explore Chinese classics at your own pace.')+'</p></header>'+
     '<section class="explore-quiz"><div><p class="eyebrow">01 / '+tr('答题训练','QUIZ PRACTICE')+'</p><h2>'+tr('用一组练习，巩固所学。','Put your knowledge into practice.')+'</h2><p>'+tr('英语与中文 · 每组 10 / 20 题 · 错题与收藏复练','English & Chinese · 10 / 20 questions · Mistakes & favorites')+'</p></div><button class="primary" data-go3="quiz">'+tr('进入答题训练','Open quiz practice')+' ↗</button></section>'+
-    '<section class="explore-classics"><div class="explore-section-title"><p class="eyebrow">02 / '+tr('中华文化典籍','CHINESE CLASSICS')+'</p><h2>'+tr('从经典中，拓展眼界。','Read beyond the familiar.')+'</h2></div><div class="explore-book-grid">'+CLASSICS.books.map((book,index)=>{
+    '<section class="explore-classics"><div class="explore-section-title"><p class="eyebrow">02 / '+tr('中华文化典籍','CHINESE CLASSICS')+'</p><h2>'+tr('从经典中，拓展眼界。','Read beyond the familiar.')+'</h2></div><div class="explore-book-grid">'+getClassicBooks().map((book,index)=>{
       const parsed = exploreParseBook(book), ready = parsed.entries.length > 0;
       return '<button class="explore-book" data-go3="classic:'+esc(book.id)+'"><span class="explore-book-number">0'+(index+1)+'</span><span class="explore-book-body"><strong>《'+esc(book.title)+'》</strong><small>'+esc(ready ? book.subtitle : tr('学习资料待收录','Study material coming later'))+'</small><span class="explore-book-status">'+(ready ? parsed.entries.length+tr(' 句 · 原文与简释',' passages · Text & explanations') : tr('查看学习入口','Open study page'))+'</span></span>'+icon3('chevron')+'</button>';
     }).join('')+'</div></section></div>';
 }
 function exploreFilteredEntries(parsed, query = exploreQuery, chapter = exploreChapter) {
   const needle = query.trim().toLocaleLowerCase();
-  return parsed.entries.filter(entry=>(!chapter || entry.chapter===chapter) && (!needle || (entry.chapter+' '+entry.number+' '+entry.markdown).toLocaleLowerCase().includes(needle)));
+  return parsed.entries.filter(entry=>(!chapter || entry.chapter===chapter) && (!needle || (entry.chapter+' '+entry.number+' '+(entry.markdown||entry.text+' '+entry.explanation)).toLocaleLowerCase().includes(needle)));
 }
 function exploreEntriesHTML(entries) {
-  return entries.length ? entries.map(entry=>'<article class="classic-passage" id="'+esc(entry.id)+'"><header><span>'+tr('第 ','Passage ')+entry.number+tr(' 句','')+'</span><span>'+esc(entry.chapter)+'</span></header><div class="classic-prose">'+exploreMarkdown(entry.markdown)+'</div></article>').join('') : '<p class="classic-no-results" role="status">'+tr('未找到匹配内容，请换一个关键词或篇目。','No matching passages. Try another term or chapter.')+'</p>';
+  return entries.length ? entries.map(entry=>'<article class="classic-passage" id="'+esc(entry.id)+'"><header><span>'+tr('第 ','Passage ')+entry.number+tr(' 句','')+'</span><span>'+esc(entry.chapter)+'</span></header><div class="classic-prose">'+(entry.markdown?exploreMarkdown(entry.markdown):'<blockquote>'+esc(entry.text)+'</blockquote>'+(entry.explanation?'<p>'+esc(entry.explanation)+'</p>':''))+'</div></article>').join('') : '<p class="classic-no-results" role="status">'+tr('未找到匹配内容，请换一个关键词或篇目。','No matching passages. Try another term or chapter.')+'</p>';
 }
 function classicPage(id) {
   const book = exploreBook(id);
@@ -87,8 +89,8 @@ function classicPage(id) {
   const parsed = exploreParseBook(book);
   if (!parsed.entries.length) return '<div class="classic-reader">'+back+'<header class="explore-heading"><p class="eyebrow">CHINESE CLASSICS</p><h1>《'+esc(book.title)+'》</h1></header><section class="classic-empty"><h2>'+tr('学习资料尚未收录','Study materials have not been added')+'</h2><p>'+tr('这里已预留典籍学习入口，正式内容收录后即可阅读。','This study page is ready for verified material when it is available.')+'</p></section></div>';
   const entries = exploreFilteredEntries(parsed);
-  return '<div class="classic-reader">'+back+'<header class="explore-heading"><p class="eyebrow">CHINESE CLASSICS / '+esc(book.englishTitle.toUpperCase())+'</p><h1>《'+esc(book.title)+'》</h1><p>'+esc(book.subtitle)+'</p><p class="classic-meta">'+parsed.entries.length+tr(' 句 · ',' passages · ')+parsed.chapters.length+tr(' 篇目 · 离线可读',' chapters · Available offline')+'</p></header>'+
-    '<details class="classic-source"><summary>'+tr('底本说明与校勘重点','Source and editorial notes')+'</summary><div class="classic-prose">'+exploreMarkdown(parsed.intro)+'</div><button data-classic-download="'+esc(id)+'">'+tr('下载原 Markdown 资料','Download original Markdown')+'</button></details>'+
+  return '<div class="classic-reader">'+back+'<header class="explore-heading"><p class="eyebrow">CHINESE CLASSICS / '+esc((book.englishTitle||'').toUpperCase())+'</p><h1>《'+esc(book.title)+'》</h1><p>'+esc(book.subtitle)+'</p><p class="classic-meta">'+parsed.entries.length+tr(' 句 · ',' passages · ')+parsed.chapters.length+tr(' 篇目 · 离线可读',' chapters · Available offline')+'</p></header>'+
+    '<details class="classic-source"><summary>'+tr('底本说明与校勘重点','Source and editorial notes')+'</summary><div class="classic-prose">'+exploreMarkdown(parsed.intro||tr('此资料由本机导入，请以所提供的底本为准。','Imported locally. Consult the supplied source.'))+'</div><button data-classic-download="'+esc(id)+'">'+(book.passages?tr('下载典籍 JSON','Download classic JSON'):tr('下载原 Markdown 资料','Download original Markdown'))+'</button></details>'+
     '<div class="classic-tools"><label><span>'+tr('搜索内容','Search passages')+'</span><input id="classicSearch" type="search" maxlength="200" value="'+esc(exploreQuery)+'" placeholder="'+tr('搜索原文、简释或篇目','Search text, explanations or chapters')+'"></label><label><span>'+tr('选择篇目','Chapter')+'</span><select id="classicChapter"><option value="">'+tr('全部篇目','All chapters')+'</option>'+parsed.chapters.map(chapter=>'<option value="'+esc(chapter)+'"'+(chapter===exploreChapter?' selected':'')+'>'+esc(chapter)+'</option>').join('')+'</select></label><p id="classicMatchCount" role="status">'+entries.length+' / '+parsed.entries.length+tr(' 句',' passages')+'</p></div>'+
     '<div id="classicPassages">'+exploreEntriesHTML(entries)+'</div><section class="classic-afterword classic-prose">'+exploreMarkdown(parsed.afterword)+'</section></div>';
 }
@@ -104,6 +106,18 @@ function bindExploreControls() {
   $$('[data-classic-download]').forEach(button=>button.onclick=()=>{
     const book = exploreBook(button.dataset.classicDownload);
     if (book?.markdown) download(book.markdown,'text/markdown;charset=utf-8',book.source?.filename || book.id+'.md');
+    else if(book?.passages) {
+      const {id,title,version,englishTitle,subtitle,passages}=book;
+      download(JSON.stringify({schemaVersion:1,book:{id,title,version,englishTitle,subtitle},passages},null,2),'application/json;charset=utf-8',id+'.json');
+    }
   });
 }
 export { explorePage, classicPage, bindExploreControls, exploreBook, exploreParseBook, exploreFilteredEntries, exploreMarkdown };
+
+async function openClassicPassage(bookId,passageId) {
+  const book=exploreBook(bookId);const parsed=exploreParseBook(book);
+  if(!book || !parsed.entries.some(p=>p.id===passageId))return go3('daily-quote');
+  exploreQuery='';exploreChapter='';await go3('classic:'+bookId);
+  requestAnimationFrame(()=>{const passage=document.getElementById(passageId);if(passage){passage.scrollIntoView({block:'center'});passage.classList.add('quote-target');passage.tabIndex=-1;passage.focus({preventScroll:true});}});
+}
+export { openClassicPassage };

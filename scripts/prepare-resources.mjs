@@ -1,4 +1,4 @@
-import {readFile,writeFile} from 'node:fs/promises';
+import {readFile,writeFile,readdir} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
@@ -18,12 +18,17 @@ if (process.argv[2]) {
     await writeFile(path.join(resourceRoot,id+'.json'),JSON.stringify({schemaVersion:1,bank:{id,name:'English '+section,subject:'english',section:section.toLowerCase(),version:'1.0.0'},questions},null,2)+'\n');
   }
 }
-const resourceNames=['english-grammar','english-vocabulary','chinese-ancient-culture','chinese-usage','daily-quotes'];
+const resourceNames=(await readdir(resourceRoot)).filter(name=>name.endsWith('.json') && name!=='manifest.json').sort();
 const entries=[];
-for (const id of resourceNames) {
-  const bytes=await readFile(path.join(resourceRoot,id+'.json'));
+const seen=new Set();
+for (const filename of resourceNames) {
+  const bytes=await readFile(path.join(resourceRoot,filename));
   const resource=JSON.parse(bytes);
-  entries.push({id,type:id==='daily-quotes'?'quotes':'quiz-bank',version:resource.bank?.version||resource.version,url:id+'.json',sha256:createHash('sha256').update(bytes).digest('hex')});
+  const type=resource.bank?'quiz-bank':resource.book?'classic':Array.isArray(resource.quotes)?'quotes':null;
+  const id=resource.bank?.id||resource.book?.id||'daily-quotes', identity=type+':'+id;
+  if(!type || resource.schemaVersion!==1 || seen.has(identity))throw new Error('Invalid or duplicate resource: '+filename);
+  seen.add(identity);
+  entries.push({id,type,version:resource.bank?.version||resource.book?.version||resource.version,url:filename,sha256:createHash('sha256').update(bytes).digest('hex')});
 }
 await writeFile(path.join(resourceRoot,'manifest.json'),JSON.stringify({schemaVersion:1,resources:entries},null,2)+'\n');
-console.log('Prepared 5 resource checksums; source content is unchanged.');
+console.log('Prepared '+entries.length+' resource checksums; source content is unchanged.');

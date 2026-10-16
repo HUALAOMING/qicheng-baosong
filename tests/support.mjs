@@ -33,6 +33,11 @@ function makeDocument() {
   document.querySelector=selector=>{
     if(fixed.has(selector.slice(1)) && selector.startsWith('#')) return fixed.get(selector.slice(1));
     const html=fixed.get('app').innerHTML;
+    const attr=/^\[([a-z0-9-]+)\]$/.exec(selector);
+    if(attr && html.includes(attr[1])) {
+      if(!generated.has(selector))generated.set(selector,new Element());
+      return generated.get(selector);
+    }
     if(selector.startsWith('#') && html.includes('id="'+selector.slice(1)+'"')) {
       if(!generated.has(selector)) generated.set(selector,new Element(selector.slice(1)));
       return generated.get(selector);

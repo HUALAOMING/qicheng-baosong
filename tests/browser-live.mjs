@@ -54,23 +54,33 @@ async function answerGroup(bank,size,wrongFirst=false){
 }
 try{
   await check('HTTPS production files exactly match the prepared 4.2 runtime',async()=>{
-    for(const name of ['index.html','service-worker.js','manifest.webmanifest','js/modules/explore.js','js/modules/quiz.js','js/resources.js','data/classics.json','data/resources/manifest.json']){
+    for(const name of ['index.html','service-worker.js','manifest.webmanifest','js/modules/explore.js','js/modules/quiz.js','js/resources.js','js/autosave.js','js/modules/settings.js','data/resource-examples.json','data/resources/daily-quotes.json','data/classics.json','data/resources/manifest.json']){
       const response=await context.request.get(new URL(name,base).href,{headers:{'Cache-Control':'no-cache'}});assert.equal(response.status(),200,name);
       const bytes=await response.body();assert.equal(createHash('sha256').update(bytes).digest('hex'),createHash('sha256').update(await readFile(path.join(root,name))).digest('hex'),name);
     }
   });
   await check('Live cold launch opens home, 228 English questions, no automatic resource manifest request',async()=>{
-    await page.goto(base);await ready();if(await page.locator('#finishSettings').isVisible())await page.locator('#finishSettings').click();
-    assert.match(await page.title(),/4\.2/);assert.equal(await page.locator('.home-shortcuts [data-go3="explore"]').count(),1);
+    await page.goto(base);await ready();if(await page.locator('#finishSettings').isVisible())await go('home');
+    assert.equal(await page.title(),'启程 · 首页');assert.equal(await page.locator('.home-shortcuts [data-go3="explore"]').count(),1);
     assert.equal(requests.filter(r=>r.url.includes('data/resources/manifest.json')).length,0);
     const banks=await page.evaluate(async base=>(await import(new URL('js/resources.js',base).href)).listQuizBanks().map(b=>({id:b.bank.id,count:b.questions.length})),base);
     assert.deepEqual(banks.map(b=>b.count),[118,110,0,0]);return banks;
   });
+  await check('Live navigation does not save and immediate content navigation still commits',async()=>{
+    await page.evaluate(async base=>{const {storage}=await import(new URL('js/storage.js',base).href);window.__liveOriginal=storage.set;window.__liveWrites=0;storage.set=async(k,v)=>{if(k==='current')window.__liveWrites++;return window.__liveOriginal(k,v);};},base);
+    for(const r of ['profile','settings','explore','home'])await go(r);await page.locator('.menu-toggle').click();await page.locator('.menu-toggle').click();await new Promise(r=>setTimeout(r,650));assert.equal(await page.evaluate(()=>window.__liveWrites),0);
+    await go('profile');await page.locator('[data-bind="profile.name"]').fill('即时切页验收');await go('explore');await new Promise(r=>setTimeout(r,700));assert.equal((await records()).current.profile.name,'即时切页验收');assert.equal(await page.evaluate(()=>window.__liveWrites),1);
+    await page.evaluate(async base=>{(await import(new URL('js/storage.js',base).href)).storage.set=window.__liveOriginal;},base);
+  });
+  await check('Live Settings is a reusable page with offline import guide and versions only at the bottom',async()=>{
+    for(const r of ['home','profile','quiz']){await go(r);await page.evaluate(()=>window.ResumeStudio.openSettings());assert.equal(await page.locator('.settings-page').count(),1);assert.equal(await page.locator('dialog#settingsDialog,.topbar-quote').count(),0);}
+    await page.locator('.resource-guide summary').click();assert.equal(await page.locator('[data-resource-sample]').count(),4);assert.match(await page.locator('.resource-guide').textContent(),/DeepSeek/);assert.match(await page.locator('.settings-versions').textContent(),/4\.2\.1/);await go('home');assert.equal(await page.locator('#homeCardRail,.brand-version,.sidebar-version').count(),0);
+  });
   await check('Legacy current record, uploads and theme survive reload at the original origin; startup returns home',async()=>{
     const fixture=JSON.parse(await readFile(path.join(root,'tests/fixtures/input.json'),'utf8'));fixture.theme='obsidian';fixture.route='profile';
     fixture.assets=[{id:'live-retained',name:'retained.txt',mime:'text/plain',kind:'file',data:'data:text/plain;base64,aGVsbG8=',size:5,createdAt:'2026-10-12T00:00:00Z',source:'synthetic acceptance'}];
-    await page.evaluate(async({base,fixture})=>{const {storage}=await import(new URL('js/storage.js',base).href);const {validateDraft}=await import(new URL('js/utils/validation.js',base).href);await storage.set('current',validateDraft(fixture));},{base,fixture});
-    await page.reload();await ready();const actual=await page.evaluate(()=>window.ResumeStudio.getState());assert.equal(actual.route,'home');assert.equal(actual.theme,'obsidian');assert.deepEqual(actual.assets,fixture.assets);assert.deepEqual(actual.profile,fixture.profile);assert.match(await page.locator('.home-goals').textContent(),/哈尔滨工业大学/);
+    await page.evaluate(async({base,fixture})=>{const {storage}=await import(new URL('js/storage.js',base).href);const {validateDraft}=await import(new URL('js/utils/validation.js',base).href);await storage.set('current',validateDraft(fixture));await storage.set('resource:official:daily-quotes',{schemaVersion:1,version:'1.0.0',quotes:[],origin:'official'});},{base,fixture});
+    await page.reload();await ready();const actual=await page.evaluate(()=>window.ResumeStudio.getState());assert.equal(actual.route,'home');assert.equal(actual.theme,'obsidian');assert.deepEqual(actual.assets,fixture.assets);assert.deepEqual(actual.profile,fixture.profile);assert.equal((await records())['resource:official:daily-quotes'].quotes.length,100);assert.match(await page.locator('.home-goals').textContent(),/哈尔滨工业大学/);
     await go('profile');await page.locator('[data-bind="profile.name"]').fill('线上验收测试同学');await page.locator('[data-bind="profile.name"]').blur();await page.evaluate(async base=>(await import(new URL('js/autosave.js',base).href)).save(),base);
     await page.reload();await ready();assert.equal(await page.evaluate(()=>window.ResumeStudio.getState().profile.name),'线上验收测试同学');
   });
@@ -96,7 +106,7 @@ try{
     const network=[];const listener=response=>{if(/data\/resources\/(manifest|english-grammar)\.json/.test(response.url()))network.push({url:response.url(),status:response.status(),fromServiceWorker:response.fromServiceWorker()});};page.on('response',listener);
     await page.evaluate(()=>window.ResumeStudio.openSettings());await page.locator('[data-resource-update]').click();await page.waitForFunction(()=>/已更新并保存到本机/.test(document.querySelector('#resourceResult')?.textContent||''));page.off('response',listener);
     assert.ok(network.some(r=>r.url.includes('manifest.json')));assert.ok(network.some(r=>r.url.includes('english-grammar.json')));assert.ok(network.every(r=>r.status===200&&!r.fromServiceWorker));
-    const installed=(await records())['resource:official:english-grammar'];assert.equal(installed.bank.version,'1.0.0');assert.equal(installed.questions.length,118);await page.locator('#finishSettings').click();return network;
+    const installed=(await records())['resource:official:english-grammar'];assert.equal(installed.bank.version,'1.0.0');assert.equal(installed.questions.length,118);await go('home');return network;
   });
   await check('Live countdown and personal backup retain data and omit official resources/navigation',async()=>{
     await go('home');await page.locator('.home-countdown-editor summary').click();await page.locator('#homeCountdownForm [name="name"]').fill('线上验收目标');await page.locator('#homeCountdownForm [name="date"]').fill('2027-01-01');await page.locator('#homeCountdownForm button').click();
@@ -104,15 +114,15 @@ try{
     const backup=await page.evaluate(async base=>(await import(new URL('js/backup.js',base).href)).getCurrentBackup(),base);assert.equal(backup.data.current.profile.name,'线上验收测试同学');assert.equal(backup.data.current.assets[0].name,'retained.txt');assert.equal(backup.data['settings:countdown'].name,'线上验收目标');assert.equal(Object.keys(backup.data).filter(k=>k.startsWith('quiz:record:')).length,2);assert.equal(Object.keys(backup.data).filter(k=>k.startsWith('resource:official:')).length,0);assert.equal('route'in backup.data.current,false);
     await page.screenshot({path:path.join(output,'live-home.png')});
   });
-  await check('Production PWA has all 111 cached assets and no Edge installation eligibility errors',async()=>{
+  await check('Production PWA has all 112 cached assets and no Edge installation eligibility errors',async()=>{
     await page.evaluate(async()=>{await navigator.serviceWorker.ready;});await page.reload();await ready();await page.waitForFunction(()=>!!navigator.serviceWorker.controller);
     const cdp=await context.newCDPSession(page);const result=await cdp.send('Page.getInstallabilityErrors');assert.deepEqual(result.installabilityErrors,[]);report.installability=result;await cdp.detach();
-    const offline=await page.evaluate(async()=>{const names=await caches.keys();return Promise.all(names.map(async n=>({name:n,count:(await (await caches.open(n)).keys()).length})));});assert.ok(offline.some(c=>c.count===111));report.caches=offline;
+    const offline=await page.evaluate(async()=>{const names=await caches.keys();return Promise.all(names.map(async n=>({name:n,count:(await (await caches.open(n)).keys()).length})));});assert.ok(offline.some(c=>c.count===112));report.caches=offline;
     const manifest=await page.evaluate(async()=>await(await fetch(document.querySelector('link[rel="manifest"]').href)).json());assert.equal(manifest.id,'./');assert.equal(manifest.display,'standalone');assert.equal(manifest.scope,'./');assert.ok(manifest.icons.some(i=>i.sizes==='512x512'));return {installability:result,caches:offline};
   });
   await check('Offline fresh page opens home, full Guanzi and downloaded quiz; failed update preserves old bank',async()=>{
     expectedNetworkFailure=true;await context.setOffline(true);await page.close();const offlinePage=await context.newPage();await offlinePage.goto(base);await ready(offlinePage);
-    assert.match(await offlinePage.locator('.home-quote').textContent(),/每日一句资源尚未安装/);assert.match(await offlinePage.locator('.home-countdown').textContent(),/线上验收目标/);
+    assert.ok((await offlinePage.locator('.home-quote blockquote').textContent()).length>5);assert.match(await offlinePage.locator('.home-countdown').textContent(),/线上验收目标/);
     await go('classic:guanzi',offlinePage);assert.equal(await offlinePage.locator('.classic-passage').count(),100);await go('quiz',offlinePage);await offlinePage.locator('[data-quiz-bank="english-grammar"]').click();await offlinePage.locator('[data-quiz-start]').click();await offlinePage.waitForSelector('#quizQuestion');
     const detail=await offlinePage.evaluate(async base=>{const r=await import(new URL('js/resources.js',base).href);const before=JSON.stringify(r.listQuizBanks());let rejected=false;try{await r.updateResources();}catch{rejected=true;}return {rejected,unchanged:before===JSON.stringify(r.listQuizBanks()),records:Object.keys(await(await import(new URL('js/storage.js',base).href)).storage.getAll()).filter(k=>k.startsWith('quiz:record:')).length};},base);
     assert.equal(detail.rejected,true);assert.equal(detail.unchanged,true);assert.equal(detail.records,2);await offlinePage.screenshot({path:path.join(output,'live-offline-quiz.png')});await offlinePage.close();await context.setOffline(false);expectedNetworkFailure=false;return detail;

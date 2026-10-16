@@ -753,7 +753,7 @@ function bindResumeControls () {
   });
   if ($ ('#versionChoice')) $ ('#versionChoice').onchange = e => {
     ctx.state.activeVersion = e.target.value;
-    changed ()
+    ctx.layoutCache = null; render ()
   };
   for (const [id, key] of [['versionName', 'name'], ['versionTarget', 'target']]) if ($ ('#' + id)) $ ('#' + id).oninput = e =>
   {

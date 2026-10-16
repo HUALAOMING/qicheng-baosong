@@ -18,12 +18,12 @@ await loadBuiltinData();
 ctx.state=fresh();ctx.state.onboarded=true;initializeSaving301();
 await resources.initializeResources();await quiz.initializeQuiz();await home.initializeHome();
 
-test('formal English banks keep 118 grammar and 110 vocabulary stable IDs, Chinese and quotes start empty',()=>{
+test('formal English banks keep 118 grammar and 110 vocabulary stable IDs, Chinese remains empty and Guanzi daily quotes are installed',()=>{
   const banks=resources.listQuizBanks();
   assert.deepEqual(banks.map(b=>[b.bank.id,b.questions.length]),[['english-grammar',118],['english-vocabulary',110],['chinese-ancient-culture',0],['chinese-usage',0]]);
   const ids=banks.flatMap(b=>b.questions.map(q=>q.id));assert.equal(new Set(ids).size,228);
   assert.ok(banks.slice(0,2).every(bank=>bank.questions.every(q=>q.type==='single-choice'&&q.options.some(option=>option.id===q.answer))));
-  assert.equal(home.homeQuoteForDate(resources.getQuotesResource()),null);
+  assert.equal(resources.getQuotesResource().quotes.length,100);assert.equal(home.homeQuoteForDate(resources.getQuotesResource()).bookId,'guanzi');
 });
 test('beta1 schema and every original user field remain readable; transient fields may be omitted',async()=>{
   assert.equal(DATABASE_NAME,'qicheng-v4');
