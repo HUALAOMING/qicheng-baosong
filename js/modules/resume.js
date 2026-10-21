@@ -62,7 +62,10 @@ function stylePanel () {
   ['airy', '舒展', 'Spacious']].map (([k, z, e]) => '<button data-preset="' + k + '">' + tr (z, e) + '</button>').join ('') +
   '</div>' + slider ('margin', tr ('四边页边距', 'Page margins'), 8, 32, 1, ' mm') + slider ('fontSize', tr ('正文字号', 'Body font size'),
   8, 16, .5, ' pt') + slider ('lineHeight', tr ('行距', 'Line spacing'), 1.1, 2, .05, '×') + slider ('gap', tr ('模块间距',
-  'Section spacing'), 2, 24, 1, ' pt') + '</div><h3>' + tr ('分别设置各模块标题', 'Style individual sections') + '</h3><div class="module-style-grid">' +
+  'Section spacing'), 2, 24, 1, ' pt') + '</div><section class="export-appearance"><div><h3>' + tr ('纸面装饰', 'Paper finish') + '</h3><p class="hint">' +
+  tr ('默认保持简洁。需要时再加细框或短强调线，颜色随当前简历配色。', 'A restrained default. Add a fine frame or short accent rule when useful; colors follow the document palette.') +
+  '</p></div>' + vSelect ('pageDecoration', tr ('装饰样式', 'Decoration'), [['plain', tr ('简洁 · 细分隔线（默认）', 'Simple · fine rule (default)')], ['frame', tr ('细框 · 四边留白', 'Fine frame · generous edges')], ['editorial', tr ('刊物 · 短强调线', 'Editorial · short accent')]]) +
+  '<div class="export-finish-samples" aria-hidden="true"><i class="finish-plain"></i><i class="finish-frame"></i><i class="finish-editorial"></i></div></section><h3>' + tr ('分别设置各模块标题', 'Style individual sections') + '</h3><div class="module-style-grid">' +
   v.order.map (k => {
     const st = moduleStyle (k, v); return '<details class="module-style"><summary>' + esc (v.titles [k]?.trim () || tr (...MODULE_NAMES [k])) +
     '</summary><div class="style-controls">' + range (tr ('大标题字号', 'Section title size'), k + ':titleSize', 10, 28, st.titleSize) +
@@ -102,8 +105,9 @@ function mediaPanel22 () {
 
 function filesPanel22 () {
   const v = currentVersion ();
-  return checkbox (v.showToc, 'data-v-bool="showToc"', tr ('添加独立目录页（列出已导出的模块）', 'Add a separate contents page')) + '<p class="hint">' +
-  tr ('请先在“模块顺序”页确认排列。Word 目录只列模块名称，避免后续编辑使页码失准。', 'Check the arrangement in Module order first. Word lists section names without fixed page numbers so later edits stay accurate.') +
+  return '<div class="export-pagination-options">' + checkbox (v.showToc, 'data-v-bool="showToc"', tr ('添加独立目录页（列出已导出的模块）', 'Add a separate contents page')) +
+  checkbox (v.showPageNumbers !== false, 'data-v-bool="showPageNumbers"', tr ('显示页码 / 总页数', 'Show page number / total pages')) + '</div><p class="hint">' +
+  tr ('PDF、PNG、HTML 与 PPTX 共用分页，目录计入总页数，目录页码指向实际页。Word 使用自动目录和页码域：打开后在目录上选择“更新整个目录”；编辑后再次更新。Markdown 为连续文本，不显示页码。', 'PDF, PNG, HTML and PPTX share physical pagination, including contents pages. Word uses dynamic contents and page-number fields: choose Update entire table after opening and again after edits. Markdown is continuous text without page numbers.') +
   '</p><div class="download-formats">' + [['pdf', 'PDF', tr ('可选择、复制的文字；固定分页', 'Selectable text; fixed pages')], ['docx',
   'Word', tr ('原生段落、可编辑内容', 'Native editable paragraphs')], ['pptx', 'PowerPoint', tr ('可编辑文本框与图片', 'Editable text boxes and images')],
   ['png', 'PNG', tr ('多页打包 ZIP', 'Multiple pages in a ZIP')], ['html', 'HTML', tr ('独立展示网页', 'Standalone display page')],
@@ -121,13 +125,13 @@ function orderPanel () {
   return '<div class="composer-intro"><div><h2>' + tr ('调整模块顺序与显示', 'Arrange sections and visibility') + '</h2><p>' +
   tr ('拖住左侧手柄移动，其他模块会让出位置；右侧勾选决定整块是否导出。', 'Drag the handle to reorder. The other sections move aside; the checkbox controls whether an entire section is included.') +
   '</p></div></div><div class="module-order" id="moduleOrder">' + v.order.map ((k, i) => '<div class="module-order-row ' +
-  (v.disabled.includes (k) ? 'is-disabled' : '') + '" data-order-key="' + k + '"><span class="order-handle" data-order-handle="' +
-  k + '" role="img" aria-label="' + tr ('拖动', 'Drag') + '">⠿</span><strong>' + esc (v.titles [k]?.trim () || tr (...MODULE_NAMES [k])) +
+  (v.disabled.includes (k) ? 'is-disabled' : '') + '" data-order-key="' + k + '"><button type="button" class="order-handle" data-order-handle="' +
+  k + '" aria-pressed="false" aria-label="' + tr ('拖动', 'Drag') + '">⠿</button><strong>' + esc (v.titles [k]?.trim () || tr (...MODULE_NAMES [k])) +
   '</strong><label class="order-visibility"><input type="checkbox" data-order-visible="' + k + '" ' + (v.disabled.includes (k) ?
   '' : 'checked') + '><span>' + tr ('显示', 'Show') + '</span></label><div class="order-arrows"><button data-module-move="' +
   k + ':-1" aria-label="' + tr ('上移', 'Move up') + '" ' + (i === 0 ? 'disabled' : '') + '>↑</button><button data-module-move="' +
   k + ':1" aria-label="' + tr ('下移', 'Move down') + '" ' + (i === v.order.length - 1 ? 'disabled' : '') + '>↓</button></div></div>').join ('') +
-  '</div><button class="primary order-next" data-studio-tab="files">' + tr ('下一步：导出文件 →', 'Next: export files →') +
+  '</div><p id="orderStatus" class="order-status hint" role="status" aria-live="polite">'+tr('拖动手柄，或聚焦手柄后按 ↑ ↓ 调整。Esc 取消移动。','Drag a handle, or focus it and use ↑ ↓. Press Esc to cancel a drag.')+'</p><button class="primary order-next" data-studio-tab="files">' + tr ('下一步：导出文件 →', 'Next: export files →') +
   '</button>';
 }
 
@@ -135,104 +139,156 @@ function orderRows () {
   return [...($$ ('#moduleOrder .module-order-row'))]
 }
 
-function settleOrder () {
-  const rows = orderRows (), v = currentVersion ();
-  v.order = rows.map (r => r.dataset.orderKey);
-  rows.forEach ((row, i) => {
-    row.querySelector ('[data-module-move$=":-1"]').disabled = i === 0; row.querySelector ('[data-module-move$=":1"]').disabled = i === rows.length - 1
-  });
-  changed (false)
+// Small, interruptible springs for this list only. Positions and velocities survive retargeting.
+const orderSprings = new Map();
+let orderFrame = 0, orderCleanup = null;
+const orderReducedMotion = () => window.matchMedia?.('(prefers-reduced-motion:reduce)').matches;
+function orderSpringFrame(now) {
+  orderFrame = 0;
+  for (const [row, spring] of orderSprings) {
+    const dt = Math.min(.032, Math.max(.001, (now-spring.time)/1000));
+    spring.time = now;
+    // Analytic critically damped spring: stable even after a backgrounded frame.
+    for (const axis of ['x','y']) {
+      const velocity = axis==='x'?'vx':'vy', displacement=spring[axis], v=spring[velocity];
+      const decay=Math.exp(-24*dt), c=v+24*displacement;
+      spring[axis]=(displacement+c*dt)*decay;
+      spring[velocity]=(v-24*c*dt)*decay;
+    }
+    row.style.transform='translate3d('+spring.x+'px,'+spring.y+'px,0)';
+    if (Math.abs(spring.x)+Math.abs(spring.y)<.15 && Math.abs(spring.vx)+Math.abs(spring.vy)<2) {
+      row.style.transform=''; row.classList.remove('order-moving','order-released'); orderSprings.delete(row); spring.done?.();
+    }
+  }
+  if(orderSprings.size)orderFrame=requestAnimationFrame(orderSpringFrame);
 }
+function orderSpring(row,x,y,vx=0,vy=0,done) {
+  if(orderReducedMotion()){row.style.transform='';row.classList.remove('order-moving','order-released');done?.();return;}
+  orderSprings.set(row,{x,y,vx,vy,time:performance.now(),done});
+  row.style.transform='translate3d('+x+'px,'+y+'px,0)';row.classList.add('order-moving');
+  if(!orderFrame)orderFrame=requestAnimationFrame(orderSpringFrame);
+}
+function cancelOrderInteraction() { orderCleanup?.(); }
+export { cancelOrderInteraction };
 
-function flipOrder (mutate) {
-  const rows = orderRows (), before = new Map (rows.map (r => [r, r.getBoundingClientRect ()]));
-  mutate ();
-  if (window.matchMedia?.('(prefers-reduced-motion:reduce)').matches) return;
-  for (const row of rows) {
-    const first = before.get (row), last = row.getBoundingClientRect (), dy = first.top - last.top;
-    if (Math.abs (dy) < 1) continue;
-    row.style.transition = 'none';
-    row.style.transform = 'translateY(' + dy + 'px)';
-    row.getBoundingClientRect ();
-    row.classList.add ('order-moving');
-    requestAnimationFrame (() => {
-      row.style.transition = 'transform .26s cubic-bezier(.2,.75,.2,1)'; row.style.transform = 'translateY(0)'; setTimeout (() =>
-      {
-        row.classList.remove ('order-moving'); row.style.transition = ''; row.style.transform = ''
-      }, 280)
-    })
+function settleOrder () {
+  const rows=orderRows(), v=currentVersion(), next=rows.map(row=>row.dataset.orderKey);
+  rows.forEach((row,index)=>{
+    row.querySelector('[data-module-move$=":-1"]').disabled=index===0;
+    row.querySelector('[data-module-move$=":1"]').disabled=index===rows.length-1;
+    row.querySelector('[data-order-handle]').setAttribute('aria-label',tr('拖动或按上下方向键调整：','Drag or use arrow keys to move: ')+row.querySelector('strong').textContent+'，'+(index+1)+' / '+rows.length);
+  });
+  if(v.order.join('|')===next.join('|'))return;
+  v.order=next;changed(false);
+  const status=$('#orderStatus');if(status)status.textContent=tr('顺序已调整，将自动保存。','Order updated. Saving automatically.');
+}
+function flipOrder(mutate) {
+  const rows=orderRows(), before=new Map(rows.map(row=>[row,row.getBoundingClientRect()]));
+  const velocities=new Map(rows.map(row=>[row,orderSprings.get(row)]));
+  mutate();
+  for(const row of rows){row.style.transform='';orderSprings.delete(row);}
+  for(const row of rows){
+    if(row.classList.contains('drag-placeholder'))continue;
+    const first=before.get(row),last=row.getBoundingClientRect(),previous=velocities.get(row);
+    orderSpring(row,first.left-last.left,first.top-last.top,previous?.vx||0,previous?.vy||0);
   }
 }
-
-function animateOrderMove (button) {
-  const row = button.closest ('.module-order-row'), dir = Number (button.dataset.moduleMove.split (':') [1]), target = dir < 0 ?
-  row.previousElementSibling : row.nextElementSibling;
-  if (! target) return;
-  flipOrder (() => row.parentElement.insertBefore (row, dir < 0 ? target : target.nextElementSibling));
-  settleOrder ()
+function animateOrderMove(button) {
+  const row=button.closest('.module-order-row'),dir=Number(button.dataset.moduleMove.split(':')[1]),target=dir<0?row.previousElementSibling:row.nextElementSibling;
+  if(!target)return;
+  flipOrder(()=>row.parentElement.insertBefore(row,dir<0?target:target.nextElementSibling));
+  settleOrder();
 }
-
-function bindModuleOrder () {
-  const list = $ ('#moduleOrder');
-  if (! list) return;
-  let drag = null;
-  $$ ('[data-order-visible]').forEach (e => e.onchange = () => {
-    const row = e.closest ('.module-order-row'); flip (currentVersion ().disabled, e.dataset.orderVisible, ! e.checked); row.classList.toggle ('is-disabled',
-    ! e.checked); changed (false)
+function bindModuleOrder() {
+  const list=$('#moduleOrder');if(!list)return;
+  let drag=null,scrollFrame=0;
+  const finish=(cancel=false)=>{
+    if(!drag)return;
+    const d=drag;drag=null;cancelAnimationFrame(scrollFrame);scrollFrame=0;
+    document.removeEventListener('pointermove',move,true);
+    document.removeEventListener('pointerup',up,true);
+    document.removeEventListener('pointercancel',cancelPointer,true);
+    document.removeEventListener('keydown',escape,true);
+    if(list.hasPointerCapture?.(d.pointerId))list.releasePointerCapture(d.pointerId);
+    d.handle.classList.remove('is-grabbed');d.handle.setAttribute('aria-pressed','false');
+    if(!d.ghost){
+      if(d.frozen)orderSpring(d.row,d.frozen.x,d.frozen.y,d.frozen.vx,d.frozen.vy);
+      return;
+    }
+    if(cancel)flipOrder(()=>d.before.forEach(row=>list.appendChild(row)));
+    else settleOrder();
+    d.row.classList.remove('drag-placeholder');
+    const target=d.row.getBoundingClientRect(),rect=d.ghost.getBoundingClientRect();
+    // Release velocity is bounded so an abrupt flick cannot throw the row off-screen.
+    const fresh=performance.now()-d.sampleTime<100;
+    d.ghost.remove();
+    // Hand motion to the real row, so it can be grabbed again while it settles.
+    d.row.classList.add('order-released');
+    orderSpring(d.row,rect.left-target.left,rect.top-target.top,fresh?Math.max(-900,Math.min(900,d.vx)):0,fresh?Math.max(-900,Math.min(900,d.vy)):0);
+    d.handle.focus({preventScroll:true});
+    if(cancel){const status=$('#orderStatus');if(status)status.textContent=tr('已取消移动，顺序未更改。','Move cancelled. Order unchanged.');}
+  };
+  const position=()=>{
+    if(!drag?.ghost)return;
+    const d=drag;
+    // Keep the original grab offset, tracking the pointer directly without an easing delay.
+    d.ghost.style.transform='translate3d('+(d.x-d.startX)+'px,'+(d.y-d.startY)+'px,0)';
+    const center=d.y-d.dy+d.height/2,others=orderRows().filter(row=>row!==d.row);
+    const target=others.find(row=>{const rect=row.getBoundingClientRect();return center<rect.top-(orderSprings.get(row)?.y||0)+rect.height/2;});
+    const next=target||null;
+    if(d.row.nextElementSibling!==next)flipOrder(()=>{list.insertBefore(d.row,next);});
+  };
+  const autoScroll=()=>{
+    scrollFrame=0;if(!drag?.ghost)return;
+    const edge=80,speed=drag.y<edge?-Math.min(18,(edge-drag.y)*.24):drag.y>innerHeight-edge?Math.min(18,(drag.y-innerHeight+edge)*.24):0;
+    if(speed){window.scrollBy(0,speed);position();}
+    scrollFrame=requestAnimationFrame(autoScroll);
+  };
+  const move=e=>{
+    if(!drag||e.pointerId!==drag.pointerId)return;
+    const d=drag,now=performance.now(),dt=Math.max(8,now-d.sampleTime);
+    d.vx=(e.clientX-d.x)/dt*1000;d.vy=(e.clientY-d.y)/dt*1000;d.sampleTime=now;d.x=e.clientX;d.y=e.clientY;
+    if(!d.ghost){
+      if(Math.hypot(d.x-d.startX,d.y-d.startY)<7)return;
+      d.ghost=d.row.cloneNode(true);d.ghost.classList.add('order-drag-float');d.ghost.setAttribute('aria-hidden','true');d.ghost.inert=true;
+      Object.assign(d.ghost.style,{left:d.left+'px',top:d.top+'px',width:d.width+'px',height:d.height+'px',transform:''});
+      document.body.appendChild(d.ghost);d.row.classList.add('drag-placeholder');d.row.style.transform='';
+      scrollFrame=requestAnimationFrame(autoScroll);
+    }
+    position();e.preventDefault();
+  };
+  const up=e=>{if(drag&&e.pointerId===drag.pointerId){finish(false);e.preventDefault();}};
+  const cancelPointer=e=>{if(drag&&e.pointerId===drag.pointerId)finish(true);};
+  const escape=e=>{if(e.key==='Escape'){e.preventDefault();finish(true);}};
+  $$('[data-order-visible]').forEach(input=>input.onchange=()=>{
+    flip(currentVersion().disabled,input.dataset.orderVisible,!input.checked);input.closest('.module-order-row').classList.toggle('is-disabled',!input.checked);changed(false);
   });
-  const stop = e => {
-    if (! drag || e.pointerId !== drag.pointerId) return;
-    const {
-      row, ghost
-    }
-    = drag;
-    drag = null;
-    document.removeEventListener ('pointermove', move, true);
-    document.removeEventListener ('pointerup', stop, true);
-    document.removeEventListener ('pointercancel', stop, true);
-    row.classList.remove ('drag-placeholder');
-    if (ghost) {
-      const rect = row.getBoundingClientRect ();
-      ghost.style.transition = 'left .15s,top .15s,opacity .15s';
-      ghost.style.left = rect.left + 'px';
-      ghost.style.top = rect.top + 'px';
-      ghost.style.opacity = '0';
-      setTimeout (() => ghost.remove (), 180);
-      settleOrder ()
-    }
-    e.preventDefault ()
+  $$('[data-order-handle]').forEach(handle=>{
+    handle.onpointerdown=e=>{
+      if(drag||!e.isPrimary||e.button!==0)return;
+      const row=handle.closest('.module-order-row'),rect=row.getBoundingClientRect();
+      const frozen=orderSprings.get(row);orderSprings.delete(row);
+      drag={row,handle,pointerId:e.pointerId,startX:e.clientX,startY:e.clientY,x:e.clientX,y:e.clientY,dx:e.clientX-rect.left,dy:e.clientY-rect.top,left:rect.left,top:rect.top,width:rect.width,height:rect.height,before:orderRows(),ghost:null,vx:0,vy:0,sampleTime:performance.now(),frozen};
+      list.setPointerCapture?.(e.pointerId);handle.classList.add('is-grabbed');handle.setAttribute('aria-pressed','true');handle.focus({preventScroll:true});
+      document.addEventListener('pointermove',move,true);document.addEventListener('pointerup',up,true);document.addEventListener('pointercancel',cancelPointer,true);document.addEventListener('keydown',escape,true);e.preventDefault();
+    };
+    handle.onkeydown=e=>{
+      if(drag||!['ArrowUp','ArrowDown','Home','End'].includes(e.key))return;
+      e.preventDefault();const row=handle.closest('.module-order-row');
+      if(e.key==='Home'||e.key==='End'){
+        flipOrder(()=>list.insertBefore(row,e.key==='Home'?list.firstElementChild:null));settleOrder();
+      }else animateOrderMove(row.querySelector('[data-module-move$=":'+(e.key==='ArrowUp'?-1:1)+'"]'));
+      handle.focus({preventScroll:true});
+    };
+  });
+  list.onlostpointercapture=()=>{if(drag)finish(true);};
+  orderCleanup=()=>{
+    finish(true);cancelAnimationFrame(orderFrame);orderFrame=0;
+    for(const [row,spring] of orderSprings){row.style.transform='';row.classList.remove('order-moving','order-released');spring.done?.();}
+    orderSprings.clear();orderCleanup=null;
   };
-  const move = e => {
-    if (! drag || e.pointerId !== drag.pointerId) return;
-    if (! drag.ghost) {
-      if (Math.hypot (e.clientX - drag.startX, e.clientY - drag.startY) < 5) return;
-      const rect = drag.row.getBoundingClientRect ();
-      drag.ghost = drag.row.cloneNode (true);
-      drag.ghost.classList.add ('order-drag-float');
-      drag.ghost.style.width = rect.width + 'px';
-      drag.ghost.style.height = rect.height + 'px';
-      document.body.appendChild (drag.ghost);
-      drag.row.classList.add ('drag-placeholder')
-    }
-    drag.ghost.style.left = e.clientX - drag.dx + 'px';
-    drag.ghost.style.top = e.clientY - drag.dy + 'px';
-    const target = document.elementFromPoint (e.clientX, e.clientY)?.closest ('.module-order-row');
-    if (target && target !== drag.row) {
-      const rect = target.getBoundingClientRect (), after = e.clientY > rect.top + rect.height / 2;
-      flipOrder (() => list.insertBefore (drag.row, after ? target.nextSibling : target))
-    }
-    if (e.clientY > window.innerHeight - 60) window.scrollBy (0, 14);
-    else if (e.clientY < 60) window.scrollBy (0, - 14);
-    e.preventDefault ()
-  };
-  $$ ('[data-order-handle]').forEach (handle => handle.onpointerdown = e => {
-    if (e.button !== 0 && e.pointerType === 'mouse') return; const row = handle.closest ('.module-order-row'), rect = row.getBoundingClientRect (); drag = {
-      row, pointerId : e.pointerId, startX : e.clientX, startY : e.clientY, dx : e.clientX - rect.left, dy : e.clientY - rect.top,
-      ghost : null
-    }; document.addEventListener ('pointermove', move, true); document.addEventListener ('pointerup', stop, true); document.addEventListener ('pointercancel',
-    stop, true); e.preventDefault ()
-  })
 }
+
 
 const exportLabel = (z, e) => currentVersion ().exportLang === 'en' ? e : z;
 

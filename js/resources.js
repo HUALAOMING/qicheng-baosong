@@ -142,7 +142,7 @@ function validateResourceRecords(records, {allowOfficial = false} = {}) {
   return normalized;
 }
 async function resourceLoad() {
-  const records = validateResourceRecords(await storage.getAll(), {allowOfficial:true});
+  const records = validateResourceRecords(await storage.getPrefix('resource:'), {allowOfficial:true});
   const embedded = globalThis.QICHENG_RESOURCE_SEEDS, seedsToStore = Object.create(null);
   // Installed resource versions always win. A new application release cannot silently
   // upgrade resources; bundled local seeds initialize only missing official records.

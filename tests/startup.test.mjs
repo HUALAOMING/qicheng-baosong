@@ -40,10 +40,11 @@ test('exported standalone HTML executes without any network imports/resources an
     setTimeout:()=>0,clearTimeout(){},requestAnimationFrame:fn=>fn(),matchMedia:()=>({matches:false}),fetch:()=>{network++;throw new Error('network forbidden');}});
   context.window=context;context.self=context;Object.assign(context,window);
   for(const match of html.matchAll(/<script(?: [^>]*)?>([\s\S]*?)<\/script>/g)) if(!match[0].startsWith('<script id="qichengEmbedded"'))new vm.Script(match[1]).runInContext(context);
-  for(let i=0;i<30&&!context.ResumeStudio;i++)await new Promise(r=>setImmediate(r));
+  const deadline=Date.now()+3000;
+  while(!context.ResumeStudio&&Date.now()<deadline&&!document.getElementById('startupErrorDetail')?.textContent)await new Promise(r=>setImmediate(r));
   assert.ok(context.ResumeStudio,document.getElementById('startupErrorDetail')?.textContent || document.getElementById('app').innerHTML);
   assert.equal(context.ResumeStudio.getState().profile.name,input.profile.name);assert.equal(network,0);
-  await context.ResumeStudio.go3('explore');assert.ok(document.getElementById('app').innerHTML.includes('学习拓展中心'));
+  await context.ResumeStudio.go3('explore');assert.ok(document.getElementById('app').innerHTML.includes('学习中心'));
   await context.ResumeStudio.go3('classic:guanzi');assert.ok(document.getElementById('app').innerHTML.includes('id="guanzi-100"'));assert.ok(document.getElementById('app').innerHTML.includes('政平则人安；士教和'));
   assert.equal(network,0);
   for (const name of ['dropRecord','moveRecord','selectedPhotos','uploadBatch','v2Action','openSettings','translateUI','exportArchive3','normalizeAssets3','selectedAttachments3','chartValue3','selectedExams3']) assert.equal(typeof context.ResumeStudio[name],'function',name);

@@ -13,7 +13,7 @@ function newVersion (name = '我的第一份简历') {
     }, breaks : [], palette : 'pudding', background : 'accent', margin : 18, fontSize : 11, lineHeight : 1.55, gap : 10,
     orientation : 'portrait', statementLang : 'both', exportLang : 'zh', photoMode : 'appendix', photosPerRow : 2, showAvatar : true,
     avatarSize : 30, avatarShape : 'square', avatarRatioW : 2, avatarRatioH : 3, boldLabels : true, showToc : false, wordImages : false,
-    wordBW : true, pptMode : 'editable'
+    wordBW : true, pptMode : 'editable', showPageNumbers : true, pageDecoration : 'plain'
   };
 }
 

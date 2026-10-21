@@ -73,6 +73,56 @@ function exportColors (v = currentVersion ()) {
   };
 }
 
+// Page numbers refer to physical pages, including every contents page. No fixed +1 assumption.
+function buildContentsPages (entries, { W, H, m, contentW, bottom, version : v, colors : c }) {
+  if (!v.showToc || !entries.length) return [];
+  const pages = [], size = v.fontSize * 1.06, lh = size * v.lineHeight;
+  let page, y;
+  const next = () => {
+    page = { kind : 'toc', items : [] }; pages.push (page); y = m + 32;
+    page.items.push ({ kind : 'text', role : 'toc-title', text : exportLabel ('目录', 'Contents') + (pages.length > 1 ? exportLabel ('（续）', ' (continued)') : ''), x : m, y, w : contentW, h : v.fontSize * 2.5, size : v.fontSize * 2, color : c.accent, bold : true });
+    y += v.fontSize * 3.7;
+  };
+  next ();
+  entries.forEach ((entry, index) => {
+    const lines = wrapText (entry.text, size, contentW - 55);
+    // Move the whole entry when it fits a fresh page; exceptionally long titles may span pages.
+    if (y + lines.length * lh + v.gap + 8 > bottom && lines.length * lh + v.gap + 8 < bottom - (m + 32 + v.fontSize * 3.7)) next ();
+    lines.forEach ((line, lineIndex) => {
+      if (y + lh > bottom) next ();
+      page.items.push ({ kind : 'text', role : 'toc-entry', sectionIndex : index, text : line, x : m, y, w : contentW - 55, h : lh, size, color : c.ink, bold : false });
+      if (lineIndex === lines.length - 1) page.items.push ({ kind : 'text', role : 'toc-page-number', sectionIndex : index, text : '', x : W - m - 35, y, w : 35, h : lh, size, color : c.accent, bold : true });
+      y += lh;
+    });
+    y += v.gap + 8;
+  });
+  for (const p of pages) for (const item of p.items) if (item.role === 'toc-page-number') item.text = String (entries[item.sectionIndex].page + pages.length);
+  return pages;
+}
+
+function decorateDocumentPages (plan, margin) {
+  const { W, H, pages, colors : c, version : v } = plan, m = margin, width = W - 2 * m;
+  const decoration = v.pageDecoration || 'plain';
+  pages.forEach ((page, index) => {
+    const chrome = [];
+    if (decoration === 'frame') {
+      const edge = Math.max (10, m * .45), line = .6;
+      chrome.push ({ kind : 'line', role : 'page-frame', x : edge, y : edge, w : W - edge * 2, h : line, color : c.line },
+      { kind : 'line', role : 'page-frame', x : edge, y : H - edge, w : W - edge * 2, h : line, color : c.line },
+      { kind : 'line', role : 'page-frame', x : edge, y : edge, w : line, h : H - edge * 2, color : c.line },
+      { kind : 'line', role : 'page-frame', x : W - edge, y : edge, w : line, h : H - edge * 2, color : c.line });
+    }
+    chrome.push ({ kind : 'line', role : 'page-accent', x : m, y : m, w : decoration === 'editorial' ? Math.min (90, width * .25) : width, h : decoration === 'editorial' ? 3 : 1.2, color : c.accent });
+    page.items.unshift (...chrome);
+    if (v.showPageNumbers !== false) {
+      const number = (index + 1) + ' / ' + pages.length;
+      page.items.push ({ kind : 'line', role : 'page-footer-line', x : m, y : H - m + 2, w : width, h : .5, color : c.line },
+      { kind : 'text', role : 'page-number', text : number, x : W - m - widthOf (number, 8), y : H - m + 8, w : 55, h : 12, size : 8, color : c.muted, bold : false });
+    }
+  });
+  return plan;
+}
+
 async function documentPlan () {
   await ensureFonts ();
   const v = clone (currentVersion ()), rows = exportRows (), c = exportColors (v), land = v.orientation === 'landscape',
@@ -94,9 +144,6 @@ async function documentPlan () {
     y = m + 18;
     portraitBottom = 0;
     portraitLeft = 0;
-    items.push ( {
-      kind : 'line', x : m, y : m, w : contentW, h : 2, color : c.accent
-    })
   };
   const ensure = h => {
     if (y + h > bottom && y > m + 20) page ()
@@ -104,15 +151,18 @@ async function documentPlan () {
   const text = (s, size, color, bold = false, gap = 3, x = m, width = contentW, align = 'left') => {
     if (x === m && y < portraitBottom) width = Math.min (width, portraitLeft - m - 16);
     const lines = wrapText (s, size, width), lh = size * v.lineHeight;
+    let firstPage = 0;
     for (const l of lines) {
       ensure (lh);
+      if (!firstPage) firstPage = pages.length;
       items.push ( {
         kind : 'text', text : l, x : align === 'center' ? x + (width - widthOf (l, size)) / 2 : x, y, w : width, h : lh, size,
         color, bold
       });
       y += lh
     }
-    y += gap
+    y += gap;
+    return firstPage;
   };
   const fieldText = (r, color) => {
     const labelBold = moduleStyle (r.module, v).labelBold, size = v.fontSize, lh = size * v.lineHeight, width = y < portraitBottom ?
@@ -207,11 +257,10 @@ async function documentPlan () {
         portraitBottom = y + height + 8;
         portraitLeft = W - m - size
       }
-      tocEntries.push ( {
-        text : r.text, page : pages.length + 1
-      });
       y += v.gap;
-      text (r.text, style.titleSize, c.accent, style.titleBold, 5, m, contentW, style.titleAlign);
+      const headingPage = text (r.text, style.titleSize, c.accent, style.titleBold, 5, m, contentW, style.titleAlign);
+      // The actual text placement wins over estimates, including oversized/wrapped custom headings.
+      tocEntries.push ({ text : r.text, page : headingPage });
       items.push ( {
         kind : 'line', x : m, y, w : y < portraitBottom ? portraitLeft - m - 16 : contentW, h : .6, color : c.line
       });
@@ -253,46 +302,10 @@ async function documentPlan () {
     else if (r.label) fieldText (r, r.kind === 'meta' ? c.muted : c.ink);
     else text (r.text, v.fontSize, r.kind === 'meta' ? c.muted : c.ink, false, 4);
   }
-  if (v.showToc && tocEntries.length) {
-    const toc = {
-      items : [ {
-        kind : 'line', x : m, y : m, w : contentW, h : 2, color : c.accent
-      }]
-    };
-    let ty = m + 45;
-    toc.items.push ( {
-      kind : 'text', text : exportLabel ('目录', 'Contents'), x : m, y : ty, w : contentW, h : v.fontSize * 2.5, size : v.fontSize * 2,
-      color : c.accent, bold : true
-    });
-    ty += v.fontSize * 4;
-    for (const entry of tocEntries) {
-      const lines = wrapText (entry.text, v.fontSize * 1.06, contentW - 45);
-      for (const line of lines) {
-        toc.items.push ( {
-          kind : 'text', text : line, x : m, y : ty, w : contentW - 45, h : v.fontSize * v.lineHeight, size : v.fontSize * 1.06,
-          color : c.ink, bold : false
-        });
-        ty += v.fontSize * v.lineHeight
-      }
-      toc.items.push ( {
-        kind : 'text', text : String (entry.page), x : W - m - 35, y : ty - v.fontSize * v.lineHeight, w : 35, h : v.fontSize * v.lineHeight,
-        size : v.fontSize * 1.06, color : c.accent, bold : true
-      });
-      ty += v.gap + 8
-    }
-    pages.unshift (toc)
-  }
-  pages.forEach ((p, i) => {
-    p.items.push ( {
-      kind : 'line', x : m, y : H - m + 2, w : contentW, h : .5, color : c.line
-    }, {
-      kind : 'text', text : (i + 1) + ' / ' + pages.length, x : W - m - 55, y : H - m + 8, w : 55, h : 12, size : 8, color : c.muted,
-      bold : false
-    })
-  });
-  return {
-    W, H, pages, colors : c, version : v
-  };
+  const contents = buildContentsPages (tocEntries, { W, H, m, contentW, bottom, version : v, colors : c });
+  pages.unshift (...contents);
+  return decorateDocumentPages ({ W, H, pages, colors : c, version : v, tocPageCount : contents.length,
+    tocEntries : tocEntries.map (entry => ({ ...entry, page : entry.page + contents.length })) }, m);
 }
 
 async function canvasPages (plan) {
@@ -405,15 +418,15 @@ async function pdfBytes (plan) {
     }
   }
   d.setTitle (currentVersion ().name);
-  d.setCreator ('Qicheng Personal Studio 4.0 Beta');
+  d.setCreator ('Qicheng Personal Studio 5.0');
   return d.save ();
 }
 
 async function wordBlob () {
   const v = clone (currentVersion ()), rows = v.wordImages ? exportRows () : textRows (), col = v.wordBW ? {
-    ink : '#000000', accent : '#000000', muted : '#444444'
+    ink : '#000000', accent : '#000000', muted : '#444444', line : '#bbbbbb'
   } : exportColors (v), {
-    Document, Paragraph, TextRun, Packer, ImageRun, PageBreak, HeadingLevel, AlignmentType
+    Document, Paragraph, TextRun, Packer, ImageRun, PageBreak, HeadingLevel, AlignmentType, Footer, Header, PageNumber, TableOfContents, BorderStyle
   }
   = docx, children = [];
   const image = async data => {
@@ -433,12 +446,10 @@ async function wordBlob () {
           text : exportLabel ('目录', 'Contents'), bold : true, size : v.fontSize * 4
         })]
       }));
-      for (const entry of entries) children.push (new Paragraph ( {
-        spacing : {
-          before : 120, after : 100
-        }, children : [new TextRun ( {
-          text : entry.text, size : v.fontSize * 2
-        })]
+      children.push (new TableOfContents (exportLabel ('目录', 'Contents'), {
+        headingStyleRange : '1-1', hyperlink : true, beginDirty : true,
+        // Visible fallback labels until Word lays out the document and updates the field.
+        contentChildren : entries.map (entry => new Paragraph ({ children : [new TextRun ({ text : entry.text, size : v.fontSize * 2 })] }))
       }));
       children.push (new Paragraph ( {
         children : [new PageBreak ()]
@@ -503,8 +514,9 @@ async function wordBlob () {
       }, children : runs
     }))
   }
-  const landscape = v.orientation === 'landscape', doc = new Document ( {
-    creator : 'Qicheng Personal Studio 4.0 Beta', title : v.name, styles : {
+  const landscape = v.orientation === 'landscape', border = { style : BorderStyle.SINGLE, size : 4, color : col.line.slice (1), space : 12 },
+  doc = new Document ( {
+    creator : 'Qicheng Personal Studio 5.0', title : v.name, features : { updateFields : true }, styles : {
       default : {
         document : {
           run : {
@@ -522,10 +534,14 @@ async function wordBlob () {
           size : {
             width : landscape ? 16838 : 11906, height : landscape ? 11906 : 16838
           }, margin : {
-            top : v.margin * 56.69, bottom : v.margin * 56.69, left : v.margin * 56.69, right : v.margin * 56.69
-          }
+            top : v.margin * 56.69, bottom : v.margin * 56.69, left : v.margin * 56.69, right : v.margin * 56.69,
+            header : Math.min (500, v.margin * 28), footer : Math.min (500, v.margin * 28)
+          }, borders : v.pageDecoration === 'frame' ? { pageBorderTop : border, pageBorderBottom : border, pageBorderLeft : border, pageBorderRight : border } : undefined
         }
-      }, children : children.length ? children : [new Paragraph ('')]
+      }, footers : v.showPageNumbers !== false ? { default : new Footer ({ children : [new Paragraph ({ alignment : AlignmentType.RIGHT,
+        children : [new TextRun ({ children : [PageNumber.CURRENT, ' / ', PageNumber.TOTAL_PAGES], size : 16, color : col.muted.slice (1) })] })] }) } : undefined,
+      headers : v.pageDecoration === 'editorial' ? { default : new Header ({ children : [new Paragraph ({ border : { bottom : { style : BorderStyle.SINGLE, size : 12, color : col.accent.slice (1), space : 3 } }, children : [] })] }) } : undefined,
+      children : children.length ? children : [new Paragraph ('')]
     }]
   });
   return Packer.toBlob (doc)
@@ -670,7 +686,7 @@ async function exportFile (type) {
   }
 }
 
-export { metrics, fontFor, widthOf, ensureFonts, wrapText, exportColors, documentPlan, canvasPages, planSvg, refreshPreview, colorRgb, pdfBytes, wordBlob, pptBlob, selectedAttachments3, exportHTML3, recordExport3, exportFile };
+export { metrics, fontFor, widthOf, ensureFonts, wrapText, exportColors, buildContentsPages, decorateDocumentPages, documentPlan, canvasPages, planSvg, refreshPreview, colorRgb, pdfBytes, wordBlob, pptBlob, selectedAttachments3, exportHTML3, recordExport3, exportFile };
 
 // All controls for this feature, in their original override order.
 function bindExportControls () {

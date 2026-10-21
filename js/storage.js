@@ -3,6 +3,13 @@ const DATABASE_NAME = 'qicheng-v4' + (globalThis.QICHENG_EMBEDDED?.id ? '-copy-'
 const STORE = 'records';
 let connection = null;
 let opening = null;
+let activityTracking = false;
+const DEVICE_ACTIVITY_KEY = 'meta:device';
+function trackStorageActivity(store, keys) {
+  if(!activityTracking || !keys.some(key=>key!=='__seedCleared'&&!key.startsWith('meta:')&&!key.startsWith('session:')&&!key.startsWith('resource:official:')))return;
+  const request=store.get(DEVICE_ACTIVITY_KEY);
+  request.onsuccess=()=>store.put({...request.result,lastSavedAt:new Date().toISOString()},DEVICE_ACTIVITY_KEY);
+}
 
 function storageOpen () {
   if (connection) return Promise.resolve (connection);
@@ -54,7 +61,10 @@ async function storageTransaction (mode, operate) {
       catch (e) {
         if (e.name !== 'TypeError') throw e; tx = db.transaction (STORE, mode);
       }
-      let result; tx.oncomplete = () => resolve (result); tx.onabort = () => reject (tx.error || new Error ('本地数据操作未完成，原数据已保留。')); tx.onerror = () =>
+      let result; tx.oncomplete = () => {
+        resolve(result);
+        if(mode==='readwrite'&&activityTracking&&globalThis.dispatchEvent&&globalThis.Event)globalThis.dispatchEvent(new Event('qicheng-local-write'));
+      }; tx.onabort = () => reject (tx.error || new Error ('本地数据操作未完成，原数据已保留。')); tx.onerror = () =>
       {
       }; operate (tx.objectStore (STORE), value => {
         result = value;
@@ -79,11 +89,13 @@ function storageGet (key) {
 function storageSet (key, value) {
   return storageTransaction ('readwrite', store => {
     store.put (value, key);
+    trackStorageActivity(store,[key]);
   });
 }
 function storageRemove (key) {
   return storageTransaction ('readwrite', store => {
     store.delete (key);
+    trackStorageActivity(store,[key]);
   });
 }
 function storageClear () {
@@ -101,12 +113,29 @@ function storageGetAll () {
     };
   });
 }
+function storageGetPrefix (prefix) {
+  if (typeof prefix !== 'string' || !prefix) return Promise.reject(new TypeError('数据键前缀不能为空。'));
+  return storageTransaction('readonly',(store,done) => {
+    const result = Object.create(null);
+    // A bounded cursor avoids deserializing uploaded files stored under `current`.
+    const range = globalThis.IDBKeyRange?.bound(prefix,prefix+'\uffff');
+    const request = store.openCursor(range);
+    request.onsuccess = () => {
+      const cursor = request.result;
+      if (!cursor) { done(result); return; }
+      // The filter also supports the tiny IndexedDB doubles used by the test suite.
+      if (typeof cursor.key === 'string' && cursor.key.startsWith(prefix)) result[cursor.key] = cursor.value;
+      cursor.continue();
+    };
+  });
+}
 function storageUpdate (key, updater) {
   return storageTransaction ('readwrite', (store, done, tx) => {
     const request = store.get (key); request.onsuccess = () => {
       try {
         const value = updater (request.result); if (value && typeof value.then === 'function') throw new TypeError ('update() 回调必须同步完成。'); store.put (value,
         key); done (value);
+        trackStorageActivity(store,[key]);
       }
       catch (error) {
         tx.abort ();
@@ -120,9 +149,11 @@ function storageReplaceAll (records) {
   });
 }
 // Merge related records in one transaction; failed writes leave every old value intact.
-function storageSetMany (records) {
+function storageSetMany (records, removeKeys = []) {
   return storageTransaction ('readwrite', store => {
     for (const [key, value] of Object.entries (records)) store.put (value, key);
+    for(const key of removeKeys)store.delete(key);
+    trackStorageActivity(store,[...Object.keys(records),...removeKeys]);
   });
 }
 function storageClose () {
@@ -130,7 +161,8 @@ function storageClose () {
   connection = null;
 }
 const storage = {
+  enableActivityTracking : enabled => {activityTracking=enabled!==false;},
   open : storageOpen, close : storageClose, get : storageGet, set : storageSet, update : storageUpdate, remove : storageRemove,
-  getAll : storageGetAll, clear : storageClear, replaceAll : storageReplaceAll, setMany : storageSetMany
+  getAll : storageGetAll, getPrefix:storageGetPrefix, clear : storageClear, replaceAll : storageReplaceAll, setMany : storageSetMany
 };
 export { storage, DATABASE_NAME };

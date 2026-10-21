@@ -1,0 +1,45 @@
+{
+  "checks": [
+    {
+      "name": "month/week, period navigation and opened/dismissed popovers never save",
+      "status": "PASS"
+    },
+    {
+      "name": "daily reflection saves one small record and appears in the Home five-day board",
+      "status": "PASS"
+    },
+    {
+      "name": "calendar countdown shares the Home goal and does not duplicate settings",
+      "status": "PASS"
+    },
+    {
+      "name": "reading entry supports create/edit and does not save on individual input or navigation",
+      "status": "PASS"
+    },
+    {
+      "name": "latest reading fills title/date independently while preserving existing reading notes",
+      "status": "PASS"
+    },
+    {
+      "name": "reading and reflection are included in validated complete backups and survive reload",
+      "status": "PASS"
+    },
+    {
+      "name": "three themes and narrow layouts remain usable without horizontal overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "keyboard date navigation and state deletion work after closing and reopening the popover",
+      "status": "PASS"
+    },
+    {
+      "name": "touch emulation can record a reflection, close its menu and scroll the calendar again",
+      "status": "PASS"
+    },
+    {
+      "name": "no browser runtime errors",
+      "status": "PASS"
+    }
+  ],
+  "errors": []
+}

@@ -67,12 +67,21 @@ function exploreParseBook(book) {
   exploreParsedBooks.set(book.id,{markdown:book.markdown,parsed}); return parsed;
 }
 function explorePage() {
-  return '<div class="explore-center"><header class="explore-heading"><p class="eyebrow">QICHENG / LEARNING</p><h1>'+tr('学习拓展中心','Learning center')+'</h1><p>'+tr('练习语言，读懂经典。把知识积累，融入每一天。','Practice languages and explore Chinese classics at your own pace.')+'</p></header>'+
-    '<section class="explore-quiz"><div><p class="eyebrow">01 / '+tr('答题训练','QUIZ PRACTICE')+'</p><h2>'+tr('用一组练习，巩固所学。','Put your knowledge into practice.')+'</h2><p>'+tr('英语与中文 · 每组 10 / 20 题 · 错题与收藏复练','English & Chinese · 10 / 20 questions · Mistakes & favorites')+'</p></div><button class="primary" data-go3="quiz">'+tr('进入答题训练','Open quiz practice')+' ↗</button></section>'+
-    '<section class="explore-classics"><div class="explore-section-title"><p class="eyebrow">02 / '+tr('中华文化典籍','CHINESE CLASSICS')+'</p><h2>'+tr('从经典中，拓展眼界。','Read beyond the familiar.')+'</h2></div><div class="explore-book-grid">'+getClassicBooks().map((book,index)=>{
+  return '<div class="explore-center"><header class="explore-heading"><p class="eyebrow">QICHENG / LEARNING</p><h1>'+tr('学习中心','Learning center')+'</h1><p>'+tr('练习语言，读懂经典。把知识积累，融入每一天。','Practice languages and explore Chinese classics at your own pace.')+'</p></header>'+
+    '<section class="explore-quiz"><div><p class="eyebrow">01 / '+tr('答题训练','QUIZ PRACTICE')+'</p><h2>'+tr('用一组练习，巩固所学。','Put your knowledge into practice.')+'</h2><p>'+tr('英语与中文 · 自定题数与计时 · 错题与收藏复练','English & Chinese · Custom size & timing · Mistakes & favorites')+'</p></div><button class="primary" data-go3="quiz">'+tr('进入答题训练','Open quiz practice')+' ↗</button></section>'+
+    learningUtilitiesMarkup()+classicLibraryMarkup()+'</div>';
+}
+function learningUtilitiesMarkup(){
+  return '<nav class="learning-utilities" aria-label="'+tr('学习工具','Learning tools')+'"><button data-go3="reading-progress">'+icon3('book')+'<strong>'+tr('每日阅读进度','Reading progress')+'</strong><small>'+tr('记录书目与页码，让阅读有迹可循。','Record a book and pages, one day at a time.')+'</small></button><button data-go3="calendar">'+icon3('calendar')+'<strong>'+tr('学习日历','Learning calendar')+'</strong><small>'+tr('今日事，今日毕。留下一次简单的自我评估。','A simple check-in for your day.')+'</small></button></nav>';
+}
+function classicLibraryMarkup() {
+  return '<section class="explore-classics"><div class="explore-section-title"><p class="eyebrow">02 / '+tr('中华文化典籍','CHINESE CLASSICS')+'</p><h2>'+tr('从经典中，拓展眼界。','Read beyond the familiar.')+'</h2></div><div class="explore-book-grid">'+getClassicBooks().map((book,index)=>{
       const parsed = exploreParseBook(book), ready = parsed.entries.length > 0;
       return '<button class="explore-book" data-go3="classic:'+esc(book.id)+'"><span class="explore-book-number">0'+(index+1)+'</span><span class="explore-book-body"><strong>《'+esc(book.title)+'》</strong><small>'+esc(ready ? book.subtitle : tr('学习资料待收录','Study material coming later'))+'</small><span class="explore-book-status">'+(ready ? parsed.entries.length+tr(' 句 · 原文与简释',' passages · Text & explanations') : tr('查看学习入口','Open study page'))+'</span></span>'+icon3('chevron')+'</button>';
-    }).join('')+'</div></section></div>';
+    }).join('')+'</div></section>';
+}
+function readingPage() {
+  return '<div class="explore-center reading-center"><header class="explore-heading"><p class="eyebrow">LEARNING / READING</p><h1>'+tr('阅读扩展','Reading')+'</h1><p>'+tr('让经典成为日常，在阅读中拓展眼界。','Make room for the classics, one passage at a time.')+'</p></header>'+classicLibraryMarkup()+'</div>';
 }
 function exploreFilteredEntries(parsed, query = exploreQuery, chapter = exploreChapter) {
   const needle = query.trim().toLocaleLowerCase();
@@ -84,7 +93,7 @@ function exploreEntriesHTML(entries) {
 function classicPage(id) {
   const book = exploreBook(id);
   if (exploreBookID !== id) { exploreBookID = id; exploreQuery = ''; exploreChapter = ''; }
-  const back = '<button class="home-text-button" data-go3="explore">← '+tr('返回学习拓展中心','Back to learning center')+'</button>';
+  const back = '<button class="home-text-button" data-go3="reading">← '+tr('返回阅读扩展','Back to reading')+'</button>';
   if (!book) return '<div class="classic-reader">'+back+'<h1>'+tr('未找到这部典籍','Book not found')+'</h1></div>';
   const parsed = exploreParseBook(book);
   if (!parsed.entries.length) return '<div class="classic-reader">'+back+'<header class="explore-heading"><p class="eyebrow">CHINESE CLASSICS</p><h1>《'+esc(book.title)+'》</h1></header><section class="classic-empty"><h2>'+tr('学习资料尚未收录','Study materials have not been added')+'</h2><p>'+tr('这里已预留典籍学习入口，正式内容收录后即可阅读。','This study page is ready for verified material when it is available.')+'</p></section></div>';
@@ -112,7 +121,7 @@ function bindExploreControls() {
     }
   });
 }
-export { explorePage, classicPage, bindExploreControls, exploreBook, exploreParseBook, exploreFilteredEntries, exploreMarkdown };
+export { explorePage, readingPage, classicPage, bindExploreControls, exploreBook, exploreParseBook, exploreFilteredEntries, exploreMarkdown };
 
 async function openClassicPassage(bookId,passageId) {
   const book=exploreBook(bookId);const parsed=exploreParseBook(book);
@@ -121,3 +130,13 @@ async function openClassicPassage(bookId,passageId) {
   requestAnimationFrame(()=>{const passage=document.getElementById(passageId);if(passage){passage.scrollIntoView({block:'center'});passage.classList.add('quote-target');passage.tabIndex=-1;passage.focus({preventScroll:true});}});
 }
 export { openClassicPassage };
+
+// Derive daily reading directly from installed classic content; never duplicate it on disk.
+function classicAsQuotes(book) {
+  const parsed=exploreParseBook(book);
+  return {schemaVersion:1,version:book?.version||'1.0.0',quotes:parsed.entries.map(entry=>({
+    id:entry.id,text:entry.text??entry.markdown.split('\n').filter(line=>line.startsWith('>')).map(line=>line.replace(/^>\s?/,'')).join('\n').replaceAll('**','').trim(),
+    source:'《'+book.title+'》'+(entry.chapter?' · '+entry.chapter:''),bookId:book.id,passageId:entry.id
+  })).filter(quote=>quote.text.trim())};
+}
+export { classicAsQuotes };

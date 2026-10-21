@@ -1,0 +1,18 @@
+{
+  "version": "5.0.0",
+  "emptyOfflineArtifact": true,
+  "offlineChecks": 8,
+  "errors": [],
+  "file": "C:\\Users\\LHM66\\.codex\\.chatgpt-projects\\g-p-6acb820145a08191968dcaea43277ba7\\outputs\\qicheng-5.0.0-offline.html",
+  "bytes": 13528712,
+  "sha256": "1d3a6d65b62976908444fae621c0d54c54e120ccceeac2c29db61bb2e82fd973",
+  "previews": [
+    "qicheng-5.0-home-light.png",
+    "qicheng-5.0-home-dark.png",
+    "qicheng-5.0-home-mobile.png",
+    "qicheng-5.0-calendar-month.png",
+    "qicheng-5.0-calendar-week.png",
+    "qicheng-5.0-reading-progress.png",
+    "qicheng-5.0-transfer-guide.png"
+  ]
+}

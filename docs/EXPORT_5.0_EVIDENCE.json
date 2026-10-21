@@ -1,0 +1,88 @@
+{
+  "startedAt": "2026-10-21T16:59:09.956Z",
+  "browser": "155.0.4283.45",
+  "isolatedContext": true,
+  "checks": [
+    {
+      "name": "temporary export tabs and route switches do not save",
+      "status": "PASS",
+      "detail": {
+        "currentWrites": 0
+      }
+    },
+    {
+      "name": "changing paper finish is saved once even when leaving immediately",
+      "status": "PASS",
+      "detail": {
+        "pageCount": 2,
+        "contentsPages": 1
+      }
+    },
+    {
+      "name": "page-number toggle updates preview and persists without hiding TOC references",
+      "status": "PASS",
+      "detail": {
+        "pageNumbersRestored": true
+      }
+    },
+    {
+      "name": "PNG export works offline and includes all pages as genuine images",
+      "status": "PASS",
+      "detail": {
+        "filename": "启程5.0-导出验证-PNG.zip",
+        "pages": 2
+      }
+    },
+    {
+      "name": "all original document download buttons create real files and export history",
+      "status": "PASS",
+      "detail": [
+        {
+          "type": "pdf",
+          "filename": "启程5.0-导出验证.pdf",
+          "bytes": 2267820
+        },
+        {
+          "type": "docx",
+          "filename": "启程5.0-导出验证.docx",
+          "bytes": 10368
+        },
+        {
+          "type": "pptx",
+          "filename": "启程5.0-导出验证.pptx",
+          "bytes": 78189
+        },
+        {
+          "type": "html",
+          "filename": "启程5.0-导出验证.html",
+          "bytes": 5762087
+        },
+        {
+          "type": "md",
+          "filename": "启程5.0-导出验证.md",
+          "bytes": 772
+        }
+      ]
+    },
+    {
+      "name": "responsive export controls fit narrow touch viewports",
+      "status": "PASS",
+      "detail": {
+        "width": 390,
+        "horizontalOverflow": false
+      }
+    },
+    {
+      "name": "no runtime or console errors were introduced",
+      "status": "PASS",
+      "detail": {
+        "errors": 0
+      }
+    }
+  ],
+  "errors": [],
+  "limitations": [
+    "Headless Edge; DOCX fields and final Word pagination were checked structurally, not rendered by Microsoft Word."
+  ],
+  "completedAt": "2026-10-21T16:59:21.031Z"
+}

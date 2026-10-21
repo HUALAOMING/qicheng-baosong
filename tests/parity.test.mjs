@@ -16,5 +16,7 @@ const snapshots=JSON.parse(await readFile(path.join(root,'tests/fixtures/v3.1-wo
 for(const [key,expected]of Object.entries(snapshots))test('v3.1 feature/field parity: '+key,()=>{
   const split=key.indexOf(':'),uiLang=key.slice(0,split),route=key.slice(split+1);
   ctx.state=validateDraft({...structuredClone(input),uiLang,route});render();
-  assert.equal(workspaceHTML(env.document),expected);
+  // The new featured-school picker is tested separately; compare all original content.
+  const html=workspaceHTML(env.document).replace(/<section class="panel home-school-picker">[\s\S]*?<\/section>/,'').replace(/<section class="quiz-dashboard panel"[\s\S]*?<\/section>/,'').replace(/<button class="school-feature-button"[\s\S]*?<\/button>/g,'');
+  assert.equal(html,expected);
 });

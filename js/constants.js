@@ -1,7 +1,7 @@
 import { uid } from './utils/helpers.js';
 // 启程 · js/constants.js
 
-const VERSION = '4.2.1';
+const VERSION = '5.0.0';
 
 const THEMES = {
   pudding : '布丁奶油', obsidian : '黑橙质感', blue : '墨蓝学院', jade : '深海翡翠', berry : '莓果银白'
@@ -98,7 +98,9 @@ const blanks = {
 };
 
 const NAV3 = [ {
-  id : 'start', zh : '启程', en : 'Qicheng', icon : 'layers', items : [['home', '首页', 'Home'], ['explore', '学习拓展中心', 'Learning center']]
+  id : 'start', zh : '首页', en : 'Home', icon : 'home', standalone : true, items : [['home', '首页', 'Home']]
+}, {
+  id : 'learning-center', zh : '学习中心', en : 'Learning center', icon : 'bulb', items : [['quiz', '练习中心', 'Practice center'], ['reading', '阅读扩展', 'Reading'], ['reading-progress', '每日阅读进度', 'Reading progress'], ['calendar', '学习日历', 'Learning calendar']]
 }, {
   id : 'entry', zh : '信息录入', en : 'Information', icon : 'edit', items : [['profile', '个人基本信息', 'Basic information'],
   ['education', '教育经历', 'Education'], ['statement', '个人陈述', 'Personal statement'], ['academics', '语言与考试成绩', 'Languages & exams'],
@@ -110,7 +112,7 @@ const NAV3 = [ {
   id : 'personal', zh : '个性化内容', en : 'Personal content', icon : 'spark', items : [['learning', '阅读与学习记录', 'Reading & learning'],
   ['achievements', '个人成果', 'Projects & work'], ['custom', '自定义图文', 'Custom content']]
 }, {
-  id : 'dashboard', zh : '数据看板', en : 'Dashboard', icon : 'chart', items : [['dashboard', '资料与成绩概览', 'Overview & trends']]
+  id : 'dashboard', zh : '数据看板', en : 'Dashboard', icon : 'chart', items : [['dashboard', '资料、成绩与练习', 'Materials, exams & practice']]
 }, {
   id : 'materials', zh : '资料中心', en : 'Materials', icon : 'folder', items : [['images', '图片管理', 'Images'], ['files',
   '文件管理', 'Files'], ['outputs', '导出内容管理', 'Exported documents']]

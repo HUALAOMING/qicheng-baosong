@@ -4,7 +4,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {readFile,stat} from 'node:fs/promises';
 const root=path.resolve(fileURLToPath(new URL('../',import.meta.url)));
-const port=Number(process.env.QICHENG_PORT || 4173);
+const port=Number(process.env.QICHENG_PORT || 4177);
 const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.webmanifest':'application/manifest+json','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.ttf':'font/ttf','.md':'text/markdown; charset=utf-8'};
 const server=http.createServer(async(req,res)=>{
   try {

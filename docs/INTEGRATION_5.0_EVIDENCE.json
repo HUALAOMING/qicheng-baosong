@@ -1,0 +1,50 @@
+{
+  "version": "5.0.0",
+  "checks": [
+    {
+      "name": "version 5 boots at home with all official content and no PUB",
+      "status": "PASS"
+    },
+    {
+      "name": "university detail marks a dream and features it directly on Home",
+      "status": "PASS"
+    },
+    {
+      "name": "saved reading progress can fill a freely editable personal reading draft",
+      "status": "PASS"
+    },
+    {
+      "name": "source prepares full user contents, a calendar status and an unfinished quiz",
+      "status": "PASS"
+    },
+    {
+      "name": "transfer guide creates standard complete JSON without official resources or device-only metadata",
+      "status": "PASS"
+    },
+    {
+      "name": "a different mobile device imports the same JSON fully offline and shows its own receipt",
+      "status": "PASS"
+    },
+    {
+      "name": "receiver reopens offline at Home and resumes its imported answers without revealing answers",
+      "status": "PASS"
+    },
+    {
+      "name": "bad transfer is rejected without altering the receiving user data or import timestamp",
+      "status": "PASS"
+    },
+    {
+      "name": "source and receiver edits remain independent until the next explicit file transfer",
+      "status": "PASS"
+    },
+    {
+      "name": "dark and light glass, calendar and transfer guide fit desktop, tablet and mobile",
+      "status": "PASS"
+    },
+    {
+      "name": "no uncaught runtime errors on either device",
+      "status": "PASS"
+    }
+  ],
+  "errors": []
+}

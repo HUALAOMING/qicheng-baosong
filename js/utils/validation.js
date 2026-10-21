@@ -86,7 +86,7 @@ function validateDraft (input) {
   stringList (s.menuOpen, 'menuOpen', NAV3.length);
   s.menuOpen.forEach (k => choice (k, NAV3.map (g => g.id), 'menuOpen'));
   text (s.route, 'route');
-  const routes = [...NAV3.flatMap (g => g.items.map (i => i [0])), 'backup', 'settings', 'daily-quote', 'quiz', ...CLASSICS.books.map (book => 'classic:' + book.id)];
+  const routes = [...NAV3.flatMap (g => g.items.map (i => i [0])), 'backup', 'settings', 'daily-quote', 'quiz', 'explore', ...CLASSICS.books.map (book => 'classic:' + book.id)];
   if (! routes.includes (s.route) && !/^classic:[A-Za-z0-9][A-Za-z0-9._-]{0,119}$/.test(s.route)) {
     try {
       if (! s.route.startsWith ('school:') || ! SCHOOLS.some (x => x.name === decodeURIComponent (s.route.slice (7)))) fail ('route');
@@ -208,6 +208,9 @@ function validateDraft (input) {
     choice (v.photosPerRow, [1, 2, 3], 'versions.photosPerRow');
     choice (v.avatarShape, ['square', 'circle', 'id', 'custom'], 'versions.avatarShape');
     choice (v.pptMode, ['editable', 'image'], 'versions.pptMode');
+    // Older documents keep their original settings and receive the same plain/page-number defaults at rendering time.
+    if (Object.hasOwn (v, 'pageDecoration')) choice (v.pageDecoration, ['plain', 'frame', 'editorial'], 'versions.pageDecoration');
+    if (Object.hasOwn (v, 'showPageNumbers')) flag (v.showPageNumbers, 'versions.showPageNumbers');
     choice (v.purpose, ['resume', 'reading', 'custom'], 'versions.purpose');
     for (const [key, min, max] of [['margin', 8, 32], ['fontSize', 8, 16], ['lineHeight', 1.1, 2], ['gap', 2, 24], ['avatarSize',
     20, 48], ['avatarRatioW', 1, 20], ['avatarRatioH', 1, 20]]) number (v [key], min, max, 'versions.' + key);

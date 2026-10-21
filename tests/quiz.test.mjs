@@ -12,7 +12,9 @@ async function quizHarness() {
     {schemaVersion:1, bank:{id:'empty',name:'Ancient culture',subject:'chinese',section:'ancient-culture',version:'1.0.0'},origin:'official',questions:[]}
   ];
   const ctx = {state:{route:'quiz',uiLang:'zh'},persistencePaused:false};
-  const context = vm.createContext({console, indexedDB:factory,setTimeout,clearTimeout,structuredClone,Date,Math,encodeURIComponent});
+  let clockNow=Date.now();
+  class QuizDate extends Date{constructor(...args){super(...(args.length?args:[clockNow]));}static now(){return clockNow;}}
+  const context = vm.createContext({console, indexedDB:factory,setTimeout,clearTimeout,structuredClone,Date:QuizDate,Math,encodeURIComponent});
   const storageModule = new vm.SourceTextModule(await readFile(new URL('../js/storage.js',import.meta.url),'utf8'),{context});
   await storageModule.link(() => {throw new Error('Unexpected storage dependency');});
   await storageModule.evaluate();
@@ -21,7 +23,7 @@ async function quizHarness() {
     '../storage.js':{storage:storageModule.namespace.storage},
     '../resources.js':{listQuizBanks:()=>banks},
     '../state.js':{ctx},
-    '../app.js':{render(){},confirmAction:async()=>true},
+    '../app.js':{render(){},confirmAction:async()=>true,go3:route=>{ctx.state.route=route;}},
     '../utils/helpers.js':{$:()=>null,$$:()=>[],esc:value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),tr:(zh,en)=>ctx.state.uiLang==='en'?en:zh,toast(){},uid:()=> 'test-'+(++nextId)}
   };
   const module = new vm.SourceTextModule(await readFile(new URL('../js/modules/quiz.js',import.meta.url),'utf8'),{context});
@@ -33,7 +35,7 @@ async function quizHarness() {
   await module.evaluate();
   const quiz=module.namespace,storage=storageModule.namespace.storage;
   await quiz.initializeQuiz();
-  return {quiz,storage,factory,banks,ctx};
+  return {quiz,storage,factory,banks,ctx,advance:ms=>clockNow+=ms};
 }
 function quizFill(quiz,session,wrongIndex=-1) {
   session.questions.forEach((question,index)=>quiz.quizAnswer(index,index===wrongIndex ? question.type==='true-false' ? !question.answer : 'B' : question.answer));
@@ -57,7 +59,7 @@ test('random groups contain 10/20 distinct snapshots; drafts never write records
   const id=session.questions[0].id;
   banks[0].questions.find(question=>question.id===id).question='changed upstream';
   assert.ok(!quiz.quizPage().includes('changed upstream'));
-  assert.throws(()=>quiz.quizStart('en/grammar','random',15));
+  assert.throws(()=>quiz.quizStart('en/grammar','random',201));
 });
 
 test('answers can be revised, incomplete groups cannot submit, result uses final choices',async()=>{
@@ -95,6 +97,7 @@ test('atomic failure midway preserves every old mark and leaves the active group
   const record=await quiz.quizSubmit();
   assert.equal(record.correct,9);
   assert.equal(Object.keys(await storage.getAll()).length,2);
+  assert.equal(await storage.get(quiz.QUIZ_DRAFT_KEY),undefined);
 });
 
 test('rapid double submission creates exactly one formal result',async()=>{
@@ -205,4 +208,32 @@ test('backup write barrier waits for favorite and group commits; paused persiste
   await quiz.waitForQuizWrites();
   assert.equal(Object.keys(await storage.getAll()).filter(key=>key.startsWith('quiz:record:')).length,1);
   await submit;
+});
+
+
+test('beta manual question sizes accept integers and never duplicate scarce questions',async()=>{
+  const {quiz}=await quizHarness();for(const count of [1,7,15,37,200]){const session=quiz.quizStart('en/grammar','random',count);assert.equal(session.questions.length,Math.min(25,count));assert.equal(new Set(session.questions.map(q=>q.id)).size,session.questions.length);}
+  for(const count of [0,-1,1.5,201,NaN])assert.throws(()=>quiz.quizStart('en/grammar','random',count));
+});
+test('beta timer uses absolute elapsed time, expires without grading, and freezes only on submission',async()=>{
+  const {quiz,storage,advance}=await quizHarness();const session=quiz.quizStart('en/grammar','random',7,()=>0.5,{limitSeconds:2});advance(1500);assert.equal(quiz.quizTimeState().remainingSeconds,1);advance(4500);assert.equal(quiz.quizTimeState().expired,true);assert.equal(quiz.quizTimeState().remainingSeconds,0);assert.equal(Object.keys(await storage.getAll()).length,0);assert.equal(quiz.getRecentQuiz(),null);assert.ok(!quiz.quizPage().includes('EXPLANATION_SECRET'));
+  quizFill(quiz,session);const record=await quiz.quizSubmit();assert.equal(record.total,7);assert.equal(record.timing.elapsedSeconds,6);assert.equal(record.timing.limitSeconds,2);advance(120000);assert.equal(quiz.quizTimeState().elapsedSeconds,6);quiz.validateQuizRecords(await storage.getAll());
+});
+test('beta untimed sessions count elapsed time and old records stay valid',async()=>{
+  const {quiz,advance}=await quizHarness();const session=quiz.quizStart('en/grammar');advance(61000);assert.equal(quiz.quizTimeState().elapsedSeconds,61);assert.equal(quiz.quizTimeState().remainingSeconds,null);assert.equal(quiz.quizTimeState().expired,false);assert.equal(quiz.quizFormatTime(3661),'1:01:01');quizFill(quiz,session);const record=await quiz.quizSubmit();delete record.timing;quiz.validateQuizRecords({['quiz:record:'+record.id]:record});record.timing={startedAt:'bad',elapsedSeconds:1,limitSeconds:60};assert.throws(()=>quiz.validateQuizRecords({['quiz:record:'+record.id]:record}));
+});
+
+test('learning overview weights submitted questions, excludes drafts, and reads without writes',async()=>{
+  const {quiz,storage,advance}=await quizHarness();
+  assert.equal(quiz.getQuizDashboard().accuracy,null);
+  let session=quiz.quizStart('en/grammar','random',7);const wrongIds=new Set(session.questions.slice(0,2).map(question=>question.id));quizFill(quiz,session);quiz.quizAnswer(0,'B');quiz.quizAnswer(1,'B');advance(65000);await quiz.quizSubmit();
+  session=quiz.quizStart('en/grammar','random',3);for(const question of session.questions)wrongIds.delete(question.id);quizFill(quiz,session);advance(35000);await quiz.quizSubmit();
+  await quiz.quizFavorite('en/grammar','Q0');quiz.quizStart('zh-usage');
+  const before=JSON.stringify(await storage.getAll()),stats=quiz.getQuizDashboard();
+  assert.equal(stats.total,10);assert.equal(stats.correct,8);assert.equal(stats.groups,2);assert.equal(stats.accuracy,80);assert.equal(stats.elapsedSeconds,100);assert.equal(stats.timedGroups,2);assert.equal(stats.favorites,1);assert.equal(stats.wrong,wrongIds.size);assert.equal(stats.recent.length,2);
+  assert.equal(quiz.getQuizDashboard('chinese-usage').total,0);assert.equal(quiz.getQuizDashboard('chinese-usage').accuracy,null);
+  stats.recent[0].bankTitle='changed';assert.notEqual(quiz.getRecentQuiz().bankTitle,'changed');
+  assert.equal(JSON.stringify(await storage.getAll()),before);
+  const records=await storage.getAll();for(const record of Object.values(records))if(record.submittedAt)delete record.timing;
+  await quiz.initializeQuiz(records);assert.equal(quiz.getQuizDashboard().total,10);assert.equal(quiz.getQuizDashboard().timedGroups,0);assert.equal(quiz.getQuizDashboard().elapsedSeconds,0);
 });

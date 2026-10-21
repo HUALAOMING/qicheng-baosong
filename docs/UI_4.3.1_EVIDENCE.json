@@ -1,0 +1,49 @@
+{
+  "checks": [
+    {
+      "name": "home is a house row; learning contains two direct subpages",
+      "status": "PASS"
+    },
+    {
+      "name": "drag tracks the grab offset, reorders live, and commits only once on drop",
+      "status": "PASS"
+    },
+    {
+      "name": "Escape and pointer cancellation roll back the drag without saving",
+      "status": "PASS"
+    },
+    {
+      "name": "keyboard ordering retains focus and debounces consecutive edits into one save",
+      "status": "PASS"
+    },
+    {
+      "name": "a settling row can be grabbed again and reversed without locking input",
+      "status": "PASS"
+    },
+    {
+      "name": "edge dragging scrolls continuously; cancel restores order without a write",
+      "status": "PASS"
+    },
+    {
+      "name": "leaving mid-drag removes listeners and ghost; pending edits still persist",
+      "status": "PASS"
+    },
+    {
+      "name": "quiz overview excludes drafts; weighted totals, marks, legacy time and filter are correct",
+      "status": "PASS"
+    },
+    {
+      "name": "reduced motion, high contrast and small viewport remain usable",
+      "status": "PASS"
+    },
+    {
+      "name": "touch pointer dragging reorders and saves the final order once",
+      "status": "PASS"
+    },
+    {
+      "name": "no uncaught runtime errors",
+      "status": "PASS"
+    }
+  ],
+  "errors": []
+}

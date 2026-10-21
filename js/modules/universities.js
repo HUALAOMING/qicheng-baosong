@@ -1,4 +1,5 @@
-import { $, $$, esc, heading3, icon3, options, tr } from '../utils/helpers.js';
+import { homeSchoolPickerMarkup, homeFeaturedSchool, saveHomePreferences } from './home.js';
+import { $, $$, esc, heading3, icon3, options, tr, toast } from '../utils/helpers.js';
 import { ctx } from '../state.js';
 import { SCHOOLS, SCHOOL_DATES31, SCHOOL_DETAILS3, SCHOOL_EXAMS302 } from '../data.js';
 import { save } from '../autosave.js';
@@ -10,6 +11,18 @@ import { vectorMapPanel31, bindMap31 } from './map.js';
 
 function bindDreams () {
   $$ ('[data-dream]').forEach (b => b.onclick = () => toggleDream (b.dataset.dream));
+  $$('[data-feature-school]').forEach(button=>button.onclick=async()=>{
+    const name=button.dataset.featureSchool;
+    if(ctx.busy||!ctx.state.dreamSchools.includes(name))return;
+    button.disabled=true;
+    try{await saveHomePreferences({featuredSchool:name});render();toast(tr('已设为首页展示院校','University featured on Home'));}
+    catch(error){toast(error.message);button.disabled=false;}
+  });
+}
+function schoolFeatureButton(name){
+  if(!ctx.state.dreamSchools.includes(name))return '';
+  const active=homeFeaturedSchool().name===name;
+  return '<button class="school-feature-button" data-feature-school="'+esc(name)+'" aria-pressed="'+active+'"'+(active?' disabled':'')+'>'+icon3('home')+tr(active?'首页展示中':'设为首页展示院校',active?'Shown on Home':'Feature on Home')+'</button>';
 }
 
 async function toggleDream (name) {
@@ -43,7 +56,7 @@ function schoolCards () {
     tr ('校测模式与历年时间已收录', 'Assessment and past dates added') : SCHOOL_DATES31 [s.name] ? tr ('历年考试时间已收录', 'Past exam dates added') : SCHOOL_EXAMS302 [s.name] ?
     tr ('2026 校测模式已收录', '2026 assessment added') : tr ('考试资料正在赶来的路上', 'Exam details are on the way')) + '</p><div class="school-card-bottom3"><button data-go3="school:' +
     encodeURIComponent (s.name) + '">' + tr ('查看院校', 'View university') + ' ↗</button><a href="' + esc (s.url) + '" target="_blank" rel="noopener noreferrer">' +
-    tr ('招生简章', 'Admissions') + '</a></div></article>'
+    tr ('招生简章', 'Admissions') + '</a></div>'+schoolFeatureButton(s.name)+'</article>'
   }).join ('') : '<div class="panel empty3">' + tr ('当前筛选没有匹配院校。可以取消所在地或梦想院校筛选。', 'No universities match. Clear a location or dream filter.') +
   '</div>'
 }
@@ -52,7 +65,7 @@ function schoolPage () {
   const regions = [...new Set (SCHOOL_DETAILS3.map (s => s.region))], match = new Set (filteredSchools3 ().map (s =>
   s.name));
   return heading3 ('DESTINATIONS / UNIVERSITIES', tr ('从这里，走向梦想的大学。', 'From here, to your dream university.'), tr ('收藏梦想院校，按所在地筛选，点进学校查看资料与招生链接。',
-  'Mark dream universities, filter by location and open their information pages.')) + '<section class="panel schools-toolbar3"><label class="search3">' +
+  'Mark dream universities, filter by location and open their information pages.')) + homeSchoolPickerMarkup() + '<section class="panel schools-toolbar3"><label class="search3">' +
   icon3 ('search') + '<input id="schoolSearch3" value="' + esc (ctx.schoolQuery) + '" placeholder="' + tr ('学校、缩写、所在地',
   'Name, abbreviation or location') + '"></label><select id="schoolRegion3" aria-label="' + tr ('按所在地筛选', 'Filter by location') +
   '"><option value="">' + tr ('全部所在地', 'All locations') + '</option>' + options (regions, ctx.schoolRegion3) + '</select><button data-action3="dreamFilter" class="' +
@@ -98,7 +111,7 @@ function schoolDetail3 (name) {
   esc (s.abbreviation) + ' / ' + tr ('院校档案', 'UNIVERSITY PROFILE') + '</div><h1>' + esc (s.name) + '</h1><p class="university-english3">' +
   esc (s.english) + '</p><div class="school-location3">' + icon3 ('globe') + esc (s.region + ' · ' + s.city) + '</div><button class="' +
   (dream ? 'primary' : '') + '" data-dream="' + esc (s.name) + '">' + STAR + tr (dream ? '已标注梦想院校' : '标注为梦想院校', dream ?
-  'Marked as dream university' : 'Mark as dream university') + '</button></div><div class="school-hero-logo3">' + schoolLogo3 (s) +
+  'Marked as dream university' : 'Mark as dream university') + '</button>'+schoolFeatureButton(s.name)+'</div><div class="school-hero-logo3">' + schoolLogo3 (s) +
   '</div></section><div class="university-details-grid3"><section class="panel school-links3"><h2>' + tr ('院校资料与链接',
   'University resources') + '</h2><a href="' + esc (s.url) + '" target="_blank" rel="noopener noreferrer"><span><strong>' +
   tr ('保送生招生简章', 'Recommended-student admissions') + '</strong><small>' + esc (s.label) + '</small></span>' + icon3 ('export') +
@@ -111,6 +124,7 @@ function schoolDetail3 (name) {
 }
 
 function bindSchoolCards3 () {
+  bindDreams();
   $$ ('#schoolLinks3 [data-go3]').forEach (b => b.onclick = () => go3 (b.dataset.go3));
   $$ ('#schoolLinks3 [data-dream]').forEach (b => b.onclick = () => toggleDream (b.dataset.dream))
 }

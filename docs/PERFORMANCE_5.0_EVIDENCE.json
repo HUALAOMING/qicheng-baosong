@@ -1,0 +1,90 @@
+{
+  "checks": [
+    {
+      "name": "mobile navigation preserves the shell, topbar and sidebar DOM without reload",
+      "status": "PASS"
+    },
+    {
+      "name": "same-page redraw and route revisits retain scroll without writing navigation",
+      "status": "PASS"
+    },
+    {
+      "name": "redraw retains text focus and selection; editing then navigating saves the latest content",
+      "status": "PASS"
+    },
+    {
+      "name": "menus, route changes, temporary tabs and returning to the foreground produce zero data writes",
+      "status": "PASS"
+    },
+    {
+      "name": "selecting an answer updates controls in place and debounces only the independent quiz draft",
+      "status": "PASS"
+    },
+    {
+      "name": "hidden/pagehide flush only dirty answers; repeated lifecycle events and timers do not write",
+      "status": "PASS"
+    },
+    {
+      "name": "process-style reload starts at Home and resumes saved unsubmitted answers without grading",
+      "status": "PASS"
+    },
+    {
+      "name": "partial answers enter a complete backup and restore without navigation or scroll data",
+      "status": "PASS"
+    },
+    {
+      "name": "older results load offline on demand while an unfinished group stays available",
+      "status": "PASS"
+    },
+    {
+      "name": "mobile redraw timings are recorded under fourfold CPU slowdown with no full-page animation",
+      "status": "PASS"
+    },
+    {
+      "name": "no browser runtime errors occurred",
+      "status": "PASS"
+    }
+  ],
+  "metrics": {
+    "navigation": [
+      {
+        "route": "profile",
+        "milliseconds": 13.9
+      },
+      {
+        "route": "home",
+        "milliseconds": 36.4
+      },
+      {
+        "route": "quiz",
+        "milliseconds": 38.9
+      },
+      {
+        "route": "reading",
+        "milliseconds": 13.6
+      },
+      {
+        "route": "calendar",
+        "milliseconds": 44.5
+      },
+      {
+        "route": "home",
+        "milliseconds": 90.1
+      },
+      {
+        "route": "reading-progress",
+        "milliseconds": 36.4
+      },
+      {
+        "route": "settings",
+        "milliseconds": 88.1
+      },
+      {
+        "route": "home",
+        "milliseconds": 42.2
+      }
+    ],
+    "maximumMilliseconds": 90.1
+  },
+  "errors": []
+}

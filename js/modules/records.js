@@ -1,4 +1,4 @@
-import { $$, area, clone, esc, heading3, icon3, input, options, select, toast, tr, translateLabel, uid, moveIn } from '../utils/helpers.js';
+import { $, $$, area, clone, esc, heading3, icon3, input, options, select, toast, tr, translateLabel, uid, moveIn } from '../utils/helpers.js';
 import { ctx } from '../state.js';
 import { ACHIEVEMENT_FIELDS, AWARD_CATS, AWARD_FIELDS, EXP_FIELDS, SCOPES, blankAward, blankExp, blanks, draftKeys } from '../constants.js';
 import { draftHasContent, formActions } from './profile.js';
@@ -8,6 +8,7 @@ import { confirmAction, render, changed, go3 } from '../app.js';
 import { draftFor3 } from './resume.js';
 import { attachmentPanel3 } from './materials.js';
 import { organizeMode3, scopeOrder3 } from './organization.js';
+import {getLatestReading} from './journal.js';
 // 启程 · js/modules/records.js
 
 
@@ -98,8 +99,9 @@ function recordsCards3 (kind) {
 
 function learningPage3 () {
   const b = ctx.state.bookDraft;
+  const progress=getLatestReading();
   return heading3 ('PERSONAL / READING', tr ('为读过的书，留下自己的思考。', 'Keep your thoughts on what you read.'), tr ('阅读、资料与学习计划可单独导出为阅读档案，也可选入简历。',
-  'Export a reading dossier, or choose selected records for your resume.')) + '<div class="entry-grid3"><div><section class="panel"><h2>' +
+  'Export a reading dossier, or choose selected records for your resume.')) + (progress?'<aside class="reading-progress-shortcut"><p>'+tr('最新阅读：','Latest progress: ')+esc(progress.book)+' · '+esc(progress.date)+' · '+progress.startPage+'–'+progress.endPage+tr(' 页',' pages')+'</p><button data-reading-quickfill>'+tr('用最新进度填入书名与日期','Fill title and date from latest progress')+'</button></aside>':'') + '<div class="entry-grid3"><div><section class="panel"><h2>' +
   tr (ctx.editing.books ? '编辑阅读记录' : '添加书目与学习资料', ctx.editing.books ? 'Edit reading record' : 'Add reading or study materials') +
   '</h2><form id="bookForm">' + input ('bookDraft.title', '书名 / 学习主题 *', b.title, '', 'text', 'required') + '<div class="grid2">' +
   input ('bookDraft.author', '作者 / 资料来源', b.author) + input ('bookDraft.language', '阅读语言', b.language) + select ('bookDraft.status',
@@ -142,6 +144,12 @@ export { collect22, editRecord, deleteRecord, entryPage3, recordsCards3, learnin
 
 // All controls for this feature, in their original override order.
 function bindRecordsControls () {
+  const quickfill=$('[data-reading-quickfill]');if(quickfill)quickfill.onclick=()=>{
+    const reading=getLatestReading();if(!reading||ctx.busy)return;
+    if(ctx.state.bookDraft.title===reading.book&&ctx.state.bookDraft.date===reading.date)return;
+    ctx.state.bookDraft.title=reading.book;ctx.state.bookDraft.date=reading.date;
+    changed();toast(tr('已填入书名与日期，可继续编辑后收录','Title and date filled. Edit freely before saving the record.'));
+  };
   $$ ('[data-edit]').forEach (b => b.onclick = () => editRecord (...b.dataset.edit.split (':')));
   $$ ('[data-delete]').forEach (b => b.onclick = () => deleteRecord (...b.dataset.delete.split (':')));
   $$ ('[data-cancel]').forEach (b => b.onclick = async () => {

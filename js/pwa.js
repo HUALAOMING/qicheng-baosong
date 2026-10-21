@@ -2,7 +2,12 @@ import { ctx } from './state.js';
 import { $, $$, toast, tr } from './utils/helpers.js';
 import { save } from './autosave.js';
 import { APP_BASE } from './data.js';
+import { waitForHomeWrites } from './modules/home.js';
+import { waitForQuizWrites } from './modules/quiz.js';
+import { waitForResourceWrites } from './resources.js';
+import { waitForJournalWrites } from './modules/journal.js';
 let installationPrompt = null, registration = null, status = 'loading', message = '', applyingUpdate = false;
+let checkingUpdate = false, updateNotice = '';
 const isIOS = () => /iPad|iPhone|iPod/.test (navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const installed = () => matchMedia ('(display-mode: standalone)').matches || navigator.standalone === true;
 function pwaStatusText () {
@@ -22,6 +27,28 @@ function pwaBind () {
   $$ ('[data-pwa-refresh]').forEach (button => {
     button.hidden = ! registration?.waiting; button.onclick = pwaApplyUpdate;
   });
+  $$('[data-pwa-check]').forEach(button=>{button.disabled=checkingUpdate;button.textContent=checkingUpdate?tr('正在检查应用更新…','Checking app updates…'):tr('检查应用新版本','Check app updates');button.onclick=pwaCheckUpdate;});
+  $$('[data-pwa-update-status]').forEach(element=>element.textContent=updateNotice);
+}
+async function pwaCheckUpdate(){
+  if(checkingUpdate)return false;
+  if(globalThis.QICHENG_STATIC){updateNotice=tr('这是独立 HTML 副本。请在可安装的 PWA 中检查应用更新。','This is a standalone HTML copy. Check app updates in the installed PWA.');pwaBind();return false;}
+  if(!navigator.onLine){updateNotice=tr('当前离线，连接网络后可检查应用新版本。本机数据不受影响。','You are offline. Connect to check app updates; local data is unchanged.');pwaBind();return false;}
+  checkingUpdate=true;updateNotice=tr('正在检查当前安装地址的应用程序…','Checking the app at this installation address…');pwaBind();
+  try{
+    registration ||= await navigator.serviceWorker?.getRegistration(APP_BASE.href);
+    if(!registration)throw new Error(tr('离线功能尚未准备好，请稍后重试。','Offline support is still being prepared. Try again shortly.'));
+    await registration.update();
+    const worker=registration.installing;
+    if(worker && !['installed','activated','redundant'].includes(worker.state))await new Promise((resolve,reject)=>{
+      const finish=error=>{clearTimeout(timer);worker.removeEventListener('statechange',changed);error?reject(error):resolve();};
+      const changed=()=>{if(['installed','activated'].includes(worker.state))finish();else if(worker.state==='redundant')finish(new Error(tr('新版下载未完成，现有版本已保留。','The update did not complete. The current version is kept.')));};
+      const timer=setTimeout(()=>finish(),60000);timer?.unref?.();worker.addEventListener('statechange',changed);changed();
+    });
+    updateNotice=registration.waiting?tr('新版已下载。点击“保存并更新应用”即可应用，资料会先保存。','Update downloaded. Choose Save & update app to apply it after saving your work.'):registration.installing?tr('新版仍在下载。你可以继续使用，稍后再检查。','The update is still downloading. Continue using the app and check again later.'):tr('当前地址提供的应用已是最新版本。题库与每日一句可在资源区单独更新。','This address provides no newer app version. Banks and daily resources update separately.');
+    return !!registration.waiting;
+  }catch(error){updateNotice=tr('应用更新检查失败：','App update check failed: ')+error.message;return false;}
+  finally{checkingUpdate=false;pwaBind();}
 }
 async function pwaInstall () {
   if (installationPrompt) {
@@ -43,6 +70,8 @@ async function pwaApplyUpdate () {
   if (ctx.busy || ctx.uploadBusy) return toast (tr ('请等待当前操作完成后更新。', 'Wait for the current operation before updating.'));
   if (! registration?.waiting) return;
   if (! await save ()) return toast (tr ('保存失败，请先备份，暂未更新。', 'Save failed. Back up before updating.'));
+  try {await Promise.all([waitForHomeWrites(),waitForQuizWrites(),waitForResourceWrites(),waitForJournalWrites()]);}
+  catch(error){toast(tr('数据仍未保存，请稍后再更新：','Pending data could not be saved: ')+error.message);return false;}
   applyingUpdate = true;
   registration.waiting.postMessage ( {
     type : 'ACTIVATE_UPDATE'
@@ -108,6 +137,6 @@ async function pwaInit () {
   }
 }
 const pwa = {
-  init : pwaInit, bind : pwaBind, install : pwaInstall, statusText : pwaStatusText
+  init : pwaInit, bind : pwaBind, install : pwaInstall, statusText : pwaStatusText, checkUpdate:pwaCheckUpdate, applyUpdate:pwaApplyUpdate
 };
 export { pwa };

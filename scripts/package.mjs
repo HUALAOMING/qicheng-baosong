@@ -10,7 +10,7 @@ const read = name => readFile(path.join(root,name));
 const json = async name => JSON.parse(await read(name));
 const modules = [
   'js/state.js','js/data.js','js/utils/helpers.js','js/constants.js','js/model.js','js/storage.js','js/resources.js',
-  'js/autosave.js','js/utils/validation.js','js/modules/images.js','js/modules/profile.js','js/modules/resume.js',
+  'js/transfer.js','js/modules/journal.js','js/autosave.js','js/utils/validation.js','js/modules/images.js','js/modules/profile.js','js/modules/resume.js',
   'js/modules/records.js','js/modules/organization.js','js/modules/dashboard.js',
   'js/modules/universities.js','js/modules/map.js','js/modules/materials.js','js/modules/export.js',
   'js/modules/markdown.js','js/modules/quiz.js','js/modules/home.js','js/modules/explore.js','js/modules/settings.js','js/pwa.js','js/backup.js','js/events.js','js/app.js'
@@ -31,7 +31,7 @@ const source = (await Promise.all(modules.map(async name => (await read(name)).t
 let html = (await read('index.html')).toString();
 html = html.replace(/<link rel="manifest"[^>]*>\s*/g,'');
 html = html.replace(/<link rel="stylesheet" href="([^"]+)">/g,(_,filename) => '<style data-source="' + filename + '">__CSS_' + filename + '__</style>');
-for (const css of ['base','resume','layout','themes','pwa','workflow']) html = html.replace('__CSS_css/' + css + '.css__',(await read('css/' + css + '.css')).toString());
+for (const css of ['base','resume','layout','themes','pwa','workflow','journal','v5']) html = html.replace('__CSS_css/' + css + '.css__',(await read('css/' + css + '.css')).toString());
 for (const [filename,mime] of [['assets/icons/icon.svg','image/svg+xml'],['assets/icons/apple-touch-icon.png','image/png']]) html = html.replaceAll(filename,'data:' + mime + ';base64,' + (await read(filename)).toString('base64'));
 html = html.replace(/<script defer src="[^"]+"><\/script>\s*/g,'');
 const escapeScript = code => code.replace(/<\/script/gi,'<\\/script');

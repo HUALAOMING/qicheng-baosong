@@ -1,0 +1,17 @@
+{
+  "version": "4.3.1-beta.1",
+  "emptyOfflineArtifact": true,
+  "offlineChecks": 6,
+  "errors": [],
+  "file": "C:\\Users\\LHM66\\.codex\\.chatgpt-projects\\g-p-6acb820145a08191968dcaea43277ba7\\outputs\\qicheng-4.3.1-beta.1-offline.html",
+  "bytes": 13439878,
+  "sha256": "7d9c6f354691d774e3e86aacb86ead424762001e468d17ab5ae7fa528f034d81",
+  "previews": [
+    "qicheng-4.3.1-home-light.png",
+    "qicheng-4.3.1-home-dark.png",
+    "qicheng-4.3.1-home-mobile.png",
+    "qicheng-4.3.1-menu.png",
+    "qicheng-4.3.1-module-order.png",
+    "qicheng-4.3.1-quiz-dashboard.png"
+  ]
+}

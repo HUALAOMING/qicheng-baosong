@@ -18,7 +18,7 @@ test('four classic entrances and the complete supplied Guanzi source are preserv
   assert.equal(createHash('sha256').update(book.markdown,'utf8').digest('hex'),book.source.sha256);
   assert.equal(book.source.sha256,'0822133bfe03e4b1d2dfd20c3b35139d47c6bbf01699eab18974d26fb600c8c5');
   assert.ok(data.CLASSICS.books.filter(book=>book.id!=='guanzi').every(book=>book.markdown===''));
-  const html = explore.explorePage();assert.ok(html.includes('学习拓展中心'));assert.ok(html.includes('data-go3="quiz"'));
+  const html = explore.explorePage();assert.ok(html.includes('学习中心'));assert.ok(html.includes('data-go3="quiz"'));
   for (const book of data.CLASSICS.books) assert.ok(html.includes('data-go3="classic:'+book.id+'"'));
 });
 test('Guanzi has all 100 original numbered passages, 26 chapters, source notes and study advice',()=>{
@@ -52,12 +52,12 @@ test('Markdown displays emphasis and lists while treating HTML and executable li
   assert.equal(/<(img|script|a)\b/.test(html),false);
 });
 test('old quiz routes remain valid while new center and all four classic pages validate',()=>{
-  for (const route of ['quiz','explore',...data.CLASSICS.books.map(book=>'classic:'+book.id)]) {
+  for (const route of ['quiz','explore','reading',...data.CLASSICS.books.map(book=>'classic:'+book.id)]) {
     const state = fresh();state.route=route;assert.equal(validateDraft(state).route,route);
-    assert.equal(routeGroup3(route).id,'start');
+    assert.equal(routeGroup3(route).id,'learning-center');
   }
   const bad = fresh();bad.route='classic:<invalid>';assert.throws(()=>validateDraft(bad));
-  assert.equal(routeName3('classic:guanzi'),'《管子》');assert.equal(routeName3('quiz'),'答题训练');
+  assert.equal(routeName3('classic:guanzi'),'《管子》');assert.equal(routeName3('quiz'),'练习中心');
 });
 test('uninstalled classics show an honest empty state; static texts do not enter personal backups',()=>{
   for (const id of ['lunyu','daodejing','zhuangzi']) {

@@ -1,0 +1,128 @@
+/* Calm, small interactions: the calendar is an instrument, not a task manager. */
+.journal-page{max-width:1120px;margin:0 auto;padding-bottom:2rem}
+.journal-heading{display:flex;align-items:center;justify-content:space-between;gap:1.5rem;margin-bottom:1.5rem}
+.journal-heading h1{font-size:clamp(1.9rem,4vw,2.8rem);line-height:1.2;letter-spacing:-.035em;margin:.35rem 0 .65rem}
+.journal-heading p{color:var(--muted);margin:.35rem 0;font-size:1rem}
+.journal-heading>button{flex:none;min-height:44px}
+.journal-calendar-panel,.journal-reading-entry,.journal-reading-history{background:var(--surface);border:1px solid var(--line);border-radius:22px;box-shadow:0 1px 0 #fff8 inset,0 12px 32px color-mix(in srgb,var(--ink) 5%,transparent);padding:clamp(1rem,3vw,1.8rem)}
+.journal-calendar-motto{display:flex;justify-content:space-between;align-items:baseline;gap:1.25rem;padding-bottom:1.4rem;border-bottom:1px solid var(--line)}
+.journal-calendar-motto>h2{font-size:clamp(1.1rem,3vw,1.6rem);font-weight:600;letter-spacing:-.02em;margin:0;overflow-wrap:anywhere}
+.journal-calendar-motto details{max-width:320px;flex:none}
+.journal-calendar-motto summary{color:var(--muted);font-size:.9rem;cursor:pointer;min-height:44px;display:flex;align-items:center}
+.journal-calendar-motto details[open]{flex:1;min-width:200px}
+.journal-calendar-toolbar{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.25rem 0}
+.journal-calendar-navigation{display:flex;align-items:center;gap:.65rem;min-width:0}
+.journal-calendar-navigation h2{font-size:1.15rem;line-height:1.35;font-weight:650;margin:0;text-align:center;min-width:10rem;letter-spacing:-.02em}
+.journal-calendar-navigation>button{padding:.3rem;min-width:44px;min-height:44px;font-size:1.5rem;border-color:transparent}
+.journal-calendar-navigation>.journal-today-button{font-size:.9rem;padding:.35rem .75rem;border-color:var(--line)}
+.journal-view-switch{display:flex;gap:3px;padding:4px;border-radius:12px;background:var(--bg);border:1px solid var(--line)}
+.journal-view-switch button{border:0;background:transparent;padding:.45rem 1rem;min-height:38px;border-radius:8px;transform:none}
+.journal-view-switch button[aria-pressed=true]{background:var(--surface);box-shadow:0 1px 5px #0001;font-weight:650}
+.journal-weekdays,.journal-calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.journal-calendar-week{display:contents}
+.journal-weekdays{padding:0 0 .65rem;color:var(--muted);text-align:center;font-size:.9rem;font-weight:600}
+.journal-calendar-day{position:relative;min-width:0;height:clamp(72px,8.5vw,108px);padding:.7rem .6rem;display:flex;align-items:flex-start;flex-direction:column;border:1px solid transparent;background:transparent;border-radius:12px;line-height:1.35;transform:none!important;transition:background 100ms,border-color 100ms;overflow:hidden;touch-action:manipulation}
+.journal-calendar-day:hover,.journal-calendar-day:focus-visible{background:var(--soft);border-color:var(--line)}
+.journal-calendar-day:active{background:color-mix(in srgb,var(--accent) 16%,var(--surface));transition:none}
+.journal-calendar-day[aria-expanded=true]{background:var(--soft);outline:2px solid var(--accent);outline-offset:-2px}
+.journal-date-number{display:grid;place-items:center;min-width:28px;min-height:28px;font-size:1.1rem;font-weight:550;font-variant-numeric:tabular-nums}
+.journal-calendar-day.is-today .journal-date-number{background:var(--ink);color:var(--surface);border-radius:50%;font-weight:700}
+.journal-calendar-day.outside-month .journal-date-number{color:color-mix(in srgb,var(--muted) 55%,transparent)}
+.journal-calendar-day.is-target{border-color:color-mix(in srgb,var(--accent) 55%,var(--line));background:color-mix(in srgb,var(--accent) 9%,var(--surface))}
+.journal-target-label{position:absolute;right:.4rem;top:.8rem;font-size:.72rem;color:var(--ink);font-weight:600;background:color-mix(in srgb,var(--accent) 23%,var(--surface));padding:2px 5px;border-radius:4px}
+.journal-day-state{display:flex;gap:6px;align-items:center;margin-top:auto;min-width:0;width:100%;font-size:.8rem;color:var(--muted);padding:4px 0 1px}
+.journal-day-state>span{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.journal-status-mark{display:inline-block;flex:none;width:10px;height:10px;border:1px solid var(--line);border-radius:50%;background:color-mix(in srgb,var(--muted) 10%,transparent)}
+.journal-status-mark.status-perfect{background:#47a99a;border-color:#47a99a;box-shadow:0 0 0 3px #47a99a17}
+.journal-status-mark.status-good{background:#7ca4cf;border-color:#7ca4cf;box-shadow:0 0 0 3px #7ca4cf17}
+.journal-status-mark.status-steady{background:#c2a968;border-color:#c2a968;box-shadow:0 0 0 3px #c2a96817}
+.journal-status-mark.status-low{background:#ae99b8;border-color:#ae99b8;box-shadow:0 0 0 3px #ae99b817}
+.journal-calendar-hint{margin:1.1rem 0 0;color:var(--muted);font-size:.9rem}
+.journal-popover{position:fixed;inset:auto;margin:0;z-index:1000;max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px);overflow:auto;overscroll-behavior:contain;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:20px;box-shadow:0 8px 20px #0001,0 28px 72px #0003;padding:1rem;transform-origin:top center}
+.journal-popover[hidden]{display:none!important}
+.journal-popover::backdrop{background:transparent}
+.journal-popover-heading{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:.7rem}
+.journal-popover-heading p{font-size:.8rem;color:var(--muted);margin:0 0 .2rem}
+.journal-popover-heading h2{margin:0;font-size:1.1rem;font-weight:650;line-height:1.4}
+.journal-popover-heading>button{padding:0;width:44px;height:44px;border:0;background:transparent;font-size:1.5rem;flex:none}
+.journal-status-options{display:grid;gap:4px}
+.journal-status-options button{display:flex;align-items:center;gap:.8rem;min-height:58px;padding:.65rem .75rem;text-align:left;border:1px solid transparent;background:transparent;border-radius:12px;transform:none}
+.journal-status-options button:hover,.journal-status-options button:active{background:var(--soft)}
+.journal-status-options button[aria-pressed=true]{background:var(--soft);border-color:var(--line)}
+.journal-status-options strong,.journal-status-options small{display:block;line-height:1.5}
+.journal-status-options strong{font-size:.96rem;font-weight:600}
+.journal-status-options small{font-size:.82rem;color:var(--muted)}
+.journal-status-check{margin-left:auto;font-weight:700;color:var(--ink)}
+.journal-status-clear{display:block;border:0;background:transparent;font-size:.82rem;text-decoration:underline;color:var(--muted);padding:.45rem .75rem;min-height:44px}
+#journalCountdownForm{border-top:1px solid var(--line);margin-top:.75rem;padding-top:1rem}
+#journalCountdownForm>.field{margin-top:0}
+#journalCountdownForm>button{min-height:44px;width:100%}
+#journalCountdownForm>.hint{font-size:.83rem;margin:.6rem 0 0}
+.journal-reading-entry h2,.journal-reading-history h2{margin:0 0 1rem;font-size:1.25rem;font-weight:650;letter-spacing:-.02em}
+.journal-reading-fields{display:grid;grid-template-columns:1.1fr 2fr .8fr .8fr;gap:1rem}
+.journal-reading-fields .field{margin:0}
+.journal-reading-fields input{min-width:0;width:100%;min-height:44px}
+.journal-form-actions{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin:1.2rem 0 .7rem}
+.journal-form-actions button{min-height:44px}
+.journal-reading-transfer{border:0;background:transparent;padding:.35rem 0;min-height:44px;text-decoration:underline;text-underline-offset:4px}
+.journal-reading-history{margin-top:1.25rem}
+.journal-list-heading{display:flex;align-items:baseline;justify-content:space-between;gap:1rem}
+.journal-list-heading>span{font-size:.9rem;color:var(--muted)}
+.journal-reading-row{display:flex;align-items:center;gap:1.5rem;padding:1.2rem 0;border-top:1px solid var(--line)}
+.journal-reading-date{display:flex;flex:none;flex-direction:column;width:5rem;font-variant-numeric:tabular-nums}
+.journal-reading-date strong{font-size:1.05rem;letter-spacing:-.025em;font-weight:650}
+.journal-reading-date small{font-size:.8rem;color:var(--muted)}
+.journal-reading-detail{flex:1;min-width:0}
+.journal-reading-detail h3{font-size:1rem;font-weight:600;line-height:1.5;margin:0;overflow-wrap:anywhere}
+.journal-reading-detail p{margin:.25rem 0 0;color:var(--muted);font-size:.9rem}
+.journal-reading-actions{display:flex;gap:.4rem}
+.journal-reading-actions button{font-size:.85rem;min-height:44px;padding:.5rem .7rem}
+.journal-empty{text-align:center;padding:2.5rem 1rem;color:var(--muted)}
+.journal-empty strong{display:block;color:var(--ink);font-weight:600;font-size:1.1rem}
+.journal-empty p{font-size:.95rem;margin:.65rem 0}
+.home-status-board{padding:1.5rem;border:1px solid var(--line);border-radius:24px;background:var(--surface);box-shadow:0 1px 0 #fff8 inset,0 12px 32px color-mix(in srgb,var(--ink) 4%,transparent)}
+.home-status-board .home-section-title{margin-bottom:1.25rem;align-items:center}
+.home-status-board .eyebrow{margin:0 0 .4rem}
+.home-status-board h2{margin:0}
+.home-status-days{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.65rem}
+.home-status-day{display:flex;align-items:center;flex-direction:column;gap:.6rem;padding:1.1rem .35rem;border-radius:14px;background:color-mix(in srgb,var(--bg) 70%,transparent);border:1px solid transparent;min-width:0}
+.home-status-day.is-today{border-color:var(--line);background:var(--soft)}
+.home-status-day>span{font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.home-status-day strong{font-size:.85rem;font-weight:550;text-align:center}
+.home-status-day small{font-size:.8rem;color:var(--muted)}
+body[data-theme=obsidian] .journal-calendar-panel,body[data-theme=obsidian] .journal-reading-entry,body[data-theme=obsidian] .journal-reading-history,body[data-theme=obsidian] .home-status-board{background:linear-gradient(145deg,#ffffff06,transparent 55%),var(--surface);border-color:#ffffff1c;box-shadow:inset 0 1px 0 #ffffff09,0 16px 40px #0002}
+body[data-theme=obsidian] .journal-popover{background:linear-gradient(140deg,#303541,#242a35 70%);border-color:#ffffff26;box-shadow:0 16px 64px #0009}
+@media(max-width:760px){
+  .journal-heading{align-items:flex-start;gap:.7rem}
+  .journal-heading>button{padding:.5rem .7rem;font-size:.85rem}
+  .journal-calendar-motto{display:block}
+  .journal-calendar-motto details{max-width:none;margin-top:.3rem}
+  .journal-calendar-toolbar{flex-wrap:wrap}
+  .journal-calendar-navigation{gap:.2rem;flex:1 0 100%}
+  .journal-calendar-navigation h2{font-size:1rem;min-width:0;flex:1;white-space:nowrap}
+  .journal-calendar-navigation>button{min-width:40px}
+  .journal-view-switch{margin-left:auto}
+  .journal-view-switch button{padding:.3rem .85rem}
+  .journal-weekdays,.journal-calendar-grid{gap:3px}
+  .journal-calendar-day{height:72px;padding:.5rem .2rem;border-radius:9px;align-items:center}
+  .journal-date-number{font-size:1rem;min-width:26px;min-height:26px}
+  .journal-day-state{justify-content:center;padding-bottom:2px}
+  .journal-day-state>span{display:none}
+  .journal-target-label{position:static;font-size:.63rem;padding:1px 4px;line-height:1.25;margin:2px 0 0}
+  .journal-calendar-day.is-target.has-status .journal-day-state{position:absolute;right:2px;top:3px;width:auto;margin:0}
+  .journal-calendar-day.is-target.has-status .journal-status-mark{width:6px;height:6px;box-shadow:none}
+  .journal-reading-fields{grid-template-columns:1fr 1fr;gap:.85rem}
+  .journal-book-field{grid-column:1 / -1;grid-row:2}
+  .journal-reading-fields>.field:first-child{grid-column:1 / -1}
+  .journal-reading-row{gap:.8rem;flex-wrap:wrap}
+  .journal-reading-date{width:4.25rem}
+  .journal-reading-actions{margin-left:auto}
+  .home-status-board{padding:1rem}
+  .home-status-days{gap:.3rem}
+  .home-status-day{padding:.9rem .15rem}
+  .home-status-day strong{font-size:.75rem}
+  .home-status-day>span,.home-status-day small{font-size:.74rem}
+}
+@media(prefers-reduced-motion:reduce){.journal-page button{transition:none!important}.journal-popover{animation:none!important}}
+@media(prefers-contrast:more){.journal-calendar-day,.journal-view-switch,.home-status-day{border-color:var(--muted)}.journal-popover{border:2px solid var(--ink)}}
+@media(prefers-reduced-transparency:reduce){.journal-popover{background:var(--surface)!important;backdrop-filter:none!important}}

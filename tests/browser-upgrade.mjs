@@ -12,7 +12,7 @@ const runtime=process.env.QICHENG_PLAYWRIGHT || 'C:/Users/LHM66/.cache/codex-run
 const {chromium}=await import(pathToFileURL(runtime).href);
 const executable=process.env.QICHENG_BROWSER || 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
 await access(executable);
-const base=process.env.QICHENG_BASE_URL || 'http://127.0.0.1:4173/';
+const base=process.env.QICHENG_BASE_URL || 'http://127.0.0.1:4177/';
 const browser=await chromium.launch({executablePath:executable,headless:true});
 const context=await browser.newContext({viewport:{width:1280,height:900},acceptDownloads:true,locale:'zh-CN',timezoneId:'Asia/Shanghai',reducedMotion:'reduce'});
 const page=await context.newPage();
@@ -37,7 +37,7 @@ async function openQuizFromHome(target=page){await target.locator('.home-shortcu
 async function backToBanks(){if(await page.locator('[data-quiz-back]').count())await page.locator('[data-quiz-back]').click();}
 async function startGroup(bank,size,mode='random'){
   await go('quiz');await backToBanks();await page.locator('[data-quiz-bank="'+bank+'"]').click();
-  await page.locator('#quizMode').selectOption(mode);await page.locator('#quizSize').selectOption(String(size));await page.locator('[data-quiz-start]').click();
+  await page.locator('#quizMode').selectOption(mode);await page.locator('#quizSize').fill(String(size));await page.locator('[data-quiz-start]').click();
   if(await page.locator('#confirmDialog[open]').count())await page.locator('#confirmAccept').click();
   await page.waitForSelector('#quizQuestion');
 }
@@ -95,11 +95,11 @@ try{
     for(const route of routes){await go(route);assert.ok((await page.locator('#workspaceContent').textContent()).trim().length>10,route);}
   });
   await check('4.2 home and menu open the learning center with quiz and four classics',async()=>{
-    await go('home');assert.match(await page.locator('.home-shortcuts [data-go3="explore"]').textContent(),/学习拓展中心/);
-    await page.locator('.home-shortcuts [data-go3="explore"]').click();assert.equal(await page.locator('.explore-center h1').textContent(),'学习拓展中心');
+    await go('home');assert.match(await page.locator('.home-shortcuts [data-go3="explore"]').textContent(),/学习中心/);
+    await page.locator('.home-shortcuts [data-go3="explore"]').click();assert.equal(await page.locator('.explore-center h1').textContent(),'学习中心');
     assert.equal(await page.locator('.explore-book').count(),4);assert.equal(await page.locator('.explore-quiz [data-go3="quiz"]').count(),1);
     await page.locator('.explore-quiz [data-go3="quiz"]').click();assert.equal(await page.locator('#quizSize').count(),1);await page.locator('#workspaceContent > [data-go3="explore"]').click();
-    for(const id of ['lunyu','daodejing','zhuangzi']){await page.locator('[data-go3="classic:'+id+'"]').click();assert.match(await page.locator('.classic-empty').textContent(),/尚未收录/);await page.locator('.classic-reader > [data-go3="explore"]').click();}
+    for(const id of ['lunyu','daodejing','zhuangzi']){await page.locator('[data-go3="classic:'+id+'"]').click();assert.match(await page.locator('.classic-empty').textContent(),/尚未收录/);await page.locator('.classic-reader > [data-go3="reading"]').click();}
     const state=await page.evaluate(()=>window.ResumeStudio.getState());assert.deepEqual(state.profile,oldFixture.profile);assert.deepEqual(state.assets,oldFixture.assets);
   });
   await check('Guanzi reader preserves 100 passages and source, filters chapters and downloads the exact Markdown',async()=>{
@@ -111,7 +111,7 @@ try{
     await page.locator('#classicSearch').fill('');assert.equal(await page.locator('.classic-passage').count(),7);await page.locator('#classicChapter').selectOption('');assert.equal(await page.locator('.classic-passage').count(),100);
     await page.locator('.classic-source summary').click();assert.match(await page.locator('.classic-source').textContent(),/ISBN 9787101133325/);assert.match(await page.locator('.classic-source').textContent(),/校勘重点/);
     const sourceFile=await saveDownload(()=>page.locator('[data-classic-download]').click(),'guanzi-source.md');assert.equal(createHash('sha256').update(await readFile(sourceFile)).digest('hex'),'0822133bfe03e4b1d2dfd20c3b35139d47c6bbf01699eab18974d26fb600c8c5');
-    await page.screenshot({path:path.join(output,'guanzi-reader-desktop.png'),fullPage:false});await page.locator('.classic-reader > [data-go3="explore"]').click();
+    await page.screenshot({path:path.join(output,'guanzi-reader-desktop.png'),fullPage:false});await page.locator('.classic-reader > [data-go3="reading"]').click();
   });
   await check('settings retains themes and Markdown template/import/export through existing controls',async()=>{
     await page.evaluate(()=>window.ResumeStudio.openSettings());
@@ -149,7 +149,7 @@ try{
   await check('settings repeatedly opens as a working page, scrolls normally and saves only changed theme/language',async()=>{
     for(const route of ['home','profile','explore','quiz','home']){await go(route);await page.evaluate(()=>window.ResumeStudio.openSettings());assert.equal(await page.locator('dialog#settingsDialog').count(),0);assert.equal(await page.locator('.settings-page').count(),1);assert.equal(await page.locator('.topbar-quote').count(),0);await page.locator('[data-setting-theme="blue"]').click();assert.equal(await page.locator('body').getAttribute('data-theme'),'blue');await page.locator('[data-setting-theme="obsidian"]').click();}
     await page.locator('#uiLanguage').selectOption('en');assert.equal(await page.locator('.settings-page h1').textContent(),'Settings');await page.locator('#uiLanguage').selectOption('zh');
-    await page.locator('.settings-versions').scrollIntoViewIfNeeded();const before=await page.evaluate(()=>scrollY);await page.mouse.move(800,400);await page.mouse.wheel(0,-400);await wait(100);assert.ok(await page.evaluate(()=>scrollY)<before);assert.match(await page.locator('.settings-versions').textContent(),/4\.2\.1/);
+    await page.locator('.settings-versions').scrollIntoViewIfNeeded();const before=await page.evaluate(()=>scrollY);await page.mouse.move(800,400);await page.mouse.wheel(0,-400);await wait(100);assert.ok(await page.evaluate(()=>scrollY)<before);assert.match(await page.locator('.settings-versions').textContent(),/5\.0\.0/);
   });
   await check('file upload, confirmed deletion and layout edits persist while subsequent navigation stays clean',async()=>{
     await go('files');await page.locator('[data-import3="center"]').setInputFiles({name:'save-check.txt',mimeType:'text/plain',buffer:Buffer.from('persist this file')});
@@ -263,6 +263,40 @@ try{
     await page.evaluate(async file=>(await import('/js/backup.js')).commitBackup(file),file);await go('classic:my-classic');assert.equal(await page.locator('.classic-passage').count(),1);
     await go('settings');const before=await getRecords();await page.locator('#resourceJSONInput').setInputFiles({name:'bad.json',mimeType:'application/json',buffer:Buffer.from('{broken')});await page.waitForFunction(()=>document.querySelector('#resourceResult')?.textContent.includes('导入失败'));assert.deepEqual(await getRecords(),before);
     await context.setOffline(false);
+  });
+  await check('beta encouragement and featured university persist independently and survive navigation',async()=>{
+    await context.setOffline(false);await page.setViewportSize({width:1280,height:900});await go('home');await page.locator('.home-motto-editor summary').click();await page.locator('#homeMottoForm [name="motto"]').fill('把今天走好，让明天更近。');await page.locator('#homeMottoForm [type="submit"]').click();await page.waitForFunction(()=>document.querySelector('.home-intro h1')?.textContent==='把今天走好，让明天更近。');
+    await go('schools');await page.locator('#homeSchoolChoice').selectOption('浙江大学');await page.waitForFunction(()=>document.querySelector('#homeSchoolChoice')?.value==='浙江大学');await page.evaluate(async()=>await(await import('/js/modules/home.js')).waitForHomeWrites());await go('home');
+    assert.match(await page.locator('.home-university h2').textContent(),/浙江大学/);assert.match(await page.locator('.home-school-short').textContent(),/ZJU/);await page.locator('.home-university-seal img').waitFor();assert.ok(await page.locator('.home-university-seal img').evaluate(i=>i.complete&&i.naturalWidth>0));
+    assert.equal(await page.locator('.home-shortcuts').evaluate(e=>e.getBoundingClientRect().top>document.querySelector('.home-goals').getBoundingClientRect().bottom),true);
+    const prefs=(await getRecords())['settings:home'];assert.equal(prefs.motto,'把今天走好，让明天更近。');assert.equal(prefs.featuredSchool,'浙江大学');
+    for(const route of ['home','profile','settings','home'])await go(route);assert.deepEqual((await getRecords())['settings:home'],prefs);await page.reload();await ready();assert.equal(await page.locator('.home-intro h1').textContent(),'把今天走好，让明天更近。');assert.match(await page.locator('.home-university h2').textContent(),/浙江大学/);
+  });
+  await check('beta classic JSON supplies daily reading and updated passages stay linked in both views',async()=>{
+    await go('settings');await page.locator('#homeQuoteSource').selectOption('classic:my-classic');await page.evaluate(async()=>await(await import('/js/modules/home.js')).waitForHomeWrites());await go('home');assert.match(await page.locator('.home-quote blockquote').textContent(),/请在此填写经核对的原文/);await page.locator('.topbar-quote').click();await page.waitForSelector('#P0001.quote-target');
+    await go('settings');await page.locator('#homeQuoteSource').selectOption('classic:guanzi');await page.evaluate(async()=>await(await import('/js/modules/home.js')).waitForHomeWrites());await go('home');const quote=await page.evaluate(async()=>{const h=await import('/js/modules/home.js');return h.homeQuoteForDate(h.getDailyQuoteResource());});assert.equal((await page.locator('.topbar-quote').textContent()).trim(),quote.text);await page.locator('.topbar-quote').click();await page.waitForSelector('#'+quote.passageId+'.quote-target');
+  });
+  await check('beta manually entered seven-question countdown expires without revealing or saving answers',async()=>{
+    await page.clock.install();await go('quiz');await backToBanks();await page.locator('[data-quiz-bank="english-grammar"]').click();await page.locator('#quizSize').fill('7');await page.locator('#quizCountdown').check();await page.locator('#quizMinutes').fill('1');
+    await page.evaluate(async()=>{const {storage}=await import('/js/storage.js');window.__betaSet=storage.set;window.__betaMany=storage.setMany;window.__betaWrites=0;window.__betaCurrent=0;storage.set=async(k,v)=>{window.__betaWrites++;if(k==='current')window.__betaCurrent++;return window.__betaSet(k,v);};storage.setMany=async v=>{window.__betaWrites++;return window.__betaMany(v);};});
+    await page.locator('[data-quiz-start]').click();assert.equal(await page.locator('[data-quiz-jump]').count(),7);assert.equal(await page.locator('#quizClock').textContent(),'01:00');await page.clock.fastForward(61000);await page.waitForSelector('#quizTimeNotice:not([hidden])');assert.equal(await page.locator('#quizClock').textContent(),'00:00');assert.equal(await page.locator('.quiz-result,.quiz-explanation,.quiz-option.correct').count(),0);assert.equal(await page.evaluate(()=>window.__betaWrites),0);
+    const record=await completeGroup('english-grammar',7);assert.ok(record.timing.elapsedSeconds>=61);assert.equal(record.timing.limitSeconds,60);assert.equal(await page.evaluate(()=>window.__betaCurrent),0);const frozen=await page.locator('.quiz-time-summary').textContent();await page.clock.fastForward(5000);assert.equal(await page.locator('.quiz-time-summary').textContent(),frozen);
+    await page.evaluate(async()=>{const {storage}=await import('/js/storage.js');storage.set=window.__betaSet;storage.setMany=window.__betaMany;});await page.clock.resume();
+  });
+  await check('beta untimed clock continues across page changes and invalid manual sizes cannot start',async()=>{
+    await go('quiz');await backToBanks();await page.locator('#quizCountdown').uncheck();await page.locator('#quizSize').fill('5');await page.locator('[data-quiz-start]').click();await page.clock.fastForward(2500);assert.ok(await page.evaluate(async()=>(await import('/js/modules/quiz.js')).quizTimeState().elapsedSeconds>=2));await go('home');await page.clock.fastForward(8000);await go('quiz');assert.ok(await page.evaluate(async()=>(await import('/js/modules/quiz.js')).quizTimeState().elapsedSeconds>=10));assert.equal(await page.locator('.quiz-explanation').count(),0);await backToBanks();
+    for(const value of ['0','201','1.5']){await page.locator('#quizSize').fill(value);await page.locator('[data-quiz-start]').click();assert.equal(await page.locator('#quizSize').evaluate(e=>e.validity.valid),false);assert.equal(await page.locator('#quizQuestion').count(),0);}await page.clock.resume();
+  });
+  await check('beta app update control is always visible and checking never saves content',async()=>{
+    await go('settings');await page.locator('[data-pwa-check]').scrollIntoViewIfNeeded();assert.equal(await page.locator('[data-pwa-check]').isVisible(),true);await page.evaluate(()=>window.ResumeStudio.save());const before=await getRecords();await page.locator('[data-pwa-check]').click();await page.waitForFunction(()=>!document.querySelector('[data-pwa-check]').disabled);assert.match(await page.locator('[data-pwa-update-status]').textContent(),/最新版本|新版已下载/);assert.deepEqual(await getRecords(),before);
+    await context.setOffline(true);await page.locator('[data-pwa-check]').click();assert.match(await page.locator('[data-pwa-update-status]').textContent(),/当前离线/);assert.deepEqual(await getRecords(),before);await context.setOffline(false);
+  });
+  await check('beta home preferences and classic bindings survive complete backup and offline portable HTML',async()=>{
+    const file=await page.evaluate(async()=>JSON.stringify(await(await import('/js/backup.js')).getCurrentBackup()));const parsed=JSON.parse(file);assert.equal(parsed.data['settings:home'].quoteBookId,'guanzi');assert.equal(parsed.data['settings:home'].featuredSchool,'浙江大学');await page.evaluate(async()=>await(await import('/js/modules/home.js')).saveHomePreferences({motto:'temporary'}));await page.evaluate(async file=>await(await import('/js/backup.js')).commitBackup(file),file);await go('home');assert.equal(await page.locator('.home-intro h1').textContent(),'把今天走好，让明天更近。');
+    await go('settings');const copy=await saveDownload(()=>page.locator('[data-action="offlineCopy"]').click(),'beta-portable.html');const offline=await browser.newContext({offline:true,viewport:{width:1280,height:900}});const copyPage=await offline.newPage();try{await copyPage.goto(pathToFileURL(copy).href);await copyPage.waitForSelector('.home-dashboard');assert.equal(await copyPage.locator('.home-intro h1').textContent(),'把今天走好，让明天更近。');assert.match(await copyPage.locator('.home-university h2').textContent(),/浙江大学/);assert.ok(await copyPage.locator('.home-university-seal img').evaluate(i=>i.complete&&i.naturalWidth>0));await copyPage.locator('.topbar-quote').click();await copyPage.waitForSelector('.quote-target');}finally{await offline.close();}
+  });
+  await check('beta dashboard screenshots show clear sections and readable secondary text in three themes',async()=>{
+    for(const [device,width,height] of [['desktop',1440,1000],['tablet',820,1180],['mobile',390,844]]){await page.setViewportSize({width,height});for(const theme of ['pudding','obsidian','blue']){await page.evaluate(theme=>{window.ResumeStudio.getState();document.body.dataset.theme=theme;},theme);await page.evaluate(async theme=>{(await import('/js/state.js')).ctx.state.theme=theme;window.ResumeStudio.render();},theme);await go('home');const dims=await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,client:document.documentElement.clientWidth}));assert.ok(dims.scroll<=dims.client+1);for(const selector of ['.home-date','.home-subtitle','.home-progress-label','.home-quote-source'])assert.ok(await page.locator(selector).first().evaluate(e=>parseFloat(getComputedStyle(e).fontSize)>=14));const name='beta-'+device+'-'+theme+'.png';await page.screenshot({path:path.join(output,name),fullPage:true});report.screenshots.push(name);}}
   });
   await check('no unexpected browser console or uncaught errors',async()=>{assert.deepEqual(errors,[]);});
 }finally{

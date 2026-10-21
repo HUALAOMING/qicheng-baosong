@@ -5,11 +5,12 @@ import { storage } from './storage.js';
 import { clone, $, download, toast, tr, uid } from './utils/helpers.js';
 import { validateDraft, assertJSON } from './utils/validation.js';
 import { fresh, snapshot3, photoRefs3, synchronizeEditing } from './model.js';
-import { confirmAction, render } from './app.js';
+import { confirmAction, render, resetViewMemory50 } from './app.js';
 import { resourceFetch } from './data.js';
 import { validateResourceRecords, reloadResources, waitForResourceWrites } from './resources.js';
-import { validateQuizRecords, initializeQuiz, waitForQuizWrites } from './modules/quiz.js';
-import { validateHomeRecords, initializeHome } from './modules/home.js';
+import { validateQuizRecords, initializeQuiz, waitForQuizWrites,getQuizDraftRecord,QUIZ_DRAFT_KEY,flushQuizDraft } from './modules/quiz.js';
+import { validateHomeRecords, initializeHome, waitForHomeWrites } from './modules/home.js';
+import {validateJournalRecords,initializeJournal,waitForJournalWrites} from './modules/journal.js';
 const BACKUP_VERSION = 1;
 function compactSnapshot (draft) {
   const copy = clone (draft);
@@ -25,13 +26,13 @@ function createBackup (snapshot, otherRecords = {
   };
   assertJSON (data);
   Object.assign (data, validateResourceRecords (data));
-  validateQuizRecords (data); validateHomeRecords (data);
+  validateQuizRecords (data); validateHomeRecords (data); validateJournalRecords(data);
   return {
     app : 'Qicheng', backupVersion : BACKUP_VERSION, appVersion : VERSION, createdAt : new Date ().toISOString (), data
   };
 }
 function backupUserRecords (records) {
-  return Object.fromEntries (Object.entries (clone (records)).filter (([key]) => !key.startsWith ('resource:official:') && key !== '__seedCleared'));
+  return Object.fromEntries (Object.entries (clone (records)).filter (([key]) => !key.startsWith ('resource:official:') && key !== '__seedCleared' && !key.startsWith('meta:') && !key.startsWith('session:')));
 }
 function parseBackup (input) {
   let backup;
@@ -47,7 +48,7 @@ function parseBackup (input) {
   if (! backup.data || typeof backup.data !== 'object' || Array.isArray (backup.data) || ! backup.data.current) throw new Error ('备份缺少必要的用户数据。');
   assertJSON (backup.data);
   Object.assign (backup.data, validateResourceRecords (backup.data));
-  validateQuizRecords (backup.data); validateHomeRecords (backup.data);
+  validateQuizRecords (backup.data); validateHomeRecords (backup.data); validateJournalRecords(backup.data);
   const draft = validateDraft (backup.data.current);
   return {
     backup, draft
@@ -65,8 +66,9 @@ function backupSummary (backup, draft) {
   'Restoring replaces all current local data.');
 }
 async function getCurrentBackup () {
-  await Promise.all ([ctx.saveChain, waitForResourceWrites (), waitForQuizWrites ()]);
+  await Promise.all ([ctx.saveChain, waitForResourceWrites (), waitForQuizWrites ().catch(()=>{}), waitForHomeWrites (), waitForJournalWrites()]);
   const other = await storage.getAll ();
+  const quizDraft=getQuizDraftRecord();if(quizDraft)other[QUIZ_DRAFT_KEY]=quizDraft;else delete other[QUIZ_DRAFT_KEY];
   return createBackup (snapshot3 (), other);
 }
 function backupFilename () {
@@ -86,6 +88,7 @@ async function exportBackup () {
   }
 }
 function resetTransientState () {
+  resetViewMemory50();
   ctx.schoolQuery = '';
   ctx.onlyDreams = false;
   ctx.schoolRegion3 = '';
@@ -114,9 +117,10 @@ async function commitBackup(input) {
     parsed.draft.sidebarHidden = true; parsed.draft.menuOpen = ['start'];
     records.current = compactSnapshot(parsed.draft);
     try {
-      await Promise.all ([ctx.saveChain, waitForResourceWrites (), waitForQuizWrites ()]);
+      await Promise.all ([ctx.saveChain, waitForResourceWrites (), waitForQuizWrites (), waitForHomeWrites (), waitForJournalWrites()]);
       const installed = await storage.getAll ();
       for (const [key, value] of Object.entries (installed)) if (key.startsWith ('resource:official:')) records[key] = value;
+      records['meta:device']={lastImportedAt:new Date().toISOString(),lastSavedAt:new Date().toISOString(),sourceCreatedAt:parsed.backup.createdAt,sourceAppVersion:parsed.backup.appVersion};
       await storage.replaceAll(records);
     } catch (error) {
       ctx.state = previous; updateSaveStatus301();
@@ -125,7 +129,7 @@ async function commitBackup(input) {
     // The transaction has committed; a display error must not masquerade as a failed restore.
     ctx.state = parsed.draft;
     try {
-      await reloadResources (); await Promise.all ([initializeQuiz (records), initializeHome (records)]);
+      await reloadResources (); await Promise.all ([initializeQuiz (records), initializeHome (records),initializeJournal(records)]);
       resetTransientState(); initializeSaving301(records.current);
     }
     catch { location.reload(); }
@@ -134,20 +138,24 @@ async function commitBackup(input) {
     ctx.busy = false; ctx.persistencePaused = false; document.body.inert = false;
     for (const dialog of document.querySelectorAll('dialog[open]')) dialog.inert = false;
     if (ctx.dirty301) scheduleSave();
+    flushQuizDraft().catch(()=>{});
   }
 }
 async function restoreBackup (event) {
   const file = event?.target?.files?.[0];
   if (! file) return;
+  const transferRequested=!!ctx.transferImportRequested;ctx.transferImportRequested=false;
   try {
     if (ctx.busy || ctx.uploadBusy) throw new Error ('请等待当前操作完成。');
     const parsed = parseBackup (await file.text ());
     if (! await confirmAction (tr ('从备份恢复？', 'Restore this backup?'), backupSummary (parsed.backup, parsed.draft), tr ('恢复',
     'Restore'))) return;
     await commitBackup (parsed.backup);
+    if(transferRequested)ctx.state.route='settings';
     for (const dialog of document.querySelectorAll ('dialog[open]')) dialog.close ();
     try {
       render ();
+      if(transferRequested)$('#transferSettings')?.scrollIntoView({block:'start'});
       toast (tr ('全部数据已恢复', 'All data restored'));
     }
     catch {
@@ -173,7 +181,7 @@ async function clearAll() {
     const empty = fresh(); empty.onboarded = true; empty.savedAt = new Date().toISOString();
     const snapshot = compactSnapshot(empty);
     try {
-      await Promise.all ([ctx.saveChain, waitForResourceWrites (), waitForQuizWrites ()]);
+      await Promise.all ([ctx.saveChain, waitForResourceWrites (), waitForQuizWrites (), waitForHomeWrites (), waitForJournalWrites()]);
       // Keep an empty workspace so reopening an editable HTML copy cannot resurrect its embedded seed.
       await storage.replaceAll({current:snapshot});
     } catch (error) {
@@ -181,7 +189,7 @@ async function clearAll() {
     }
     ctx.state = empty;
     try {
-      await reloadResources (); await Promise.all ([initializeQuiz ({}), initializeHome ({})]);
+      await reloadResources (); await Promise.all ([initializeQuiz ({}), initializeHome ({}),initializeJournal({})]);
       resetTransientState(); initializeSaving301(snapshot);
       for (const dialog of document.querySelectorAll('dialog[open]')) dialog.close();
       render(); toast(tr('本地数据已清除','Local data cleared'));
@@ -235,11 +243,13 @@ async function openBackupText () {
   }
 }
 async function offlineHTML () {
-  await Promise.all ([ctx.saveChain, waitForResourceWrites (), waitForQuizWrites ()]);
+  await Promise.all ([ctx.saveChain, waitForResourceWrites (), waitForQuizWrites ().catch(()=>{}), waitForHomeWrites (), waitForJournalWrites()]);
   const template = globalThis.QICHENG_PORTABLE_TEMPLATE || await (await resourceFetch ('assets/editable-template.html')).text ();
   const records = await storage.getAll ();
+  const quizDraft=getQuizDraftRecord();if(quizDraft)records[QUIZ_DRAFT_KEY]=quizDraft;else delete records[QUIZ_DRAFT_KEY];
   delete records.current; delete records.__seedCleared;
-  assertJSON (records); validateQuizRecords (records); validateHomeRecords (records);
+  for(const key of Object.keys(records))if(key.startsWith('meta:')||key.startsWith('session:'))delete records[key];
+  assertJSON (records); validateQuizRecords (records); validateHomeRecords (records);validateJournalRecords(records);
   Object.assign (records, validateResourceRecords (records, {allowOfficial:true}));
   const payload = JSON.stringify ( {
     id : uid (), draft : snapshot3 (), records

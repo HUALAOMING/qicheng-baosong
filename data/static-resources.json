@@ -1,5 +1,5 @@
 {
-  "revision": "2aaa1c7acf6a",
+  "revision": "9d9b14415390",
   "assets": [
     "assets/editable-template.html",
     "assets/fonts/cjk.ttf",
@@ -64,10 +64,12 @@
     "assets/vendor/pdf-lib.js",
     "assets/vendor/pptxgen.js",
     "css/base.css",
+    "css/journal.css",
     "css/layout.css",
     "css/pwa.css",
     "css/resume.css",
     "css/themes.css",
+    "css/v5.css",
     "css/workflow.css",
     "data/china-map.json",
     "data/classics.json",
@@ -96,6 +98,7 @@
     "js/modules/export.js",
     "js/modules/home.js",
     "js/modules/images.js",
+    "js/modules/journal.js",
     "js/modules/map.js",
     "js/modules/markdown.js",
     "js/modules/materials.js",
@@ -110,6 +113,7 @@
     "js/resources.js",
     "js/state.js",
     "js/storage.js",
+    "js/transfer.js",
     "js/utils/helpers.js",
     "js/utils/validation.js",
     "manifest.webmanifest"
