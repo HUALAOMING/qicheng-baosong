@@ -1,0 +1,54 @@
+{
+  "version": "5.0.0",
+  "base": "https://hualaoming.github.io/qicheng-baosong/",
+  "isolatedSyntheticProfile": true,
+  "checks": [
+    {
+      "name": "existing 4.2.1 PWA accepts update at the same address without clearing data",
+      "status": "PASS",
+      "detail": {
+        "initial": "4.2.1",
+        "updated": "5.0.0"
+      }
+    },
+    {
+      "name": "old profile, uploads, theme, targets, countdown and quiz marks survive the update",
+      "status": "PASS"
+    },
+    {
+      "name": "production source and complete cache match the release candidate, and PWA is installable",
+      "status": "PASS",
+      "detail": {
+        "cacheRevision": "9d9b14415390",
+        "cacheAssets": 116,
+        "installationErrors": []
+      }
+    },
+    {
+      "name": "live navigation stays on one document, saves no content; immediate editing persists",
+      "status": "PASS"
+    },
+    {
+      "name": "live reading, calendar reflection, home board and JSON transfer guide work",
+      "status": "PASS"
+    },
+    {
+      "name": "live grouped practice hides feedback, restores a draft after reload, and grades only on submission",
+      "status": "PASS"
+    },
+    {
+      "name": "offline cold launch keeps home, user data, classic, calendar and downloaded banks",
+      "status": "PASS"
+    },
+    {
+      "name": "warm dark and mobile home have no horizontal overflow or uncaught errors",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "passed": 8,
+  "failed": 0,
+  "applicationCommit": "561d7cee7df5ef0b26d21a633f007e34497fd1a1",
+  "deploymentRun": "https://github.com/HUALAOMING/qicheng-baosong/actions/runs/39645109939",
+  "date": "2026-10-22 Asia/Shanghai"
+}

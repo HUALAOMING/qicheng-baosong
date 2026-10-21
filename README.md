@@ -48,7 +48,7 @@ node scripts/serve.mjs
 
 159 项自动化检查、86 项实际 Edge 浏览器场景及 8 项独立离线文件检查通过，覆盖模拟触控、三主题、旧资料、两设备接力、导出、PWA 离线及安装资格。未实测 Safari、实体手机后台和真实 Microsoft Word 排版。
 
-本地开发与测试报告见 `docs/DELIVERY_5.0_REPORT.md`，线上验收另记部署报告。
+本地开发与测试报告见 `docs/DELIVERY_5.0_REPORT.md`，[线上升级、资料保留与离线安装验收](docs/DEPLOYMENT_5.0_REPORT.md)已通过。
 
 ```sh
 node scripts/package.mjs
