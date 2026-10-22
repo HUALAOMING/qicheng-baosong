@@ -13,7 +13,7 @@ try{
   await check('same-version 5.1 replacement installs through its new service-worker revision without clearing data',async()=>{
    const updated=await page.evaluate(async base=>typeof(await import(new URL('js/resources.js',base))).moveImportedQuizPack==='function',base);
    if(!updated){await page.evaluate(()=>ResumeStudio.openSettings());await page.locator('[data-pwa-check]').click();await page.waitForSelector('[data-pwa-refresh]:not([hidden])',{timeout:120000});await page.locator('[data-pwa-refresh]').click();await page.waitForFunction(async base=>{try{return typeof(await import(new URL('js/resources.js',base))).moveImportedQuizPack==='function';}catch{return false;}},base,{timeout:120000});}
-   assert.equal(await page.evaluate(()=>ResumeStudio.version),'5.1.0');assert.equal(await page.evaluate(()=>ResumeStudio.getState().profile.name),'题包更新保留资料');
+   await page.waitForFunction(()=>window.ResumeStudio);assert.equal(await page.evaluate(()=>ResumeStudio.version),'5.1.0');assert.equal(await page.evaluate(()=>ResumeStudio.getState().profile.name),'题包更新保留资料');
    const fixture=JSON.parse(await readFile(path.join(out,'fixture.json'),'utf8'));await page.evaluate(()=>ResumeStudio.go3('quiz'));assert.equal(await page.locator('.quiz-grid>.quiz-bank').count(),5);assert.equal(await page.locator('.quiz-grid>.quiz-section').count(),0);assert.equal(await page.evaluate(async({base,id})=>(await import(new URL('js/modules/quiz.js',base))).getQuizDashboard('bank:'+id).total,{base,id:fixture.bankId}),1);
   });
   await check('live JSON pack creates a peer bank and moving an old pack preserves wrong/favorite marks',async()=>{
