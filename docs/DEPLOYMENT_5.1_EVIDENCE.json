@@ -1,0 +1,62 @@
+{
+  "version": "5.1.0",
+  "base": "https://hualaoming.github.io/qicheng-baosong/",
+  "isolatedSyntheticProfile": true,
+  "checks": [
+    {
+      "name": "existing 5.0 PWA accepts update at the same address without clearing data",
+      "status": "PASS",
+      "detail": {
+        "initial": "5.0.0",
+        "updated": "5.1.0"
+      }
+    },
+    {
+      "name": "old profile, uploads, theme, targets, countdown and quiz marks survive the update",
+      "status": "PASS"
+    },
+    {
+      "name": "production source and complete cache match the release candidate, and PWA is installable",
+      "status": "PASS",
+      "detail": {
+        "cacheRevision": "8b4ed66ae366",
+        "cacheAssets": 118,
+        "installationErrors": []
+      }
+    },
+    {
+      "name": "live navigation stays on one document, saves no content; immediate editing persists",
+      "status": "PASS"
+    },
+    {
+      "name": "live reading, calendar reflection, home board and JSON transfer guide work",
+      "status": "PASS"
+    },
+    {
+      "name": "live grouped practice hides feedback, restores a draft after reload, and grades only on submission",
+      "status": "PASS"
+    },
+    {
+      "name": "offline cold launch keeps home, user data, classic, calendar and downloaded banks",
+      "status": "PASS"
+    },
+    {
+      "name": "5.1 unified settings, split dashboards and empty exam calendar are live",
+      "status": "PASS"
+    },
+    {
+      "name": "live app update check returns a useful result without an unknown error",
+      "status": "PASS",
+      "detail": {
+        "message": "当前地址提供的应用已是最新版本。题库与每日一句可在资源区单独更新。"
+      }
+    },
+    {
+      "name": "warm dark and mobile home have no horizontal overflow or uncaught errors",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "passed": 10,
+  "failed": 0
+}
