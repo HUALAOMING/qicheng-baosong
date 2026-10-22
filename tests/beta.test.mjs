@@ -47,5 +47,5 @@ test('explicit app update check finds waiting versions, handles offline/failure,
   const nav={onLine:true,userAgent:'Test',serviceWorker:{register:async()=>reg,getRegistration:async()=>reg,addEventListener(){},ready:Promise.resolve(reg)}};
   Object.defineProperty(globalThis,'navigator',{value:nav,configurable:true});globalThis.isSecureContext=true;await pwa.init();const before=JSON.stringify(await storage.getAll());await pwa.checkUpdate();assert.ok(updateCalls>=2);assert.equal(JSON.stringify(await storage.getAll()),before);
   reg.waiting={postMessage(){posted++;}};assert.equal(await pwa.checkUpdate(),true);ctx.state.profile.name='未保存内容';env.factory.failWrite=true;await pwa.applyUpdate();assert.equal(posted,0);env.factory.failWrite=false;await pwa.applyUpdate();assert.equal(posted,1);assert.equal((await storage.get('current')).profile.name,'未保存内容');
-  const calls=updateCalls;nav.onLine=false;assert.equal(await pwa.checkUpdate(),false);assert.equal(updateCalls,calls);nav.onLine=true;fail=true;assert.equal(await pwa.checkUpdate(),false);
+  const calls=updateCalls;nav.onLine=false;assert.equal(await pwa.checkUpdate(),false);assert.equal(updateCalls,calls);nav.onLine=true;reg.waiting=null;fail=true;assert.equal(await pwa.checkUpdate(),false);
 });

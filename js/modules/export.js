@@ -418,7 +418,7 @@ async function pdfBytes (plan) {
     }
   }
   d.setTitle (currentVersion ().name);
-  d.setCreator ('Qicheng Personal Studio 5.0');
+  d.setCreator ('Qicheng Personal Studio 5.1');
   return d.save ();
 }
 
@@ -516,7 +516,7 @@ async function wordBlob () {
   }
   const landscape = v.orientation === 'landscape', border = { style : BorderStyle.SINGLE, size : 4, color : col.line.slice (1), space : 12 },
   doc = new Document ( {
-    creator : 'Qicheng Personal Studio 5.0', title : v.name, features : { updateFields : true }, styles : {
+    creator : 'Qicheng Personal Studio 5.1', title : v.name, features : { updateFields : true }, styles : {
       default : {
         document : {
           run : {

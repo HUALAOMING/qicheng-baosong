@@ -35,6 +35,13 @@
       "version": "1.0.0",
       "url": "english-vocabulary.json",
       "sha256": "5a3338eca6276dbd0705634ea2093db0cf21a78d075d850b491398940b2ab7bf"
+    },
+    {
+      "id": "exam-schedule",
+      "type": "exam-schedule",
+      "version": "1.0.0",
+      "url": "exam-schedule.json",
+      "sha256": "b9da512380bffd1561d0daa9089accd5c4f65c9ec8781044fb7a1b510d551f53"
     }
   ]
 }

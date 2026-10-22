@@ -1,0 +1,55 @@
+{
+  "checks": [
+    {
+      "name": "settings preserves closed Information and Dashboard navigation has two independent child pages",
+      "status": "PASS"
+    },
+    {
+      "name": "one manual save commits immediately navigated edits and quiz drafts; repeated saves/navigation write nothing unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "practice bank selection and centered bulb are visible in all three themes",
+      "status": "PASS"
+    },
+    {
+      "name": "material charts and submitted practice metrics display on separate pages",
+      "status": "PASS"
+    },
+    {
+      "name": "examination calendar starts empty, has complete Monday-first weeks and navigates months without writes",
+      "status": "PASS"
+    },
+    {
+      "name": "local JSON schedules populate two schools and three written/interview stages; malformed files preserve existing schedules",
+      "status": "PASS"
+    },
+    {
+      "name": "unified JSON export uses the stable backup format and includes custom resources and practice",
+      "status": "PASS"
+    },
+    {
+      "name": "another mobile device imports the same JSON fully offline and shows its own successful receipt",
+      "status": "PASS"
+    },
+    {
+      "name": "invalid imported backup does not replace a receiving device’s data or import time",
+      "status": "PASS"
+    },
+    {
+      "name": "advanced editable HTML exports, opens offline, preserves the calendar and edits in a separate workspace",
+      "status": "PASS"
+    },
+    {
+      "name": "390px examination view remains readable across all themes with centered help and no overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "offline cold reload keeps the new pages and saved content; PWA cache and installability remain complete",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "passed": 12,
+  "failed": 0
+}

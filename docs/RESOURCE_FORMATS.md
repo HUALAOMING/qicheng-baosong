@@ -1,5 +1,27 @@
 # 题库、典籍与每日一句资源格式
 
+## 院校考试日程（本地修订新增）
+
+```json
+{
+  "schemaVersion": 1,
+  "version": "1.0.0",
+  "examSchedule": []
+}
+```
+
+空数组合法，本阶段应用内不预填真实日程。未来每个安排需要 `id`、`schoolId`、`schoolName`、`date`（有效 YYYY-MM-DD）、`stage`（`written` 笔试 / `interview` 面试）。可选 `startTime`、`endTime`（HH:mm，结束晚于开始）、`location`、`note`。同一学校不同阶段分别设置稳定的安排 ID，使用相同 schoolId；日历按同日唯一 schoolId 统计院校数，点日期显示各阶段。
+
+设置中本地导入可完全离线，成功后替换自定义日程并立即显示。自定义日程进入用户完整 JSON 与 HTML 副本，记录为 `resource:custom:schedule:exam-schedule`；类型前缀不会占用旧题库 ID。官方日程为同结构，manifest 的 type/id 均为 `exam-schedule`，校验哈希及版本后原子更新。官方与自定义记录分离，自定义优先。现有六项官方资源只在用户主动请求时检查更新。
+
+## 5.0 本地修订：题目包与练习题库
+
+题库 JSON Schema 保持 v1。`bank.id` 识别导入题目包；用户在设置中选择该题目包归入哪个默认或自建题库，确认以后才写入。多个不同 ID 的题目包可以合并到同一个练习入口；同一个 ID 再次导入更新原题目包，并可移动归属。旧导入题目包自动按 section 归入四个默认题库之一，原始题目与学习标记不用重编号。
+
+练习入口由 `listPracticeBanks()` 提供，原始资源仍由 `listQuizBanks()` 提供。用户题库定义和题目包归属保存到 `settings:quiz-library`，随完整 JSON / HTML 一起备份。原始题目包仍存于 `resource:custom:{id}`。练习快照为导入题目附带 `learningBankId` / `learningQuestionId`，用于匹配旧错题、收藏；这些内部字段不需要写入用户资源 JSON。
+
+支持单独删除导入题目包，或删除自建题库及其中的导入题目。默认题库不能删除，历史成绩和学习标记保留。详细说明见 [本地修订报告](QUIZ_LIBRARY_LOCAL_REPORT.md)。
+
 资源与个人资料、练习记录分开存放。应用启动只读取随应用打包的本地资源和已保存的资源，不访问更新清单。用户手动点击更新时才请求清单；导入本地 JSON 完全离线可用。
 
 ## 题库 JSON（schemaVersion 1）

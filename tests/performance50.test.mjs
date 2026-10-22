@@ -15,7 +15,7 @@ async function harness() {
   const storage=storeModule.namespace.storage;
   for(const method of ['set','setMany','update','remove']){const original=storage[method];storage[method]=(...args)=>{writes.push({method,key:args[0]});return original(...args);};}
   const dependencies={
-    '../storage.js':{storage},'../resources.js':{listQuizBanks:()=>banks},'../state.js':{ctx},
+    '../storage.js':{storage},'../resources.js':{listPracticeBanks:()=>banks},'../state.js':{ctx},
     '../app.js':{render(){},confirmAction:async()=>true,go3:route=>{ctx.state.route=route;}},
     '../utils/helpers.js':{$:()=>null,$$:selector=>controls.get(selector)||[],esc:value=>String(value??''),tr:zh=>zh,toast:message=>messages.push(message),uid:()=> 'draft-'+(++nextId)}
   };

@@ -8,10 +8,10 @@ const output=path.resolve('../outputs'),base='http://127.0.0.1:4177/';
 const browser=await chromium.launch({executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless:true});
 const context=await browser.newContext({viewport:{width:1440,height:1050},locale:'zh-CN',timezoneId:'Asia/Shanghai',reducedMotion:'reduce'});
 const page=await context.newPage(),errors=[];page.on('pageerror',error=>errors.push(error.message));
-const offlineFile=path.join(output,'qicheng-5.0.0-offline.html');
+const offlineFile=path.join(output,'qicheng-5.1.0-offline.html');
 async function shot(name){await page.evaluate(()=>document.querySelectorAll('.toast').forEach(e=>e.remove()));await page.waitForTimeout(350);await page.screenshot({path:path.join(output,name),fullPage:true});}
 try{
- await page.goto(base);await page.waitForFunction(()=>window.ResumeStudio);assert.equal(await page.evaluate(()=>ResumeStudio.version),'5.0.0');
+ await page.goto(base);await page.waitForFunction(()=>window.ResumeStudio);assert.equal(await page.evaluate(()=>ResumeStudio.version),'5.1.0');
  const html=await page.evaluate(()=>ResumeStudio.offlineHTML());await writeFile(offlineFile,html);
  const offline=await browser.newContext({offline:true,viewport:{width:390,height:844},hasTouch:true,isMobile:true,locale:'zh-CN',timezoneId:'Asia/Shanghai'}),copy=await offline.newPage(),copyErrors=[];copy.on('pageerror',e=>copyErrors.push(e.message));
  try{
@@ -31,7 +31,7 @@ try{
  await shot('qicheng-5.0-home-light.png');await page.evaluate(async()=>{(await import('/js/state.js')).ctx.state.theme='obsidian';ResumeStudio.render();});await shot('qicheng-5.0-home-dark.png');
  await page.setViewportSize({width:390,height:844});await shot('qicheng-5.0-home-mobile.png');
  await page.setViewportSize({width:1440,height:1050});await page.evaluate(()=>ResumeStudio.go3('calendar'));await shot('qicheng-5.0-calendar-month.png');await page.locator('[data-journal-view="week"]').click();await shot('qicheng-5.0-calendar-week.png');
- await page.evaluate(()=>ResumeStudio.go3('reading-progress'));await shot('qicheng-5.0-reading-progress.png');await page.evaluate(()=>ResumeStudio.go3('settings'));await page.locator('[data-transfer-role="receive"]').click();await page.locator('#transferSettings').screenshot({path:path.join(output,'qicheng-5.0-transfer-guide.png')});
- assert.deepEqual(errors,[]);const bytes=await readFile(offlineFile);const result={version:'5.0.0',emptyOfflineArtifact:true,offlineChecks:8,errors,file:offlineFile,bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex'),previews:['qicheng-5.0-home-light.png','qicheng-5.0-home-dark.png','qicheng-5.0-home-mobile.png','qicheng-5.0-calendar-month.png','qicheng-5.0-calendar-week.png','qicheng-5.0-reading-progress.png','qicheng-5.0-transfer-guide.png']};
+ await page.evaluate(()=>ResumeStudio.go3('reading-progress'));await shot('qicheng-5.0-reading-progress.png');await page.evaluate(()=>ResumeStudio.go3('settings'));await page.locator('#transferSettings').screenshot({path:path.join(output,'qicheng-5.0-transfer-guide.png')});
+ assert.deepEqual(errors,[]);const bytes=await readFile(offlineFile);const result={version:'5.1.0',emptyOfflineArtifact:true,offlineChecks:8,errors,file:offlineFile,bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex'),previews:['qicheng-5.0-home-light.png','qicheng-5.0-home-dark.png','qicheng-5.0-home-mobile.png','qicheng-5.0-calendar-month.png','qicheng-5.0-calendar-week.png','qicheng-5.0-reading-progress.png','qicheng-5.0-transfer-guide.png']};
  await writeFile(path.join(output,'qicheng-5.0-artifact-verification.json'),JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result));
 }finally{await context.close();await browser.close();}

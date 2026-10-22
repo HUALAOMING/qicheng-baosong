@@ -1,0 +1,43 @@
+{
+  "checks": [
+    {
+      "name": "four default practice choices; opening menus and switching pages never save current",
+      "status": "PASS"
+    },
+    {
+      "name": "JSON preview waits for destination and confirmation, then merges into an existing default bank",
+      "status": "PASS"
+    },
+    {
+      "name": "two packs with the same question ID share one bank and both can be answered",
+      "status": "PASS"
+    },
+    {
+      "name": "users create a named bank and import into it without creating a second entry",
+      "status": "PASS"
+    },
+    {
+      "name": "reimport updates and moves a pack; invalid and cancelled imports leave installed content unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "deletion is confirmed, removes only selected imported content and preserves result snapshots",
+      "status": "PASS"
+    },
+    {
+      "name": "bank names and import controls work at Android width without horizontal overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "offline restart preserves imported questions and supports complete submitted practice",
+      "status": "PASS"
+    },
+    {
+      "name": "an edit immediately followed by navigation still saves; console has no uncaught errors",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "passed": 9,
+  "failed": 0
+}

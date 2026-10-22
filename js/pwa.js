@@ -8,6 +8,11 @@ import { waitForResourceWrites } from './resources.js';
 import { waitForJournalWrites } from './modules/journal.js';
 let installationPrompt = null, registration = null, status = 'loading', message = '', applyingUpdate = false;
 let checkingUpdate = false, updateNotice = '';
+let updateDownloadError = '';
+function pwaUpdateError(error) {
+  const detail = [error?.name, error?.message].filter(Boolean).join(': ') || 'UnknownError';
+  return tr('应用更新未完成，旧版和个人资料已保留。请确认网络能打开本站，并留出设备存储空间后重试；也可在安装启程时使用的浏览器中打开原地址检查。技术信息：','The update could not finish. Your current app and personal data are kept. Check this site is reachable and device storage is available, then retry in the browser used to install the app. Details: ')+(updateDownloadError || detail);
+}
 const isIOS = () => /iPad|iPhone|iPod/.test (navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const installed = () => matchMedia ('(display-mode: standalone)').matches || navigator.standalone === true;
 function pwaStatusText () {
@@ -36,9 +41,20 @@ async function pwaCheckUpdate(){
   if(!navigator.onLine){updateNotice=tr('当前离线，连接网络后可检查应用新版本。本机数据不受影响。','You are offline. Connect to check app updates; local data is unchanged.');pwaBind();return false;}
   checkingUpdate=true;updateNotice=tr('正在检查当前安装地址的应用程序…','Checking the app at this installation address…');pwaBind();
   try{
-    registration ||= await navigator.serviceWorker?.getRegistration(APP_BASE.href);
+    registration = await navigator.serviceWorker?.getRegistration(APP_BASE.href) || registration;
     if(!registration)throw new Error(tr('离线功能尚未准备好，请稍后重试。','Offline support is still being prepared. Try again shortly.'));
-    await registration.update();
+    updateDownloadError='';
+    // A downloaded update is usable even when a new network check would fail.
+    if(!registration.waiting){
+      try{await registration.update();}
+      catch(error){
+        // Android browsers may hold a stale registration after resuming the app.
+        // Retry the same URL/scope once, without unregistering or clearing data.
+        if(!['UnknownError','InvalidStateError','TypeError'].includes(error?.name))throw error;
+        registration=await navigator.serviceWorker.register(new URL('service-worker.js',APP_BASE),{scope:APP_BASE.href,updateViaCache:'none'});
+        if(!registration.waiting)await registration.update();
+      }
+    }
     const worker=registration.installing;
     if(worker && !['installed','activated','redundant'].includes(worker.state))await new Promise((resolve,reject)=>{
       const finish=error=>{clearTimeout(timer);worker.removeEventListener('statechange',changed);error?reject(error):resolve();};
@@ -47,7 +63,7 @@ async function pwaCheckUpdate(){
     });
     updateNotice=registration.waiting?tr('新版已下载。点击“保存并更新应用”即可应用，资料会先保存。','Update downloaded. Choose Save & update app to apply it after saving your work.'):registration.installing?tr('新版仍在下载。你可以继续使用，稍后再检查。','The update is still downloading. Continue using the app and check again later.'):tr('当前地址提供的应用已是最新版本。题库与每日一句可在资源区单独更新。','This address provides no newer app version. Banks and daily resources update separately.');
     return !!registration.waiting;
-  }catch(error){updateNotice=tr('应用更新检查失败：','App update check failed: ')+error.message;return false;}
+  }catch(error){updateNotice=pwaUpdateError(error);return false;}
   finally{checkingUpdate=false;pwaBind();}
 }
 async function pwaInstall () {
@@ -101,6 +117,13 @@ async function pwaInit () {
   navigator.serviceWorker.addEventListener ('controllerchange', () => {
     if (applyingUpdate) location.reload ();
   });
+  navigator.serviceWorker.addEventListener('message',event=>{
+    if(event.source?.scriptURL && new URL(event.source.scriptURL).href!==new URL('service-worker.js',APP_BASE).href)return;
+    if(event.data?.type==='UPDATE_CACHE_FAILED'){
+      updateDownloadError=String(event.data.detail||'UnknownError').slice(0,1200);
+      updateNotice=pwaUpdateError(new Error(updateDownloadError));pwaBind();
+    }
+  });
   try {
     registration = await navigator.serviceWorker.register (new URL ('service-worker.js', APP_BASE), {
       scope : APP_BASE.href, updateViaCache : 'none'
@@ -114,7 +137,8 @@ async function pwaInit () {
           }
         }
         else if (worker.state === 'redundant') {
-          status = 'error'; message = tr ('离线资源准备失败，请联网重新加载。', 'Offline preparation failed. Reload while online.'); pwaBind (); toast (message);
+          if(navigator.serviceWorker.controller){updateNotice=pwaUpdateError(new Error('新版离线资源下载未完成'));pwaBind();}
+          else{status = 'error'; message = tr ('离线资源准备失败，请联网重试。', 'Offline preparation failed. Retry online.'); pwaBind (); toast (message);}
         }
       });
     });

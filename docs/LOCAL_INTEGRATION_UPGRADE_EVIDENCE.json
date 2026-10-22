@@ -1,0 +1,13 @@
+{
+  "checks": [
+    {
+      "name": "published 5.0 updates at the same address; personal data, old imports and wrong/favorite identities survive",
+      "status": "PASS"
+    },
+    {
+      "name": "upgraded app reopens fully offline with old source-pack learning marks intact",
+      "status": "PASS"
+    }
+  ],
+  "errors": []
+}

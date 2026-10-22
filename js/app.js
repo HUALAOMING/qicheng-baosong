@@ -1,6 +1,6 @@
 import { dropRecord, moveRecord, organizationPage3 } from './modules/organization.js';
 import { selectedPhotos, uploadBatch, avatarData } from './modules/images.js';
-import { chartValue3, selectedExams3, dashboardPage3, drawDashboard3 } from './modules/dashboard.js';
+import { chartValue3, selectedExams3, dashboardPage3, drawDashboard3,practiceDashboardPage } from './modules/dashboard.js';
 import { exportArchive3, importAssets3, assetUsage3, archivePage3, materialsPage3, outputsPage3 } from './modules/materials.js';
 import { normalizeAssets3, fresh, snapshot3, synchronizeEditing, cats, currentVersion, newVersion } from './model.js';
 import { selectedAttachments3, ensureFonts, exportFile, documentPlan, pdfBytes, pptBlob, wordBlob, canvasPages, exportHTML3, refreshPreview } from './modules/export.js';
@@ -9,7 +9,7 @@ import { storage } from './storage.js';
 import { loadBuiltinData, SCHOOL_DETAILS3 } from './data.js';
 import { validateDraft } from './utils/validation.js';
 import { save, initializeSaving301, scheduleSave, updateSaveStatus301 } from './autosave.js';
-import { clearAll, exportBackup, offlineHTML, openBackupText } from './backup.js';
+import { clearAll, exportBackup, offlineHTML, openBackupText,saveAllLocal } from './backup.js';
 import { openSettings, openOfflineGuide, settingsPage } from './modules/settings.js';
 import { markdown, markdownTemplate31, parseMarkdown31, applyMarkdown31, importMarkdownFile31 } from './modules/markdown.js';
 import { exportRows, textRows, preflight3, allPhotos, customPage3, previewPage, cancelOrderInteraction } from './modules/resume.js';
@@ -26,6 +26,7 @@ import { explorePage, readingPage, classicPage, exploreBook } from './modules/ex
 import { academicsPage, educationPage, profilePage, statementPage } from './modules/profile.js';
 import { bind } from './events.js';
 import {initializeJournal,validateJournalRecords,calendarPage,progressPage} from './modules/journal.js';
+import {examCalendarPage} from './modules/exam-calendar.js';
 // 启程 · js/app.js
 
 function confirmAction (title, message, label = '确认') {
@@ -110,6 +111,7 @@ function routeName3 (route = ctx.state.route) {
 }
 
 function routeGroup3 (route = ctx.state.route) {
+  if (['settings','backup','daily-quote'].includes(route)) return undefined;
   if (['quiz', 'reading', 'explore','calendar','reading-progress'].includes(route) || route.startsWith ('classic:')) return NAV3.find (g => g.id === 'learning-center');
   return NAV3.find (g => g.items.some (x => x [0] === route)) || NAV3.find (g => g.id === 'info')
 }
@@ -218,8 +220,8 @@ function render () {
     entryPage3 ('awards'), experiences : () => entryPage3 ('experiences'), practices : () => entryPage3 ('practices'),
     'sort-awards' : () => organizationPage3 ('awards'), 'sort-experiences' : () => organizationPage3 ('experiences'),
     'sort-practices' : () => organizationPage3 ('practices'), learning : learningPage3, achievements : () => entryPage3 ('achievements'),
-    custom : customPage3, dashboard : dashboardPage3, home : homePage, explore : explorePage, reading : readingPage, quiz : quizPage, settings : settingsPage, backup : settingsPage, 'daily-quote' : dailyQuotePage, images : () => materialsPage3 ('image'), files : () => materialsPage3 ('file'),
-    outputs : outputsPage3, studio : previewPage, archive : archivePage3, schools : schoolPage, calendar:calendarPage,'reading-progress':progressPage
+    custom : customPage3, dashboard : dashboardPage3, 'practice-dashboard':practiceDashboardPage, home : homePage, explore : explorePage, reading : readingPage, quiz : quizPage, settings : settingsPage, backup : settingsPage, 'daily-quote' : dailyQuotePage, images : () => materialsPage3 ('image'), files : () => materialsPage3 ('file'),
+    outputs : outputsPage3, studio : previewPage, archive : archivePage3, schools : schoolPage, calendar:calendarPage,'reading-progress':progressPage,'exam-calendar':examCalendarPage
   };
   const page = ctx.state.route.startsWith ('classic:') ? () => classicPage (ctx.state.route.slice (8)) : ctx.state.route.startsWith ('school:') ? () => schoolDetail3 (decodeURIComponent (ctx.state.route.slice (7))) : pages3 [ctx.state.route] ||
   profilePage;
@@ -293,7 +295,8 @@ async function action (name) {
   if (name === 'settings') return openSettings ();
   if (name === 'resources') return openSettings (false, true);
   if (name === 'save') {
-    if (await save ()) toast (tr ('当前进度已保存', 'Saved'));
+    try { await saveAllLocal(); toast (tr ('当前进度已保存', 'Saved')); }
+    catch(error) { toast(tr('尚未全部保存：','Some changes are not saved: ')+error.message); }
     return;
   }
   if (name === 'backup') return exportBackup ();

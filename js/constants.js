@@ -1,7 +1,7 @@
 import { uid } from './utils/helpers.js';
 // 启程 · js/constants.js
 
-const VERSION = '5.0.0';
+const VERSION = '5.1.0';
 
 const THEMES = {
   pudding : '布丁奶油', obsidian : '黑橙质感', blue : '墨蓝学院', jade : '深海翡翠', berry : '莓果银白'
@@ -112,7 +112,7 @@ const NAV3 = [ {
   id : 'personal', zh : '个性化内容', en : 'Personal content', icon : 'spark', items : [['learning', '阅读与学习记录', 'Reading & learning'],
   ['achievements', '个人成果', 'Projects & work'], ['custom', '自定义图文', 'Custom content']]
 }, {
-  id : 'dashboard', zh : '数据看板', en : 'Dashboard', icon : 'chart', items : [['dashboard', '资料、成绩与练习', 'Materials, exams & practice']]
+  id : 'dashboard', zh : '数据看板', en : 'Dashboard', icon : 'chart', items : [['dashboard', '资料与成绩', 'Materials & results'], ['practice-dashboard', '练习数据', 'Practice data']]
 }, {
   id : 'materials', zh : '资料中心', en : 'Materials', icon : 'folder', items : [['images', '图片管理', 'Images'], ['files',
   '文件管理', 'Files'], ['outputs', '导出内容管理', 'Exported documents']]
@@ -120,7 +120,7 @@ const NAV3 = [ {
   id : 'export', zh : '导出成果', en : 'Create documents', icon : 'export', items : [['studio', '编排与导出', 'Compose & export'],
   ['archive', '个人资料打包', 'Download all materials']]
 }, {
-  id : 'info', zh : '信息栏', en : 'Universities', icon : 'globe', items : [['schools', '目标院校与地图', 'Universities & map']]
+  id : 'info', zh : '信息栏', en : 'Universities', icon : 'globe', items : [['schools', '目标院校与地图', 'Universities & map'], ['exam-calendar', '考试信息', 'Examination calendar']]
 }];
 
 const ACHIEVEMENT_FIELDS = [['title', '成果名称'], ['category', '成果类型'], ['date', '完成 / 研究时间'], ['role', '个人角色'], ['method',

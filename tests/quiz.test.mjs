@@ -21,7 +21,7 @@ async function quizHarness() {
   let nextId = 0;
   const modules = {
     '../storage.js':{storage:storageModule.namespace.storage},
-    '../resources.js':{listQuizBanks:()=>banks},
+    '../resources.js':{listPracticeBanks:()=>banks},
     '../state.js':{ctx},
     '../app.js':{render(){},confirmAction:async()=>true,go3:route=>{ctx.state.route=route;}},
     '../utils/helpers.js':{$:()=>null,$$:()=>[],esc:value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),tr:(zh,en)=>ctx.state.uiLang==='en'?en:zh,toast(){},uid:()=> 'test-'+(++nextId)}

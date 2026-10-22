@@ -10,7 +10,7 @@ const read = name => readFile(path.join(root,name));
 const json = async name => JSON.parse(await read(name));
 const modules = [
   'js/state.js','js/data.js','js/utils/helpers.js','js/constants.js','js/model.js','js/storage.js','js/resources.js',
-  'js/transfer.js','js/modules/journal.js','js/autosave.js','js/utils/validation.js','js/modules/images.js','js/modules/profile.js','js/modules/resume.js',
+  'js/transfer.js','js/modules/journal.js','js/modules/exam-calendar.js','js/autosave.js','js/utils/validation.js','js/modules/images.js','js/modules/profile.js','js/modules/resume.js',
   'js/modules/records.js','js/modules/organization.js','js/modules/dashboard.js',
   'js/modules/universities.js','js/modules/map.js','js/modules/materials.js','js/modules/export.js',
   'js/modules/markdown.js','js/modules/quiz.js','js/modules/home.js','js/modules/explore.js','js/modules/settings.js','js/pwa.js','js/backup.js','js/events.js','js/app.js'
@@ -26,7 +26,7 @@ for (const university of data[0]) {
 }
 const fonts = await Promise.all(['latin','cjk'].map(async name => 'data:font/ttf;base64,' + (await read('assets/fonts/' + name + '.ttf')).toString('base64')));
 const staticData = JSON.stringify({data,fonts}).replace(/</g,'\\u003c');
-const resourceSeeds = JSON.stringify({banks:await Promise.all(['english-grammar','english-vocabulary','chinese-ancient-culture','chinese-usage'].map(id=>json('data/resources/'+id+'.json'))),quotes:await json('data/resources/daily-quotes.json')}).replace(/</g,'\\u003c');
+const resourceSeeds = JSON.stringify({banks:await Promise.all(['english-grammar','english-vocabulary','chinese-ancient-culture','chinese-usage'].map(id=>json('data/resources/'+id+'.json'))),quotes:await json('data/resources/daily-quotes.json'),examSchedule:await json('data/resources/exam-schedule.json')}).replace(/</g,'\\u003c');
 const source = (await Promise.all(modules.map(async name => (await read(name)).toString().replace(/^import\s+[^\n]*;\s*$/gm,'').replace(/^export\s*\{[^}]*\};\s*$/gm,'')))).join('\n\n');
 let html = (await read('index.html')).toString();
 html = html.replace(/<link rel="manifest"[^>]*>\s*/g,'');
@@ -64,8 +64,19 @@ self.addEventListener('install',event => {
   event.waitUntil((async () => {
     try {
       const cache = await caches.open(CACHE_NAME);
-      await cache.addAll(PRECACHE.map(path => new Request(new URL(path,self.registration.scope),{cache:'reload'})));
-    } catch(error) { await caches.delete(CACHE_NAME); throw error; }
+      // Bound concurrent downloads on mobile. Publish only after every batch succeeds.
+      for(let offset=0;offset<PRECACHE.length;offset+=4){
+        const batch=PRECACHE.slice(offset,offset+4);
+        for(let attempt=0;attempt<2;attempt++){
+          try{await cache.addAll(batch.map(path => new Request(new URL(path,self.registration.scope),{cache:'reload'})));break;}
+          catch(error){if(attempt===1)throw new Error(batch.join(', ')+' — '+(error.name||'Error')+': '+error.message);}
+        }
+      }
+    } catch(error) {
+      await caches.delete(CACHE_NAME);
+      try{for(const client of await (self.clients.matchAll?.({type:'window',includeUncontrolled:true})||[]))if(client.url?.startsWith(self.registration.scope))client.postMessage({type:'UPDATE_CACHE_FAILED',detail:error.message});}catch{}
+      throw error;
+    }
   })());
 });
 self.addEventListener('activate',event => {

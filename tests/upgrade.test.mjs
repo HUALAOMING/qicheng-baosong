@@ -56,7 +56,7 @@ test('full backup covers independent user keys, omits navigation and official re
   await resources.importResourceJSON(custom);
   await storage.set('settings:countdown',{name:'Backup goal',date:'2027-01-01'});
   await home.initializeHome();
-  quiz.quizStart('upgrade-custom','random',10);quiz.quizAnswer(0,true);await quiz.quizFavorite('upgrade-custom','TF1');await quiz.quizSubmit();
+  quiz.quizStart('chinese-usage','random',10);quiz.quizAnswer(0,true);await quiz.quizFavorite('upgrade-custom','TF1');await quiz.quizSubmit();
   await storage.set('future-user-note',{text:'Retain unknown user records'});
   const file=await backup.getCurrentBackup();
   assert.equal(file.backupVersion,1);assert.equal(file.data.current.profile.name,'Backup fixture');

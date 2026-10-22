@@ -8,10 +8,27 @@ import { fresh, snapshot3, photoRefs3, synchronizeEditing } from './model.js';
 import { confirmAction, render, resetViewMemory50 } from './app.js';
 import { resourceFetch } from './data.js';
 import { validateResourceRecords, reloadResources, waitForResourceWrites } from './resources.js';
-import { validateQuizRecords, initializeQuiz, waitForQuizWrites,getQuizDraftRecord,QUIZ_DRAFT_KEY,flushQuizDraft } from './modules/quiz.js';
+import { validateQuizRecords, initializeQuiz, waitForQuizWrites,getQuizDraftRecord,QUIZ_DRAFT_KEY,flushQuizDraft,hasPendingQuizWrites } from './modules/quiz.js';
 import { validateHomeRecords, initializeHome, waitForHomeWrites } from './modules/home.js';
 import {validateJournalRecords,initializeJournal,waitForJournalWrites} from './modules/journal.js';
 const BACKUP_VERSION = 1;
+let manualSavePending = null;
+function saveAllLocal() {
+  if (manualSavePending) return manualSavePending;
+  manualSavePending = (async () => {
+    if (ctx.persistencePaused || ctx.uploadBusy) throw new Error('请等待当前文件或数据操作完成后再保存。');
+    // Attach to independent writes now, so a rejection while current is saving
+    // cannot disappear from a queue before we observe it.
+    const [saved] = await Promise.all([save(),waitForQuizWrites(),waitForHomeWrites(),waitForResourceWrites(),waitForJournalWrites()]);
+    if (!saved) throw new Error('本机资料未能保存，请导出完整 JSON 备份。');
+    // Edits made while another queue was completing must also reach the database.
+    if (ctx.dirty301 && !await save()) throw new Error('最新修改未能保存，请导出完整 JSON 备份。');
+    if (hasPendingQuizWrites()) await waitForQuizWrites();
+    if (ctx.dirty301 || hasPendingQuizWrites()) throw new Error('仍有新修改正在保存，请稍后再次确认。');
+    return true;
+  })().finally(() => { manualSavePending = null; });
+  return manualSavePending;
+}
 function compactSnapshot (draft) {
   const copy = clone (draft);
   for (const photo of photoRefs3 (copy)) if (photo.assetId && copy.assets.some (a => a.id === photo.assetId)) delete photo.data;
@@ -79,9 +96,11 @@ function backupFilename () {
 async function exportBackup () {
   if (ctx.busy || ctx.uploadBusy) return;
   try {
-    await save ();
+    let saved=true;
+    try { await saveAllLocal(); } catch { saved=false; }
     const backup = await getCurrentBackup ();
     download (JSON.stringify (backup, null, 2), 'application/json;charset=utf-8', backupFilename ());
+    if(!saved)toast(tr('本机保存尚未完成，JSON 已包含当前可读取的资料和答案草稿，请妥善保存文件。','Local saving is incomplete. This JSON includes the readable current materials and answer draft; keep the file safely.'));
   }
   catch (error) {
     toast (tr ('无法生成备份：', 'Unable to back up: ') + error.message);
@@ -257,7 +276,7 @@ async function offlineHTML () {
   return template.replace (/(<script id="qichengEmbedded" type="application\/json">)[\s\S]*?(<\/script>)/, (_, start,
   end) => start + payload + end);
 }
-export { BACKUP_VERSION, createBackup, parseBackup, compactSnapshot, backupUserRecords, backupSummary, getCurrentBackup, backupFilename, exportBackup, commitBackup, restoreBackup, clearAll, openBackupText, offlineHTML };
+export { BACKUP_VERSION, createBackup, parseBackup, compactSnapshot, backupUserRecords, backupSummary, getCurrentBackup, backupFilename, exportBackup, commitBackup, restoreBackup, clearAll, openBackupText, offlineHTML, saveAllLocal };
 
 // All controls for this feature, in their original override order.
 function bindBackupControls () {

@@ -1,5 +1,5 @@
 {
-  "revision": "9d9b14415390",
+  "revision": "8b4ed66ae366",
   "assets": [
     "assets/editable-template.html",
     "assets/fonts/cjk.ttf",
@@ -79,6 +79,7 @@
     "data/resources/daily-quotes.json",
     "data/resources/english-grammar.json",
     "data/resources/english-vocabulary.json",
+    "data/resources/exam-schedule.json",
     "data/schools.json",
     "data/translations.json",
     "data/universities.json",
@@ -94,6 +95,7 @@
     "js/events.js",
     "js/model.js",
     "js/modules/dashboard.js",
+    "js/modules/exam-calendar.js",
     "js/modules/explore.js",
     "js/modules/export.js",
     "js/modules/home.js",

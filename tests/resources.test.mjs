@@ -57,9 +57,9 @@ test('initialization fetches only bundled local resources and never requests a m
   delete globalThis.QICHENG_RESOURCE_SEEDS; const requested = [];
   globalThis.fetch = async url => { const target = new URL(url); requested.push(target.href); return new Response(await readFile(path.join(root,target.pathname.slice(1)))); };
   await resources.reloadResources();
-  assert.equal(resources.listQuizBanks().length,4); assert.equal(requested.length,5);
+  assert.equal(resources.listQuizBanks().length,4); assert.equal(requested.length,6);
   assert.ok(requested.every(url => url.startsWith('https://qicheng.test/data/resources/') && !url.includes('manifest')));
-  assert.equal(Object.keys(await storage.getAll()).length,5);
+  assert.equal(Object.keys(await storage.getAll()).length,6);
   requested.length = 0; await resources.reloadResources(); assert.equal(requested.length,0);
 });
 
@@ -118,7 +118,7 @@ test('a correctly hashed but invalid schema or inconsistent version cannot updat
   await assert.rejects(resources.updateResources('https://updates.test/manifest.json'),/正确答案/);
   remote([bank('english-grammar','1.1.0')],manifest=>{manifest.resources[0].version='1.2.0';});
   await assert.rejects(resources.updateResources('https://updates.test/manifest.json'),/版本/);
-  assert.equal(resources.listQuizBanks()[0].bank.version,'1.0.0'); assert.equal(Object.keys(await storage.getAll()).length,5);
+  assert.equal(resources.listQuizBanks()[0].bank.version,'1.0.0'); assert.equal(Object.keys(await storage.getAll()).length,6);
 });
 
 test('database failure after the first put rolls all resources back without publishing memory', async () => {

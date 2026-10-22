@@ -24,8 +24,8 @@ const seen=new Set();
 for (const filename of resourceNames) {
   const bytes=await readFile(path.join(resourceRoot,filename));
   const resource=JSON.parse(bytes);
-  const type=resource.bank?'quiz-bank':resource.book?'classic':Array.isArray(resource.quotes)?'quotes':null;
-  const id=resource.bank?.id||resource.book?.id||'daily-quotes', identity=type+':'+id;
+  const type=resource.bank?'quiz-bank':resource.book?'classic':Array.isArray(resource.quotes)?'quotes':Array.isArray(resource.examSchedule)?'exam-schedule':null;
+  const id=resource.bank?.id||resource.book?.id||(type==='exam-schedule'?'exam-schedule':'daily-quotes'), identity=type+':'+id;
   if(!type || resource.schemaVersion!==1 || seen.has(identity))throw new Error('Invalid or duplicate resource: '+filename);
   seen.add(identity);
   entries.push({id,type,version:resource.bank?.version||resource.book?.version||resource.version,url:filename,sha256:createHash('sha256').update(bytes).digest('hex')});

@@ -1,6 +1,6 @@
 {
   "name": "qicheng-pwa",
-  "version": "5.0.0",
+  "version": "5.1.0",
   "private": true,
   "type": "module",
   "description": "启程 Local First PWA · 原生 HTML/CSS/JavaScript",

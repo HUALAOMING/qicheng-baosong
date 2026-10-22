@@ -98,7 +98,7 @@ function dashboardPage3 () {
   return heading3 ('OVERVIEW / DASHBOARD', tr ('成长的轨迹，一目了然。', 'See the shape of your growth.'), tr ('汇总已经收录的资料；成绩与排名只使用有效数字，不把缺失值当成零。',
   'A view of saved materials. Charts use valid numeric values; missing values are never treated as zero.')) + '<div class="stat-grid3">' +
   counts.map (([n, z, e, i]) => '<article class="stat-card3">' + icon3 (i) + '<strong>' + n + '</strong><span>' + tr (z,
-  e) + '</span></article>').join ('') + '</div>' + quizDashboardMarkup() + '<div class="pie-grid3">' + [['awards', '荣誉类别', 'Award categories'], ['experiences',
+  e) + '</span></article>').join ('') + '</div>' + '<div class="pie-grid3">' + [['awards', '荣誉类别', 'Award categories'], ['experiences',
   '经历类别', 'Experience categories'], ['practices', '实践类别', 'Practice categories']].map (([kind, z, e]) => '<section class="panel"><h2>' +
   tr (z, e) + '</h2>' + pieChart3 (ctx.state [kind], tr (z, e)) + '</section>').join ('') + '</div><section class="panel exam-dashboard3"><div class="panel-title"><div><h2>' +
   tr ('考试成绩与排名', 'Examination trends') + '</h2><p class="hint">' + tr ('勾选要比较的考试。不同类型、满分或排名范围的考试请谨慎横向比较。', 'Choose exams to compare. Take care when types, full marks or ranking groups differ.') +
@@ -126,8 +126,11 @@ function dashboardPage3 () {
 
 function drawDashboard3 () {
 }
+function practiceDashboardPage() {
+  return heading3('LEARNING / PRACTICE DATA',tr('每一次练习，都在积累。','Every practice adds up.'),tr('查看已经提交的练习、错题与收藏。','Review submitted practice, mistakes and favorites.')) + quizDashboardMarkup();
+}
 
-export { numeric3, pieChart3, selectedExams3, chartValue3, lineChart3, dashboardPage3, drawDashboard3 };
+export { numeric3, pieChart3, selectedExams3, chartValue3, lineChart3, dashboardPage3, drawDashboard3,practiceDashboardPage };
 
 // All controls for this feature, in their original override order.
 function bindDashboardControls () {

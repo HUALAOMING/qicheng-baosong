@@ -7,25 +7,25 @@ import vm from 'node:vm';
 import {root} from './support.mjs';
 const source=await readFile(path.join(root,'service-worker.js'),'utf8');
 const origin='https://qicheng.test',scope=origin+'/app/';
-function worker(code=source,shared={stores:new Map()},failure='') {
-  const listeners={};let claimed=false,skipped=false,offline=false;
+function worker(code=source,shared={stores:new Map()},failure='',transient=false) {
+  const listeners={},batches=[],notices=[];let claimed=false,skipped=false,offline=false,failed=false;
   const caches={
     open:async name=>{
       if(!shared.stores.has(name))shared.stores.set(name,new Map());const store=shared.stores.get(name);
       return {
-        async addAll(requests){const entries=await Promise.all(requests.map(async r=>{if(r.url.endsWith(failure)&&failure)throw new Error('cache installation failed');const pathname=new URL(r.url).pathname.slice('/app/'.length);return [r.url,await readFile(path.join(root,pathname))];}));for(const [k,v]of entries)store.set(k,v);},
+        async addAll(requests){batches.push(requests.length);const entries=await Promise.all(requests.map(async r=>{if(r.url.endsWith(failure)&&failure&&(!transient||!failed)){failed=true;throw new Error('cache installation failed');}const pathname=new URL(r.url).pathname.slice('/app/'.length);return [r.url,await readFile(path.join(root,pathname))];}));for(const [k,v]of entries)store.set(k,v);},
         async match(request){const bytes=store.get(typeof request==='string'?request:request.url);return bytes?new Response(bytes):undefined;}
       };
     },
     keys:async()=>[...shared.stores.keys()],delete:async name=>shared.stores.delete(name)
   };
-  const self={registration:{scope},location:{origin},clients:{claim:async()=>{claimed=true;}},addEventListener:(name,fn)=>{listeners[name]=fn;},skipWaiting(){skipped=true;}};
+  const self={registration:{scope},location:{origin},clients:{claim:async()=>{claimed=true;},matchAll:async()=>[{url:scope,postMessage:message=>notices.push(message)},{url:origin+'/other/',postMessage:()=>{throw Error('Wrong scope');}}]},addEventListener:(name,fn)=>{listeners[name]=fn;},skipWaiting(){skipped=true;}};
   const context=vm.createContext({self,caches,URL,Request,Response,Set,fetch:async()=>{if(offline)throw new Error('offline');return new Response('network');}});
   vm.runInContext(code,context);
   async function event(name,data={}) {
     let promise,result;listeners[name]({waitUntil:p=>{promise=p;},respondWith:p=>{result=p;},...data});if(promise)await promise;return result?await result:undefined;
   }
-  return {event,shared,offline:()=>{offline=true;},claimed:()=>claimed,skipped:()=>skipped};
+  return {event,shared,batches,notices,offline:()=>{offline=true;},claimed:()=>claimed,skipped:()=>skipped};
 }
 test('actual static cache paths exist and exclude user records, documentation and tests',async()=>{
   const paths=JSON.parse(source.match(/const PRECACHE = (\[[^;]+\]);/)[1]);assert.ok(paths.includes('data/china-map.json'));assert.ok(paths.includes('assets/editable-template.html'));assert.ok(paths.includes('js/storage.js'));
@@ -50,4 +50,13 @@ test('worker update switches complete version cache and removes only this app ol
 });
 test('failed cache install discards incomplete new cache and leaves current offline version intact',async()=>{
   const old=worker();await old.event('install');const before=[...old.shared.stores.keys()];const broken=worker(source.replace(/v4-[0-9a-f]{12}/,'v4-broken'),old.shared,'assets/fonts/cjk.ttf');await assert.rejects(()=>broken.event('install'),/cache installation failed/);assert.deepEqual([...old.shared.stores.keys()],before);
+});
+test('mobile installation bounds batches to four and retries a transient download without publishing partial caches',async()=>{
+  const w=worker(source,{stores:new Map()},'assets/fonts/cjk.ttf',true);await w.event('install');
+  assert.ok(w.batches.every(size=>size<=4));assert.ok(w.batches.length>29);assert.equal(w.notices.length,0);
+  assert.equal([...w.shared.stores.values()][0].size,JSON.parse(source.match(/const PRECACHE = (\[[^;]+\]);/)[1]).length);
+});
+test('permanent install failure reports the failed file group only to clients within this app scope',async()=>{
+  const w=worker(source,{stores:new Map()},'assets/fonts/cjk.ttf');await assert.rejects(w.event('install'));
+  assert.equal(w.shared.stores.size,0);assert.equal(w.notices.length,1);assert.equal(w.notices[0].type,'UPDATE_CACHE_FAILED');assert.match(w.notices[0].detail,/assets\/fonts\/cjk.ttf/);
 });
