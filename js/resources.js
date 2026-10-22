@@ -4,7 +4,7 @@ import { APP_BASE, CLASSICS, resourceFetch } from './data.js';
 // Resource content is independent from personal learning records and application releases.
 const RESOURCE_SCHEMA_VERSION = 1;
 const RESOURCE_BANK_IDS = ['english-grammar', 'english-vocabulary', 'chinese-ancient-culture', 'chinese-usage'];
-const RESOURCE_SECTIONS = {english:['grammar','vocabulary'], chinese:['ancient-culture','chinese-usage']};
+const RESOURCE_SECTIONS = {english:['grammar','vocabulary'], chinese:['ancient-culture','chinese-usage'],custom:['custom']};
 const RESOURCE_MAX_BYTES = 12 * 1024 * 1024;
 let resourceBanks = [], resourceOfficialQuotes = null, resourceCustomQuotes = null;
 let resourceClassics = [];
@@ -59,7 +59,8 @@ function validateQuizBank(input) {
   const bank = resourceObject(data.bank, 'bank');
   const cleanBank = {id:resourceID(bank.id, '题库 ID'), name:resourceString(bank.name, '题库名称', 200), subject:bank.subject, section:bank.section, version:resourceVersion(bank.version)};
   if (bank.id === 'daily-quotes') throw new Error('daily-quotes 是名言资源的保留 ID。');
-  if (!Object.hasOwn(RESOURCE_SECTIONS, bank.subject) || !RESOURCE_SECTIONS[bank.subject].includes(bank.section)) throw new Error('题库科目与章节不匹配。');
+  resourceID(bank.subject,'科目 ID');resourceID(bank.section,'资源分组 ID');
+  if (['english','chinese'].includes(bank.subject) && !RESOURCE_SECTIONS[bank.subject].includes(bank.section)) throw new Error('题库科目与章节不匹配。');
   if (bank.source !== undefined) cleanBank.source = resourceString(bank.source, '题库来源', 2000, true);
   if (!Array.isArray(data.questions) || data.questions.length > 20000) throw new Error('questions 必须是最多 20000 项的数组。');
   const seen = new Set();
@@ -249,6 +250,7 @@ function validateQuizLibrary(input) {
   return {schemaVersion:1,banks,assignments};
 }
 function defaultQuizTarget(bank) {
+  if(!['english','chinese'].includes(bank.subject))return undefined;
   return RESOURCE_BANK_IDS.find(id => resourceBanks.find(item => item.bank.id === id)?.bank.section === bank.section);
 }
 function assignedQuizTarget(id, library = quizLibrary) {
@@ -268,7 +270,7 @@ function listPracticeBanks() {
 function listImportedQuizPacks() {
   return resourceBanks.filter(item => item.origin === 'custom').map(item => ({...structuredClone(item),targetBankId:assignedQuizTarget(item.bank.id) || defaultQuizTarget(item.bank)}));
 }
-function createPracticeBank({name, subject, section}) {
+function createPracticeBank({name, subject='custom', section='custom'}) {
   return resourceEnqueue(async () => {
     await initializeResources();
     const id = 'user-' + (globalThis.crypto?.randomUUID?.() || Date.now().toString(36)+'-'+Math.random().toString(36).slice(2));
@@ -285,6 +287,17 @@ function deleteImportedQuizPack(id) {
     const next = structuredClone(quizLibrary); delete next.assignments[id];
     await storage.setMany({[QUIZ_LIBRARY_KEY]:next},['resource:custom:'+id]);
     quizLibrary = next; resourceBanks = resourceBanks.filter(item => !(item.origin === 'custom' && item.bank.id === id));
+  });
+}
+function moveImportedQuizPack(id,targetBankId) {
+  return resourceEnqueue(async()=>{
+    await initializeResources();
+    const pack=listImportedQuizPacks().find(item=>item.bank.id===id);
+    if(!pack)throw new Error('未找到这个题目资源包。');
+    if(!listPracticeBanks().some(item=>item.bank.id===targetBankId))throw new Error('目标题库不存在。');
+    if(pack.targetBankId===targetBankId)return false;
+    const next=validateQuizLibrary({...quizLibrary,assignments:{...quizLibrary.assignments,[id]:targetBankId}});
+    await storage.set(QUIZ_LIBRARY_KEY,next);quizLibrary=next;return true;
   });
 }
 function deletePracticeBank(id) {
@@ -308,14 +321,14 @@ function getResourceVersions() {
   const schedule=resourceCustomSchedule||resourceOfficialSchedule;
   return {banks:resourceBanks.map(item => ({...item.bank, origin:item.origin, questionCount:item.questions.length})), classics:getClassicBooks().map(book=>({id:book.id,title:book.title,version:book.version,origin:book.origin})), quotes:quotes ? {id:'daily-quotes',version:quotes.version,origin:quotes.origin,count:quotes.quotes.length} : null,examSchedule:{id:EXAM_SCHEDULE_ID,version:schedule?.version||'1.0.0',origin:schedule?.origin||'bundled',count:schedule?.examSchedule.length||0}};
 }
-function importResourceJSON(input, {targetBankId} = {}) {
+function importResourceJSON(input, {targetBankId,newBankName} = {}) {
   // Snapshot and validate before queuing, so callers cannot mutate queued input.
   let clean;
   try { clean = parseResource(input); }
   catch (error) { return Promise.reject(error); }
   // A local copy of an official JSON is a separate personal pack, never an
   // overwrite of the installed official bank (and therefore enters backups).
-  if (clean.bank && targetBankId && RESOURCE_BANK_IDS.includes(clean.bank.id)) clean.bank.id = 'local-pack-' + clean.bank.id;
+  if (clean.bank && (targetBankId||newBankName) && RESOURCE_BANK_IDS.includes(clean.bank.id)) clean.bank.id = 'local-pack-' + clean.bank.id;
   return resourceEnqueue(async () => {
     await initializeResources();
     const id = clean.book ? 'classic:'+clean.book.id : clean.bank?.id || (clean.examSchedule ? 'schedule:'+EXAM_SCHEDULE_ID : 'daily-quotes');
@@ -325,12 +338,19 @@ function importResourceJSON(input, {targetBankId} = {}) {
     const record = {...clean, origin:'custom'};
     const next = structuredClone(quizLibrary);
     if (clean.bank) {
+      if(newBankName!==undefined){
+        if(targetBankId)throw new Error('请选择已有题库或新建题库，不能同时指定。');
+        const id='user-'+(globalThis.crypto?.randomUUID?.()||Date.now().toString(36)+'-'+Math.random().toString(36).slice(2));
+        const bank=validateQuizBank({schemaVersion:1,bank:{id,name:typeof newBankName==='string'?newBankName.trim():newBankName,subject:'custom',section:'custom',version:'1.0.0'},questions:[]}).bank;
+        next.banks.push(bank);targetBankId=id;
+      }
       const target = targetBankId || assignedQuizTarget(id,next) || defaultQuizTarget(clean.bank);
-      if (!listPracticeBanks().some(item => item.bank.id === target)) throw new Error('请选择一个现有题库，或先新建题库。');
+      if (!listPracticeBanks().some(item => item.bank.id === target)&&!next.banks.some(item=>item.id===target)) throw new Error('请选择一个现有题库，或先新建题库。');
       next.assignments[id] = target;
     }
-    await storage.setMany({['resource:custom:' + id]:record,...(clean.bank ? {[QUIZ_LIBRARY_KEY]:next} : {})});
-    if (clean.bank) quizLibrary = next;
+    const library=clean.bank?validateQuizLibrary(next):next;
+    await storage.setMany({['resource:custom:' + id]:record,...(clean.bank ? {[QUIZ_LIBRARY_KEY]:library} : {})});
+    if (clean.bank) quizLibrary = library;
     if (clean.bank) resourceBanks = existing ? resourceBanks.map(item => item.bank.id === id ? record : item) : [...resourceBanks, record];
     else if (clean.book) resourceClassics = [...resourceClassics.filter(item=>!(item.origin==='custom' && item.book.id===clean.book.id)),record];
     else if(clean.examSchedule)resourceCustomSchedule=record;
@@ -407,5 +427,5 @@ function updateResources(manifestURL = 'data/resources/manifest.json') {
 }
 
 export { RESOURCE_SCHEMA_VERSION, RESOURCE_BANK_IDS, RESOURCE_SECTIONS, validateQuizBank, validateQuotes, validateClassic, validateResourceRecords, compareResourceVersions, initializeResources, reloadResources, listQuizBanks, getClassicBooks, getQuotesResource, getResourceVersions, importResourceJSON, updateResources, waitForResourceWrites };
-export { QUIZ_LIBRARY_KEY, validateQuizLibrary, listPracticeBanks, listImportedQuizPacks, createPracticeBank, deletePracticeBank, deleteImportedQuizPack };
+export { QUIZ_LIBRARY_KEY, validateQuizLibrary, listPracticeBanks, listImportedQuizPacks, createPracticeBank, deletePracticeBank, deleteImportedQuizPack,moveImportedQuizPack };
 export {validateExamSchedule,getExamScheduleResource,EXAM_SCHEDULE_ID};

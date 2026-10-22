@@ -17,7 +17,8 @@ let quizDraftEditedAt = '';
 const quizPendingWrites = new Set();
 const quizSections = [
   ['grammar', '英语语法', 'English grammar'], ['vocabulary', '英语词汇', 'English vocabulary'],
-  ['ancient-culture', '中国古代文化常识', 'Ancient Chinese culture'], ['chinese-usage', '汉语易错知识', 'Chinese language usage']
+  ['ancient-culture', '中国古代文化常识', 'Ancient Chinese culture'], ['chinese-usage', '汉语易错知识', 'Chinese language usage'],
+  ['custom','我的题库','My banks']
 ];
 
 function quizTrackWrite(promise) {
@@ -197,23 +198,23 @@ function quizRecordSummary(record) {
 function getRecentQuizSummary() { return quizHistory.length ? quizRecordSummary(quizHistory[0]) : null; }
 // Read only: unfinished drafts never enter this aggregation, nor trigger storage writes.
 function getQuizDashboard(section = '') {
-  const records = quizHistory.filter(record => !section || record.section === section);
-  const total = records.reduce((sum, record) => sum + record.total, 0);
-  const correct = records.reduce((sum, record) => sum + record.correct, 0);
-  const timed = records.filter(record => record.timing);
-  const sections = quizSections.map(([id, zh, en]) => {
-    const groups = records.filter(record => record.section === id);
-    const count = groups.reduce((sum, record) => sum + record.total, 0);
-    return {id, zh, en, groups:groups.length, total:count,
-      correct:groups.reduce((sum, record) => sum + record.correct, 0)};
+  const banks=listQuizBanks(), names=new Map(banks.filter(item=>item.origin==='custom').map(item=>[item.bank.id,item.bank.name]));
+  for(const record of quizHistory)if(record.section==='custom'&&!names.has(record.bankId))names.set(record.bankId,record.bankTitle);
+  const matches=(record,id)=>id.startsWith('bank:')?record.bankId===id.slice(5):record.section===id&&!names.has(record.bankId);
+  const records=quizHistory.filter(record=>!section||matches(record,section));
+  const total=records.reduce((sum,record)=>sum+record.total,0),correct=records.reduce((sum,record)=>sum+record.correct,0),timed=records.filter(record=>record.timing);
+  const definitions=[...quizSections.filter(([id])=>id!=='custom'),...[...names].map(([id,name])=>['bank:'+id,name,name])];
+  const sections=definitions.map(([id,zh,en])=>{
+    const groups=records.filter(record=>matches(record,id));return {id,zh,en,groups:groups.length,total:groups.reduce((sum,record)=>sum+record.total,0),correct:groups.reduce((sum,record)=>sum+record.correct,0)};
   });
-  const sectionBanks = section ? new Set(listQuizBanks().filter(bank=>bank.bank.section===section).flatMap(bank=>bank.sourceBankIds || [bank.bank.id])) : null;
-  const marks = [...quizMarks.values()].filter(mark => !sectionBanks || sectionBanks.has(mark.bankId));
-  return {groups:records.length,total,correct,accuracy:total ? Math.round(correct / total * 100) : null,
-    elapsedSeconds:timed.reduce((sum,record) => sum + record.timing.elapsedSeconds,0),timedGroups:timed.length,
-    wrong:marks.filter(mark => mark.wrong).length,favorites:marks.filter(mark => mark.favorite).length,
+  const sectionBanks=section?new Set(banks.filter(item=>section.startsWith('bank:')?item.bank.id===section.slice(5):item.origin!=='custom'&&item.bank.section===section).flatMap(item=>item.sourceBankIds||[item.bank.id])):null;
+  const marks=[...quizMarks.values()].filter(mark=>!sectionBanks||sectionBanks.has(mark.bankId));
+  return {groups:records.length,total,correct,accuracy:total?Math.round(correct/total*100):null,
+    elapsedSeconds:timed.reduce((sum,record)=>sum+record.timing.elapsedSeconds,0),timedGroups:timed.length,
+    wrong:marks.filter(mark=>mark.wrong).length,favorites:marks.filter(mark=>mark.favorite).length,
     sections,recent:records.slice(0,7).map(quizRecordSummary)};
 }
+
 export { getQuizDashboard, getRecentQuizSummary };
 function quizGetMark(bankId, questionId, suppliedQuestion) {
   const question = suppliedQuestion || (quizSession?.bankId === bankId && quizSession.questions.find(q => q.id === questionId)) || listQuizBanks().find(item => item.bank.id === bankId)?.questions.find(q => q.id === questionId);
@@ -242,7 +243,7 @@ function quizStart(bankId, mode = 'random', requestedSize = 10, random = Math.ra
     Object.freeze(question);
   }
   Object.freeze(questions);
-  quizSession = {id: uid(), bankId, bankTitle: resource.bank.name, section: resource.bank.section, mode, requestedSize, questions, answers: questions.map(() => null), index: 0, record: null, startedAt:Date.now(), limitSeconds};
+  quizSession = {id: uid(), bankId, bankTitle: resource.bank.name, section: resource.origin==='custom'?'custom':resource.bank.section, mode, requestedSize, questions, answers: questions.map(() => null), index: 0, record: null, startedAt:Date.now(), limitSeconds};
   quizDraft = quizSession; quizScheduleDraft();
   quizSelectedBank = bankId; quizMode = mode; quizSize = requestedSize;quizCountdown=limitSeconds>0;if(quizCountdown)quizMinutes=limitSeconds/60; quizView = 'session';
   return quizClone(quizSession);
@@ -297,15 +298,13 @@ function quizChoiceLabel(question, answer) {
   const option = question.options.find(item => item.id === answer);
   return option ? esc(option.id) + '. ' + quizText(option.text) : '';
 }
+function quizBankCard(resource) { return '<button type="button" class="quiz-bank ' + (resource.bank.id === quizSelectedBank ? 'selected' : '') + '" data-quiz-bank="' + esc(resource.bank.id) + '" aria-pressed="' + (resource.bank.id === quizSelectedBank) + '"><span class="quiz-selection-indicator" aria-hidden="true">✓</span><strong>' + esc(resource.bank.name) + '</strong><span>' + resource.questions.length + tr(' 题', ' questions') + (resource.origin === 'custom' ? tr(' · 自定义', ' · Custom') : '') + '</span>' + (resource.questions.length ? '' : '<small>' + tr('暂无题目 · 可导入题库', 'No questions · Import a bank') + '</small>') + '</button>'; }
 function quizSetupPage() {
   const banks = listQuizBanks();
   if (!banks.some(resource => resource.bank.id === quizSelectedBank)) quizSelectedBank = banks.find(resource => resource.questions.length)?.bank.id || banks[0]?.bank.id || '';
   const selected = banks.find(resource => resource.bank.id === quizSelectedBank);
   const count = selected ? quizPool(selected, quizMode).length : 0;
-  const cards = quizSections.map(([section, zh, en]) => {
-    const resources = banks.filter(resource => resource.bank.section === section);
-    return '<section class="quiz-section"><h2>' + tr(zh, en) + '</h2>' + (resources.length ? resources.map(resource => '<button type="button" class="quiz-bank ' + (resource.bank.id === quizSelectedBank ? 'selected' : '') + '" data-quiz-bank="' + esc(resource.bank.id) + '" aria-pressed="' + (resource.bank.id === quizSelectedBank) + '"><span class="quiz-selection-indicator" aria-hidden="true">✓</span><strong>' + esc(resource.bank.name) + '</strong><span>' + resource.questions.length + tr(' 题', ' questions') + (resource.origin === 'custom' ? tr(' · 自定义', ' · Custom') : '') + '</span>' + (resource.questions.length ? '' : '<small>' + tr('暂无题目 · 可导入题库', 'No questions · Import a bank') + '</small>') + '</button>').join('') : '<div class="quiz-empty">' + tr('暂无题目 · 可导入题库', 'No questions · Import a bank') + '</div>') + '</section>';
-  }).join('');
+  const cards=banks.map(quizBankCard).join('');
   const resume = quizDraft ? '<div class="quiz-notice">' + tr('有一组练习尚未交卷，答案已保留。', 'Your unfinished answers are kept.') + ' <button type="button" data-quiz-resume>' + tr('继续作答', 'Resume') + '</button></div>' : '';
   const history = quizHistory.length ? '<div class="quiz-history"><h2>' + tr('已完成的练习', 'Completed groups') + '</h2>' + quizHistory.slice(0, 30).map(record => '<button type="button" data-quiz-review="' + esc(record.id) + '"><span>' + esc(record.bankTitle) + '</span><span>' + record.correct + ' / ' + record.total + ' · ' + Math.round(record.correct / record.total * 100) + '%</span><small>' + esc(new Date(record.submittedAt).toLocaleString()) + '</small></button>').join('') + '</div>' : '<p class="quiz-empty">' + tr('交卷后，这里会显示成绩与解析。', 'Submit a group to see results and explanations here.') + '</p>';
   return '<div class="quiz-setup"><div class="actions"><button data-action="resources">'+tr('管理题库 / 导入题目','Manage banks / import questions')+'</button></div>' + resume + '<div class="quiz-grid">' + cards + '</div><section class="quiz-controls card"><label>' + tr('练习方式', 'Practice mode') + '<select id="quizMode">' + [['random', '随机练习', 'Random'], ['wrong', '错题巩固', 'Wrong answers'], ['favorites', '收藏练习', 'Favorites']].map(([value, zh, en]) => '<option value="' + value + '"' + (value === quizMode ? ' selected' : '') + '>' + tr(zh, en) + '</option>').join('') + '</select></label><label>' + tr('每组题数', 'Group size') + '<input id="quizSize" type="number" inputmode="numeric" min="1" max="200" step="1" value="'+(Number.isFinite(quizSize)?quizSize:'')+'" required></label><div class="quiz-timing-controls"><label class="quiz-timing-toggle"><input id="quizCountdown" type="checkbox" '+(quizCountdown?'checked':'')+'>'+tr('开启倒计时','Countdown')+'</label><label>'+tr('时长（分钟）','Minutes')+'<input id="quizMinutes" type="number" inputmode="numeric" min="1" max="180" step="1" value="'+quizMinutes+'" '+(quizCountdown?'':'disabled')+'></label></div><button type="button" class="primary" data-quiz-start' + (!count || !quizReady ? ' disabled' : '') + '>' + tr('开始练习', 'Start practice') + '</button><p class="quiz-notice" id="quizSetupStatus" role="status">' + (!quizReady ? tr('正在读取本地练习记录。', 'Loading local practice records.') : !count ? tr('当前范围暂无题目，请更换题库或练习方式。', 'No questions in this selection. Choose another bank or mode.') : count < quizSize ? tr('当前范围只有 ', 'Only ') + count + tr(' 题，本组将练习全部可用题目。', ' questions available; this group uses all of them.') : count + tr(' 道可用题目 · 交卷后统一批改', ' available questions · Graded on submission')) + '</p><p class="quiz-notice">'+tr('题数可手填 1–200；不足时练习全部可用题。倒计时到时只提醒，不自动交卷；计时不触发保存。','Enter 1–200 questions. A smaller pool uses all available questions. Countdown gives a reminder without auto-submission.')+'</p></section>' + history + '</div>';
