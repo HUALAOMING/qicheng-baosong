@@ -51,4 +51,4 @@ npm run test:5.2
 
 浏览器定向脚本：`tests/local52-browser.mjs`、`tests/reading52-browser.mjs`、`tests/scores52-browser.mjs`、`tests/design52-browser.mjs`。使用独立虚构数据和 Edge，需本机存在脚本指定的 Playwright 与 Edge 路径。
 
-本轮交互与外观结果见 `docs/POLISH_5.2_REPORT.md`。第一轮5.2功能验收见 `docs/UPDATE_5.2_REPORT.md`；更旧的验收文档是历史参考。
+[5.2线上发布与升级验收](docs/DEPLOYMENT_5.2_REPORT.md) · 本轮交互与外观结果见 `docs/POLISH_5.2_REPORT.md`。第一轮5.2功能验收见 `docs/UPDATE_5.2_REPORT.md`；更旧的验收文档是历史参考。
