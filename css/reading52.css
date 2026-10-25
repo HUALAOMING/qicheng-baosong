@@ -1,0 +1,61 @@
+/* Reading keeps a clear path: one book, one timeline, and room for its notes. */
+.journal-reading-fields .reading-chapter52{grid-column:1/-1}
+.reading-filters52{display:flex;flex-wrap:wrap;gap:14px;margin:18px 0 12px}
+.reading-filters52 .field{flex:1;min-width:210px;max-width:420px;margin:0}
+.reading-timelines52{display:grid;gap:20px;margin-top:22px}
+.reading-book52{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--surface)}
+.reading-book52>header{display:flex;align-items:center;gap:14px;padding:20px 24px;background:color-mix(in srgb,var(--accent) 7%,var(--surface));border-bottom:1px solid var(--line)}
+.reading-book52>header>div{flex:1;min-width:0}
+.reading-book52>header h3{margin:0 0 5px;font-size:1.2rem;letter-spacing:-.025em;overflow-wrap:anywhere}
+.reading-book52>header p{margin:0;color:var(--muted);font-size:.86rem}
+.reading-book-mark52{width:42px;height:49px;display:grid;place-items:center;background:var(--surface);border:1px solid var(--line);border-radius:5px 10px 10px 5px;box-shadow:3px 0 0 color-mix(in srgb,var(--accent) 12%,var(--surface));font-family:serif;font-size:22px;flex:none}
+.reading-axis52{padding:4px 24px 10px 33px}
+.reading-axis52 .journal-reading-row{position:relative;display:grid;grid-template-columns:80px minmax(0,1fr) auto;gap:22px;padding:24px 0 24px 24px;border:0;align-items:start}
+.reading-axis52 .journal-reading-row:before{content:"";position:absolute;width:1px;left:0;top:0;bottom:0;background:color-mix(in srgb,var(--accent) 28%,var(--line))}
+.reading-axis52 .journal-reading-row:after{content:"";position:absolute;left:-4px;top:31px;width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 5px var(--surface)}
+.reading-axis52 .journal-reading-row:last-child:before{bottom:calc(100% - 35px)}
+.reading-axis52 .journal-reading-row:first-child:before{top:31px}
+.reading-axis52 .journal-reading-date{border:0;background:transparent;padding:0;text-align:left;min-width:0}
+.reading-axis52 .journal-reading-date strong{font-size:.94rem;font-variant-numeric:tabular-nums}
+.reading-axis52 .journal-reading-date small{font-size:.76rem;color:var(--muted)}
+.reading-axis52 .journal-reading-detail h3{font-size:1.02rem;margin:0 0 7px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
+.reading-axis52 .journal-reading-detail p{font-size:.84rem;color:var(--muted);margin:0}
+.reading-axis52 .journal-reading-detail .reading-note52{white-space:pre-wrap;font-size:.94rem;line-height:1.85;margin:12px 0 0;color:var(--ink);overflow-wrap:anywhere}
+.reading-axis52 .journal-reading-actions{display:flex;gap:4px;flex-wrap:wrap}
+.reading-axis52 .journal-reading-actions button{min-height:40px;padding:5px 9px}
+.reading-experience52>.panel-title{gap:14px}
+.reading-entry-modes52{display:flex;gap:4px;padding:4px;border:1px solid var(--line);background:var(--bg);border-radius:13px;margin:18px 0}
+.reading-entry-modes52 button{flex:1;border:0;box-shadow:none;background:transparent;border-radius:9px;min-height:44px;transition:background .2s,box-shadow .2s;transform:none}
+.reading-entry-modes52 button[aria-pressed=true]{background:var(--surface);box-shadow:0 2px 6px #0001;font-weight:650}
+.reading-import52{border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:22px;background:color-mix(in srgb,var(--accent) 5%,var(--surface))}
+.reading-other-learning52{margin-top:24px}
+.reading-other-learning52>h2{margin-top:0}
+.weekly-quote-settings52{margin:18px 0}
+.weekly-quote-dialog52{width:min(1100px,calc(100vw - 32px));max-width:none;max-height:calc(100dvh - 40px);border:1px solid var(--line);border-radius:24px;padding:0;background:var(--surface);color:var(--ink);box-shadow:0 30px 100px #0004;overflow:auto}
+.weekly-quote-dialog52::backdrop{background:#15232b66;backdrop-filter:blur(6px)}
+.weekly-quote-heading52{display:flex;align-items:start;justify-content:space-between;gap:20px;padding:26px 28px 18px}
+.weekly-quote-heading52 h2{font-size:1.6rem;letter-spacing:-.03em;margin:6px 0 10px}
+.weekly-quote-heading52>button{border:0;background:var(--bg);border-radius:50%;font-size:24px;min-width:42px;min-height:42px;padding:0;flex:none}
+.weekly-quote-layout52{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(280px,1fr);gap:24px;padding:0 28px 24px}
+.weekly-quote-layout52 .grid2{gap:12px}
+.weekly-quote-choices52{height:420px;overflow:auto;overscroll-behavior:contain;border:1px solid var(--line);border-radius:14px;scrollbar-gutter:stable}
+.weekly-quote-choice52{display:flex;gap:13px;align-items:start;padding:16px;border-bottom:1px solid var(--line);cursor:pointer;transition:background .16s}
+.weekly-quote-choice52:last-child{border-bottom:0}
+.weekly-quote-choice52:has(input:checked){background:color-mix(in srgb,var(--accent) 9%,var(--surface))}
+.weekly-quote-choice52 input{width:20px;height:20px;flex:none;accent-color:var(--accent);margin:4px 0 0}
+.weekly-quote-choice52>span{min-width:0}
+.weekly-quote-text52{display:block;line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere;font-size:.95rem}
+.weekly-quote-choice52 small{display:block;color:var(--muted);font-size:.78rem;margin-top:8px}
+.weekly-quote-order52{border-radius:16px;background:var(--bg);padding:18px}
+.weekly-quote-order52 h3{display:flex;justify-content:space-between;font-size:1rem;margin:0 0 12px}
+.weekly-quote-order52 h3 span{color:var(--muted);font-weight:400}
+.weekly-quote-order52 ol{list-style:none;padding:0;margin:0}
+.weekly-quote-order52 li{display:grid;grid-template-columns:36px minmax(0,1fr) auto;align-items:start;gap:8px;padding:12px 0;border-top:1px solid var(--line)}
+.weekly-quote-order52 li>strong{font-size:.78rem;line-height:1.9;color:var(--muted);font-weight:500}
+.weekly-quote-order52 li>p{font-size:.86rem;line-height:1.7;margin:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.weekly-quote-order52 li>div{display:flex;gap:2px}
+.weekly-quote-order52 li button{padding:0;width:28px;min-height:32px;border:0;background:transparent;font-size:18px}
+.weekly-quote-footer52{display:flex;align-items:center;justify-content:flex-end;gap:12px;padding:18px 28px;border-top:1px solid var(--line);background:var(--surface);position:sticky;bottom:0}
+.weekly-quote-footer52>span{font-size:.84rem;color:var(--muted);margin-right:auto;max-width:60%}
+@media(max-width:760px){.reading-book52>header{padding:17px}.reading-axis52{padding-left:22px;padding-right:16px}.reading-axis52 .journal-reading-row{grid-template-columns:65px minmax(0,1fr);gap:12px;padding-left:18px}.reading-axis52 .journal-reading-actions{grid-column:2}.reading-axis52 .journal-reading-detail h3{font-size:1rem}.weekly-quote-dialog52{width:calc(100vw - 20px);max-height:calc(100dvh - 20px);border-radius:20px}.weekly-quote-heading52{padding:22px 18px 14px}.weekly-quote-layout52{grid-template-columns:1fr;padding:0 18px 18px;gap:18px}.weekly-quote-choices52{height:300px}.weekly-quote-order52 li>p{-webkit-line-clamp:2}.weekly-quote-footer52{padding:14px 18px;flex-wrap:wrap}.weekly-quote-footer52>span{max-width:100%;flex-basis:100%}.reading-entry-modes52 button{padding-left:8px;padding-right:8px}}
+@media(prefers-reduced-motion:reduce){.reading-entry-modes52 button,.weekly-quote-choice52{transition:none}}

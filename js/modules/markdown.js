@@ -13,7 +13,7 @@ import { render } from '../app.js';
 
 
 const MD_FIELDS31 = {
-  profile : PROFILE, education : [['stage', '教育阶段'], ...EDU_FIELDS], statement : [['zh', '中文个人陈述'], ['en', '英文个人陈述']],
+  profile : PROFILE, education : [['stage', '教育阶段'], ...EDU_FIELDS], statement : [['zh', '中文个人陈述'], ['en', '英文个人陈述'], ['otherLanguage','小语种语种'], ['other','小语种个人陈述']],
   academics : [['languageLearning', '语言学习'], ['certificates', '证书与等级']], exams : EXAM_FIELDS, awards : [...AWARD_FIELDS,
   ['priority', '整理优先级'], ['summary', '补充简历表述']], experiences : [...EXP_FIELDS, ['priority', '整理优先级'], ['summary', '补充简历表述']],
   practices : [...EXP_FIELDS, ['summary', '补充简历表述']], strengths : [['strengths', '个人特长'], ['hobbies', '兴趣爱好']], achievements : [...ACHIEVEMENT_FIELDS,

@@ -1,7 +1,7 @@
 import { uid } from './utils/helpers.js';
 // 启程 · js/constants.js
 
-const VERSION = '5.1.0';
+const VERSION = '5.2.0';
 
 const THEMES = {
   pudding : '布丁奶油', obsidian : '黑橙质感', blue : '墨蓝学院', jade : '深海翡翠', berry : '莓果银白'
@@ -100,7 +100,7 @@ const blanks = {
 const NAV3 = [ {
   id : 'start', zh : '首页', en : 'Home', icon : 'home', standalone : true, items : [['home', '首页', 'Home']]
 }, {
-  id : 'learning-center', zh : '学习中心', en : 'Learning center', icon : 'bulb', items : [['quiz', '练习中心', 'Practice center'], ['reading', '阅读扩展', 'Reading'], ['reading-progress', '每日阅读进度', 'Reading progress'], ['calendar', '学习日历', 'Learning calendar']]
+  id : 'learning-center', zh : '学习中心', en : 'Learning center', icon : 'bulb', items : [['quiz', '练习中心', 'Practice center'], ['reading', '阅读扩展', 'Reading'], ['reading-progress', '每日阅读进度', 'Reading progress'], ['calendar', '学习日历', 'Learning calendar'], ['self-introductions','自我介绍汇总','Self introductions']]
 }, {
   id : 'entry', zh : '信息录入', en : 'Information', icon : 'edit', items : [['profile', '个人基本信息', 'Basic information'],
   ['education', '教育经历', 'Education'], ['statement', '个人陈述', 'Personal statement'], ['academics', '语言与考试成绩', 'Languages & exams'],

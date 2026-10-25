@@ -199,6 +199,7 @@ function icon3 (kind) {
   const p = {
     calendar : 'M7 3v4m10-4v4M3 10h18M5 5h14a2 2 0 0 1 2 2v13H3V7a2 2 0 0 1 2-2ZM7 14h2m6 0h2m-10 4h2', home : 'm3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9', bulb : 'M9 18h6M10 21h4M8 14a6 6 0 1 1 8 0c-1 1-1 2-1 4H9c0-2 0-3-1-4Z', book : 'M12 5v16M12 5C9 3 5 3 2 4v15c3-1 7-1 10 2 3-3 7-3 10-2V4c-3-1-7-1-10 1Z', menu : 'M4 6h16M4 12h16M4 18h16', edit : 'm5 16-1 4 4-1L20 7l-3-3L5 16Z', layers : 'm12 3 10 5-10 5L2 8l10-5Zm-9 10 9 5 9-5M3 18l9 5 9-5',
     spark : 'm12 2 3 7 7 3-7 3-3 7-3-7-7-3 7-3 3-7Z', chart : 'M4 3v17h17M8 16v-5m5 5V7m5 9V4', folder : 'M3 6h7l2 3h9v11H3V6Z',
+    download : 'M12 3v13m-5-5 5 5 5-5M4 16v5h16v-5',
     export : 'M12 16V3m-5 5 5-5 5 5M4 14v7h16v-7', globe : 'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM3 12h18M12 3c-5 6-5 12 0 18 5-6 5-12 0-18',
     close : 'm6 6 12 12M6 18 18 6', chevron : 'm6 9 6 6 6-6', search : 'M16 16l5 5M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z',
     check : 'm4 12 5 5L20 6'
@@ -237,6 +238,7 @@ function savedStatus (message) {
   if (element) {
     element.textContent = message;
     element.classList.toggle ('saved-error', ctx.saveError);
+    const card=element.closest?.('.sidebar-save52');if(card)card.dataset.saveState=ctx.saveError?'error':ctx.saving||ctx.dirty301?'saving':'saved';
     element.setAttribute ('role', 'status');
     element.setAttribute ('aria-live', 'polite');
   }

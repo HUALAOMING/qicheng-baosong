@@ -1,12 +1,13 @@
 {
   "name": "qicheng-pwa",
-  "version": "5.1.0",
+  "version": "5.2.0",
   "private": true,
   "type": "module",
   "description": "启程 Local First PWA · 原生 HTML/CSS/JavaScript",
   "scripts": {
     "package": "node scripts/package.mjs",
     "check": "node scripts/check.mjs",
-    "test": "node --experimental-vm-modules --test tests/*.test.mjs"
+    "test": "node --experimental-vm-modules --test tests/*.test.mjs",
+    "test:5.2": "node --experimental-vm-modules --test tests/introductions52.test.mjs tests/review52.test.mjs tests/reading52.test.mjs tests/scores52.test.mjs tests/design52.test.mjs tests/startup.test.mjs tests/export50.test.mjs tests/pwa-update.test.mjs tests/resources.test.mjs tests/page-help52.test.mjs tests/home-polish52.test.mjs"
   }
 }

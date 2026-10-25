@@ -1,8 +1,8 @@
 import { ctx } from '../state.js';
-import { $, $$, checkbox, esc, flip, head, heading3, icon3, tr, translateLabel, clamp } from '../utils/helpers.js';
+import { $, $$, checkbox, esc, flip, head, heading3, icon3, tr, translateLabel, clamp, loadImage, readFile, toast } from '../utils/helpers.js';
 import { photoTiles, selectedPhotos } from './images.js';
 import { cleanCrop, currentVersion, fieldVisible, moduleStyle } from '../model.js';
-import { ACHIEVEMENT_FIELDS, AWARD_FIELDS, BOOK_FIELDS, EDU_FIELDS, EXAM_FIELDS, EXP_FIELDS, MODULE_NAMES, PROFILE, THEMES, MODULES } from '../constants.js';
+import { ACHIEVEMENT_FIELDS, AWARD_FIELDS, BOOK_FIELDS, EDU_FIELDS, EXAM_FIELDS, EXP_FIELDS, MODULE_NAMES, PROFILE, MODULES } from '../constants.js';
 import { avatarEditor, draftHasContent } from './profile.js';
 import { changed, render, v2Action } from '../app.js';
 import { EN } from '../data.js';
@@ -47,28 +47,55 @@ function slider (key, label, min, max, step, unit) {
   '"></div></label>';
 }
 
+const DENSITY_PRESETS = [
+  { key : 'compact', zh : '紧凑', en : 'Compact', margin : 13, fontSize : 10, lineHeight : 1.3, gap : 6 },
+  { key : 'standard', zh : '标准', en : 'Standard', margin : 18, fontSize : 11, lineHeight : 1.55, gap : 10 },
+  { key : 'airy', zh : '舒展', en : 'Spacious', margin : 23, fontSize : 12, lineHeight : 1.8, gap : 16 }
+];
+const DENSITY_FIELDS = ['margin', 'fontSize', 'lineHeight', 'gap'];
+const validColor = (value, fallback = '#000000') => /^#[0-9a-f]{6}$/i.test (value || '') ? value : fallback;
+function colorField52 (key, label, value, extra = '') {
+  return '<label class="field export-color52"><span>' + label + '</span><div><input type="color" ' + extra + ' value="' + validColor (value) +
+  '" ' + (key ? 'data-paper-color="' + key + '"' : '') + '><output>' + validColor (value).toUpperCase () + '</output></div></label>';
+}
+function densityPanel52 () {
+  const v = currentVersion (), exact = DENSITY_PRESETS.findIndex (preset => DENSITY_FIELDS.every (key => Number (v[key]) === preset[key])), nearest = DENSITY_PRESETS.map (preset =>
+  DENSITY_FIELDS.reduce ((sum, key) => sum + Math.abs (Number (v[key]) - preset[key]) / (DENSITY_PRESETS[2][key] - DENSITY_PRESETS[0][key]), 0)),
+  index = exact < 0 ? nearest.indexOf (Math.min (...nearest)) : exact;
+  return '<div class="density-field52"><span>' + tr ('排版密度', 'Layout density') + '<small id="densityNote52">' +
+  (exact < 0 ? tr ('已自定义', 'Custom settings') : tr (DENSITY_PRESETS[index].zh, DENSITY_PRESETS[index].en)) + '</small></span>' +
+  '<div class="density-switch52" id="densitySwitch52" role="slider" tabindex="0" aria-label="' + tr ('排版密度，左右方向键调整', 'Layout density, use left and right arrows') +
+  '" aria-valuemin="0" aria-valuemax="2" aria-valuenow="' + index + '" aria-valuetext="' + tr (DENSITY_PRESETS[index].zh, DENSITY_PRESETS[index].en) +
+  '"><i class="density-thumb52" style="transform:translate3d(' + (index * 100) + '%,0,0)" aria-hidden="true"></i>' +
+  DENSITY_PRESETS.map ((p, i) => '<span class="' + (i === index ? 'is-selected' : '') + '">' + tr (p.zh, p.en) + '</span>').join ('') +
+  '</div><p class="hint">' + tr ('拖动或点击选择；下方仍可逐项微调。', 'Drag or tap to choose. Fine-tune each setting below.') + '</p></div>';
+}
+
 function stylePanel () {
   const v = currentVersion (), opts = (key, field, choices, value) => '<label class="field"><span>' + key + '</span><select data-module-style="' +
   field + '">' + choices.map (([id, label]) => '<option value="' + id + '" ' + (value === id ? 'selected' : '') + '>' +
   label + '</option>').join ('') + '</select></label>', range = (key, field, min, max, value) => '<label class="field"><span>' +
   key + ' <output>' + value + ' pt</output></span><input type="range" data-module-style="' + field + '" min="' + min +
   '" max="' + max + '" step=".5" value="' + value + '"></label>';
-  return '<div class="style-main">' + vSelect ('palette', tr ('简历配色', 'Resume palette'), [...Object.entries (THEMES).map (([k,
-  x]) => [k, translateLabel (x)]), ['bw', tr ('纯黑白', 'Black & white')]]) + vSelect ('background', tr ('背景方式', 'Background'),
-  [['accent', tr ('白底强调色', 'White with accents')], ['full', tr ('完整主题背景', 'Full theme background')], ['none', tr ('白底黑字',
-  'Plain black & white')]]) + vSelect ('orientation', tr ('纸张方向', 'Page orientation'), [['portrait', tr ('A4 纵向', 'A4 portrait')],
+  return '<section class="paper-design52"><div class="paper-colors52">' + colorField52 ('lineColor', tr ('分割线颜色', 'Divider color'), v.lineColor || '#d6d6d6') +
+  colorField52 ('paperColor', tr ('纸张背景颜色', 'Paper color'), v.paperColor || '#ffffff') + colorField52 ('titleColor', tr ('版块标题颜色', 'Section title color'), v.titleColor) +
+  '</div><div class="paper-image52">' + (v.paperImage ? '<img src="' + esc (v.paperImage) + '" alt="' + tr ('当前纸张背景图片', 'Current paper background') + '">' : '') +
+  '<div><label class="file-button">' + tr (v.paperImage ? '更换背景图片' : '上传背景图片', v.paperImage ? 'Replace background image' : 'Upload background image') +
+  '<input type="file" id="paperImage52" accept="image/png,image/jpeg,image/webp" hidden></label>' + (v.paperImage ? '<button type="button" id="removePaperImage52">' +
+  tr ('移除图片', 'Remove image') + '</button>' : '') + '<p class="hint">' + tr ('图片会铺满每页纸面，正文保持黑色。建议使用浅色图片。', 'Images fill every page. Body text stays black; use a light image for readability.') +
+  '</p></div></div></section><div class="style-main">' + vSelect ('orientation', tr ('纸张方向', 'Page orientation'), [['portrait', tr ('A4 纵向', 'A4 portrait')],
   ['landscape', tr ('A4 横向', 'A4 landscape')]]) + vSelect ('exportLang', tr ('导出标题语言', 'Export label language'), [['zh',
-  '中文'], ['en', 'English']]) + '<div class="actions">' + [['compact', '紧凑', 'Compact'], ['standard', '标准', 'Standard'],
-  ['airy', '舒展', 'Spacious']].map (([k, z, e]) => '<button data-preset="' + k + '">' + tr (z, e) + '</button>').join ('') +
-  '</div>' + slider ('margin', tr ('四边页边距', 'Page margins'), 8, 32, 1, ' mm') + slider ('fontSize', tr ('正文字号', 'Body font size'),
+  '中文'], ['en', 'English']]) + densityPanel52 () + slider ('margin', tr ('四边页边距', 'Page margins'), 8, 32, 1, ' mm') + slider ('fontSize', tr ('正文字号', 'Body font size'),
   8, 16, .5, ' pt') + slider ('lineHeight', tr ('行距', 'Line spacing'), 1.1, 2, .05, '×') + slider ('gap', tr ('模块间距',
   'Section spacing'), 2, 24, 1, ' pt') + '</div><section class="export-appearance"><div><h3>' + tr ('纸面装饰', 'Paper finish') + '</h3><p class="hint">' +
-  tr ('默认保持简洁。需要时再加细框或短强调线，颜色随当前简历配色。', 'A restrained default. Add a fine frame or short accent rule when useful; colors follow the document palette.') +
+  tr ('可按需要添加细框或短线，统一使用上方的分割线颜色。', 'Add a fine frame or short rule using your chosen divider color.') +
   '</p></div>' + vSelect ('pageDecoration', tr ('装饰样式', 'Decoration'), [['plain', tr ('简洁 · 细分隔线（默认）', 'Simple · fine rule (default)')], ['frame', tr ('细框 · 四边留白', 'Fine frame · generous edges')], ['editorial', tr ('刊物 · 短强调线', 'Editorial · short accent')]]) +
   '<div class="export-finish-samples" aria-hidden="true"><i class="finish-plain"></i><i class="finish-frame"></i><i class="finish-editorial"></i></div></section><h3>' + tr ('分别设置各模块标题', 'Style individual sections') + '</h3><div class="module-style-grid">' +
   v.order.map (k => {
     const st = moduleStyle (k, v); return '<details class="module-style"><summary>' + esc (v.titles [k]?.trim () || tr (...MODULE_NAMES [k])) +
-    '</summary><div class="style-controls">' + range (tr ('大标题字号', 'Section title size'), k + ':titleSize', 10, 28, st.titleSize) +
+    '</summary><div class="style-controls">' + colorField52 ('', tr ('该版块标题颜色', 'This section title color'), st.titleColor || v.titleColor, 'data-module-style="' + k + ':titleColor"') +
+    '<button type="button" class="title-color-reset52" data-reset-title-color="' + k + '">' + tr ('跟随统一标题颜色', 'Use common title color') + '</button>' +
+    range (tr ('大标题字号', 'Section title size'), k + ':titleSize', 10, 28, st.titleSize) +
     opts (tr ('大标题对齐', 'Section title alignment'), k + ':titleAlign', [['left', tr ('靠左', 'Left')], ['center', tr ('居中',
     'Center')]], st.titleAlign) + checkbox (st.titleBold, 'data-module-style="' + k + ':titleBold"', tr ('大标题加粗', 'Bold section title')) +
     range (tr ('小标题字号', 'Item title size'), k + ':subtitleSize', 9, 20, st.subtitleSize) + opts (tr ('小标题对齐', 'Item title alignment'),
@@ -116,7 +143,7 @@ function filesPanel22 () {
   '</h3>' + checkbox (v.wordBW, 'data-v-bool="wordBW"', tr ('黑白 Word，便于后期修改', 'Black-and-white Word')) + checkbox (v.wordImages,
   'data-v-bool="wordImages"', tr ('Word 包含已选择的图片', 'Include selected photos in Word')) + vSelect ('pptMode', tr ('PPTX 模式',
   'PPTX mode'), [['editable', tr ('可编辑文字与图片', 'Editable text and images')], ['image', tr ('整页图片，保持外观', 'Full-page images for fidelity')]]) +
-  '<p class="hint">' + tr ('黑白 PDF：在“排版”中选择“纯黑白”。Word / PPT 的字体和换行可能随设备变化，提交前请在目标软件检查。', 'For a monochrome PDF, choose Black & white in Layout. Fonts and line breaks in Word/PPT may vary by device; check in the destination app before submission.') +
+  '<p class="hint">' + tr ('纸张、标题和分割线颜色会用于 PDF、PNG、HTML、PPTX 与彩色 Word。Markdown 保留纯文字。Word / PPT 的字体和换行可能随设备变化，提交前请在目标软件检查。', 'Paper, heading and divider colors apply to PDF, PNG, HTML, PPTX and color Word exports. Markdown stays plain text. Fonts and line breaks in Word/PPT may vary by device; check before submission.') +
   '</p>';
 }
 
@@ -168,7 +195,7 @@ function orderSpring(row,x,y,vx=0,vy=0,done) {
   row.style.transform='translate3d('+x+'px,'+y+'px,0)';row.classList.add('order-moving');
   if(!orderFrame)orderFrame=requestAnimationFrame(orderSpringFrame);
 }
-function cancelOrderInteraction() { orderCleanup?.(); }
+function cancelOrderInteraction() { orderCleanup?.(); densityCleanup52?.(); }
 export { cancelOrderInteraction };
 
 function settleOrder () {
@@ -327,6 +354,10 @@ function exportRows22 () {
         if (ctx.state.statement.zh && visible ('statement.zh')) r.push (body ('Personal Statement', 'entry'));
         r.push (body (ctx.state.statement.en, 'body', 'statement.en'))
       }
+      if (ctx.state.statement.other && visible ('statement.other')) {
+        r.push (body (ctx.state.statement.otherLanguage || exportLabel ('小语种个人陈述', 'Additional personal statement'), 'entry'));
+        r.push (body (ctx.state.statement.other, 'body', 'statement.other'))
+      }
     }
     if (key === 'academics') for (const [k, z, e] of [['languageLearning', '语言学习', 'Language learning'], ['certificates',
     '证书与等级', 'Certificates']]) if (ctx.state.academics [k] && visible ('academics.' + k)) r.push (field (exportLabel (z,
@@ -459,7 +490,7 @@ function selectionPanel () {
     if (k === 'education') return ctx.state.education.filter (x => EDU_FIELDS.some (([f]) => x [f])).map (x => record (k,
     x, [['stage', '教育阶段'], ...EDU_FIELDS])).join ('');
     if (k === 'statement') return field ('statement.zh', '中文个人陈述', ctx.state.statement.zh) + field ('statement.en', '英文个人陈述',
-    ctx.state.statement.en);
+    ctx.state.statement.en) + field ('statement.other', (ctx.state.statement.otherLanguage || '小语种') + '个人陈述', ctx.state.statement.other);
     if (k === 'academics') return field ('academics.languageLearning', '语言学习', ctx.state.academics.languageLearning) +
     field ('academics.certificates', '证书与等级', ctx.state.academics.certificates);
     if (k === 'strengths') return field ('statement.strengths', '个人特长', ctx.state.statement.strengths) + field ('statement.hobbies',
@@ -644,7 +675,7 @@ function preflight3 () {
     ['grade', '毕业届别', 'graduation year']]) if (! (k === 'targetSchool' && v.target) && ! ctx.state.profile [k]) add (suggestions,
     tr ('建议补充基本信息：' + z, 'Consider adding your ' + e), 'profile');
     for (const [condition, z, e, route] of [[! ctx.state.education.some (x => x.school), '教育经历', 'education', 'education'],
-    [! ctx.state.statement.zh && ! ctx.state.statement.en, '个人陈述', 'a personal statement', 'statement'], [! ctx.state.exams.length,
+    [! ctx.state.statement.zh && ! ctx.state.statement.en && ! ctx.state.statement.other, '个人陈述', 'a personal statement', 'statement'], [! ctx.state.exams.length,
     '考试成绩', 'exam results', 'academics'], [! ctx.state.awards.length, '个人荣誉', 'honors & awards', 'awards'], [! ctx.state.experiences.length &&
     ! ctx.state.practices.length, '个人经历或社会实践', 'experience or social practice', 'experiences']]) if (condition) add (suggestions,
     tr ('尚未填写' + z + '，可按需要补充。', 'No ' + e + ' saved. Add it if relevant.'), route);
@@ -744,6 +775,102 @@ function filesPanel () {
 export { customPage, vSelect, slider, stylePanel, mediaPanel22, filesPanel22, orderPanel, orderRows, settleOrder, flipOrder, animateOrderMove, bindModuleOrder, exportLabel, exportRows22, draftFor3, customPage3, selectionPanel, allPhotos, exportRows, textRows, mediaPanel, preflight3, preflightPanel3, previewPage, filesPanel };
 
 // All controls for this feature, in their original override order.
+let densityCleanup52 = null;
+function bindDensity52 () {
+  densityCleanup52?.();
+  const control = $ ('#densitySwitch52');
+  if (!control) return;
+  const thumb = control.querySelector ('.density-thumb52'), labels = [...control.querySelectorAll ('span')];
+  let position = Number (control.getAttribute ('aria-valuenow')), target = position, velocity = 0, frame = 0, lastTime = 0, drag = null;
+  const paint = () => {
+    thumb.style.transform = 'translate3d(' + (position * 100) + '%,0,0)';
+    labels.forEach ((label, index) => label.classList.toggle ('is-selected', index === Math.round (target)));
+  };
+  // Analytic critical damping preserves the live position and velocity when grabbed again.
+  const animate = time => {
+    frame = 0;
+    if (!control.isConnected) return;
+    const dt = Math.min (.032, Math.max (.001, (time - lastTime) / 1000)), offset = position - target, coefficient = velocity + 27 * offset, decay = Math.exp (-27 * dt);
+    lastTime = time; position = target + (offset + coefficient * dt) * decay; velocity = (velocity - 27 * coefficient * dt) * decay;
+    if (Math.abs (position - target) < .001 && Math.abs (velocity) < .01) { position = target; velocity = 0; }
+    else frame = requestAnimationFrame (animate);
+    paint ();
+  };
+  const settle = (index, commit = true) => {
+    target = clamp (index, 0, 2, 1);
+    const preset = DENSITY_PRESETS[target], v = currentVersion ();
+    if (commit) DENSITY_FIELDS.forEach (key => {
+      v[key] = preset[key];
+      $$ ('[data-v-range="' + key + '"],[data-v-number="' + key + '"]').forEach (input => { input.value = preset[key]; });
+      const out = $ ('#out-' + key); if (out) out.textContent = preset[key] + (key === 'margin' ? ' mm' : key === 'lineHeight' ? '×' : ' pt');
+    });
+    if (commit) v.layoutPreset = preset.key;
+    control.setAttribute ('aria-valuenow', target); control.setAttribute ('aria-valuetext', tr (preset.zh, preset.en));
+    const note = $ ('#densityNote52'); if (note && commit) note.textContent = tr (preset.zh, preset.en);
+    cancelAnimationFrame (frame); frame = 0;
+    velocity = clamp (velocity, -27 * position, 27 * (2 - position), 0);
+    if (window.matchMedia?.('(prefers-reduced-motion:reduce)').matches) { position = target; velocity = 0; paint (); }
+    else { lastTime = performance.now (); frame = requestAnimationFrame (animate); }
+    if (commit) changed (false);
+  };
+  const release = (event, cancelled = false) => {
+    if (!drag || event.pointerId !== drag.id) return;
+    const d = drag; drag = null; control.classList.remove ('is-dragging');
+    if (control.hasPointerCapture?.(d.id)) control.releasePointerCapture (d.id);
+    const last = d.samples.at (-1), first = d.samples.find (sample => last.time - sample.time <= 90) || last;
+    velocity = !cancelled && performance.now () - last.time < 120 && last.time > first.time ? (last.value - first.value) / ((last.time - first.time) / 1000) : 0;
+    // Exponential deceleration projects a short flick before choosing the nearest detent.
+    settle (cancelled ? d.initial : Math.round (position + velocity * .099), !cancelled);
+  };
+  control.onpointerdown = event => {
+    if (event.button !== 0 || drag) return;
+    event.preventDefault (); control.focus ({preventScroll:true}); cancelAnimationFrame (frame); frame = 0;
+    const rect = control.getBoundingClientRect (), cell = (rect.width - 8) / 3, point = (event.clientX - rect.left - 4 - cell / 2) / cell;
+    const grabbedThumb = event.clientX >= rect.left + 4 + position * cell && event.clientX <= rect.left + 4 + (position + 1) * cell;
+    drag = { id : event.pointerId, initial : Number (control.getAttribute ('aria-valuenow')), cell, left : rect.left + 4 + cell / 2,
+      offset : grabbedThumb ? point - position : 0, samples : [] };
+    if (!grabbedThumb) position = clamp (point, 0, 2, position);
+    drag.samples.push ({ value : position, time : performance.now () });
+    target = position; velocity = 0; control.setPointerCapture (event.pointerId); control.classList.add ('is-dragging'); paint ();
+  };
+  control.onpointermove = event => {
+    if (!drag || event.pointerId !== drag.id) return;
+    position = clamp ((event.clientX - drag.left) / drag.cell - drag.offset, 0, 2, position); target = position;
+    const time = performance.now (); drag.samples.push ({value:position,time}); drag.samples = drag.samples.filter (sample => time - sample.time < 140); paint ();
+  };
+  control.onpointerup = event => release (event);
+  control.onpointercancel = event => release (event, true);
+  control.onlostpointercapture = event => { if (drag) release (event, true); };
+  control.onkeydown = event => {
+    const key = event.key, current = Number (control.getAttribute ('aria-valuenow'));
+    if (['ArrowLeft', 'ArrowDown', 'ArrowRight', 'ArrowUp', 'Home', 'End'].includes (key)) {
+      event.preventDefault (); settle (key === 'Home' ? 0 : key === 'End' ? 2 : current + (['ArrowLeft', 'ArrowDown'].includes (key) ? -1 : 1));
+    }
+    if (key === 'Escape' && drag) release ({pointerId:drag.id}, true);
+  };
+  densityCleanup52 = () => { cancelAnimationFrame (frame); frame = 0; drag = null; densityCleanup52 = null; };
+}
+
+async function setPaperImage52 (input) {
+  const file = input.files?.[0]; if (!file) return;
+  const version = currentVersion ();
+  try {
+    if (!['image/png', 'image/jpeg', 'image/webp'].includes (file.type)) throw Error (tr ('请选择 PNG、JPG 或 WebP 图片。', 'Choose a PNG, JPG or WebP image.'));
+    if (file.size > 20 * 1024 * 1024) throw Error (tr ('背景图片请小于 20 MB。', 'Choose an image smaller than 20 MB.'));
+    const image = await loadImage (await readFile (file)), scale = Math.min (1, 1600 / Math.max (image.width, image.height)), canvas = document.createElement ('canvas');
+    canvas.width = Math.max (1, Math.round (image.width * scale)); canvas.height = Math.max (1, Math.round (image.height * scale));
+    canvas.getContext ('2d').drawImage (image, 0, 0, canvas.width, canvas.height);
+    let data = canvas.toDataURL ('image/png');
+    while (data.length > 5800000 && canvas.width > 200) {
+      canvas.width = Math.max (1, Math.round (canvas.width * .8)); canvas.height = Math.max (1, Math.round (canvas.height * .8));
+      canvas.getContext ('2d').drawImage (image, 0, 0, canvas.width, canvas.height); data = canvas.toDataURL ('image/png');
+    }
+    version.paperImage = data; changed ();
+  }
+  catch (error) { toast (tr ('背景图片未更改：', 'Background unchanged: ') + error.message); }
+  finally { input.value = ''; }
+}
+
 function bindResumeControls () {
   $$ ('[data-orientation]').forEach (b => b.onclick = () => {
     if (ctx.busy) return; ctx.state.orientation = b.dataset.orientation; scheduleSave (); render (); refreshPreview ();
@@ -776,9 +903,26 @@ function bindResumeControls () {
     const [k, field] = e.dataset.moduleStyle.split (':'); const update = () => {
       const style = currentVersion ().moduleStyles [k] || moduleStyle (k); style [field] = e.type === 'checkbox' ? e.checked : e.type === 'range' ?
       Number (e.value) : e.value; currentVersion ().moduleStyles [k] = style; if (e.type === 'range') e.closest ('label').querySelector ('output').textContent = e.value +
-      ' pt'; changed (false)
+      ' pt'; if (e.type === 'color') e.closest ('label').querySelector ('output').textContent = e.value.toUpperCase (); changed (false)
     }; e.oninput = update; e.onchange = update
   });
+  $$ ('[data-paper-color]').forEach (e => e.oninput = () => {
+    currentVersion ()[e.dataset.paperColor] = e.value; e.closest ('label').querySelector ('output').textContent = e.value.toUpperCase ();
+    if (e.dataset.paperColor === 'titleColor') $$ ('[data-module-style$=":titleColor"]').forEach (input => {
+      const key = input.dataset.moduleStyle.split (':')[0]; if (currentVersion ().moduleStyles[key]?.titleColor) return;
+      input.value = e.value; input.closest ('label').querySelector ('output').textContent = e.value.toUpperCase ();
+    });
+    changed (false);
+  });
+  $$ ('[data-reset-title-color]').forEach (button => button.onclick = () => {
+    const key = button.dataset.resetTitleColor;
+    if (currentVersion ().moduleStyles[key]) currentVersion ().moduleStyles[key].titleColor = '';
+    const input = $ ('[data-module-style="' + key + ':titleColor"]');
+    if (input) { input.value = validColor (currentVersion ().titleColor); input.closest ('label').querySelector ('output').textContent = input.value.toUpperCase (); }
+    changed (false);
+  });
+  const paperInput = $ ('#paperImage52'); if (paperInput) paperInput.onchange = () => setPaperImage52 (paperInput);
+  const removePaper = $ ('#removePaperImage52'); if (removePaper) removePaper.onclick = () => { currentVersion ().paperImage = ''; changed (); };
   $$ ('[data-v-setting]').forEach (e => e.onchange = () => {
     currentVersion () [e.dataset.vSetting] = e.dataset.vSetting === 'photosPerRow' ? Number (e.value) : e.value; changed (e.dataset.vSetting === 'avatarShape')
   });
@@ -789,24 +933,16 @@ function bindResumeControls () {
     const k = e.dataset.vRange || e.dataset.vNumber; const commit = () => {
       const val = clamp (e.value, + e.min, + e.max, currentVersion () [k]); currentVersion () [k] = val; const pair = $ ('[data-v-' +
       (e.dataset.vRange ? 'number' : 'range') + '="' + k + '"]'); if (pair) pair.value = val; $ ('#out-' + k).textContent = val +
-      (k === 'margin' || k === 'avatarSize' ? ' mm' : k === 'lineHeight' ? '×' : ' pt'); ctx.layoutCache = null; scheduleSave ();
+      (k === 'margin' || k === 'avatarSize' ? ' mm' : k === 'lineHeight' ? '×' : ' pt');
+      if (DENSITY_FIELDS.includes (k)) { currentVersion ().layoutPreset = 'custom'; const note = $ ('#densityNote52'); if (note) note.textContent = tr ('已自定义', 'Custom settings'); }
+      ctx.layoutCache = null; scheduleSave ();
     }; e.oninput = () => {
       commit (); if (e.dataset.vNumber) changed (false)
     }; e.onchange = () => {
       commit (); changed (false)
     };
   });
-  $$ ('[data-preset]').forEach (e => e.onclick = () => {
-    Object.assign (currentVersion (), ( {
-      compact : {
-        margin : 13, fontSize : 10, lineHeight : 1.3, gap : 6
-      }, standard : {
-        margin : 18, fontSize : 11, lineHeight : 1.55, gap : 10
-      }, airy : {
-        margin : 23, fontSize : 12, lineHeight : 1.8, gap : 16
-      }
-    }) [e.dataset.preset]); changed ()
-  });
+  bindDensity52 ();
   if ($ ('#versionChoice')) $ ('#versionChoice').onchange = e => {
     ctx.state.activeVersion = e.target.value;
     ctx.layoutCache = null; render ()

@@ -6,6 +6,7 @@ import { waitForHomeWrites } from './modules/home.js';
 import { waitForQuizWrites } from './modules/quiz.js';
 import { waitForResourceWrites } from './resources.js';
 import { waitForJournalWrites } from './modules/journal.js';
+import {waitForExamCalendarWrites} from './modules/exam-calendar.js';
 let installationPrompt = null, registration = null, status = 'loading', message = '', applyingUpdate = false;
 let checkingUpdate = false, updateNotice = '';
 let updateDownloadError = '';
@@ -86,7 +87,7 @@ async function pwaApplyUpdate () {
   if (ctx.busy || ctx.uploadBusy) return toast (tr ('请等待当前操作完成后更新。', 'Wait for the current operation before updating.'));
   if (! registration?.waiting) return;
   if (! await save ()) return toast (tr ('保存失败，请先备份，暂未更新。', 'Save failed. Back up before updating.'));
-  try {await Promise.all([waitForHomeWrites(),waitForQuizWrites(),waitForResourceWrites(),waitForJournalWrites()]);}
+  try {await Promise.all([waitForHomeWrites(),waitForQuizWrites(),waitForResourceWrites(),waitForJournalWrites(),waitForExamCalendarWrites()]);}
   catch(error){toast(tr('数据仍未保存，请稍后再更新：','Pending data could not be saved: ')+error.message);return false;}
   applyingUpdate = true;
   registration.waiting.postMessage ( {

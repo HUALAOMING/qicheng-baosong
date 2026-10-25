@@ -1,14 +1,52 @@
 import { render } from '../app.js';
-import { $, $$, checkbox, esc, heading3, icon3, options, tr, translateLabel, flip } from '../utils/helpers.js';
+import { $, $$, checkbox, esc, heading3, icon3, tr, translateLabel, flip } from '../utils/helpers.js';
 import { ctx } from '../state.js';
 import { getQuizDashboard, quizFormatTime } from './quiz.js';
-import { changed } from '../app.js';
 // 启程 · js/modules/dashboard.js
 
 
 function numeric3 (value) {
-  const s = String (value || '').replace (/[０-９]/g, c => String (c.charCodeAt (0) - 65296)).replace (/,/g, '').trim ();
-  return /^-?\d+(?:\.\d+)?$/.test (s) ? Number (s) : null
+  const s = String (value ?? '').replace (/[０-９]/g, c => String (c.charCodeAt (0) - 65296)).replace (/,/g, '').trim ();
+  const valueNumber = /^-?\d+(?:\.\d+)?$/.test (s) ? Number (s) : NaN;
+  return Number.isFinite(valueNumber) ? valueNumber : null
+}
+
+// Chart and calculator choices are temporary; entered examination data stays unchanged.
+let chartDisplayMode52 = 'score';
+const weightedExamSelection52 = new Map();
+function chartParts52(exam) {
+  const subject = ctx.state.chartMetric === 'subject' ? (exam.subjects || []).find(item => String(item.name || '').trim() === String(ctx.state.chartSubject || '').trim()) : null;
+  return ctx.state.chartMetric === 'subject' ? {score:numeric3(subject?.score),fullMark:numeric3(subject?.fullMark),rank:numeric3(subject?.rank)} : {score:numeric3(exam.totalScore),fullMark:numeric3(exam.totalFullMark),rank:numeric3(exam.rank)};
+}
+function chartModeLabel52(mode = chartDisplayMode52) { return mode === 'rate' ? tr('得分率','Score rate') : mode === 'rank' ? tr('排名','Rank') : tr('实际得分','Actual score'); }
+function chartNumber52(value, mode = chartDisplayMode52) { return value === null ? '—' : String(Math.round(value * 100) / 100) + (mode === 'rate' ? '%' : ''); }
+
+function calculateWeightedExams52(exams, selections) {
+  const selected = Array.from(selections || [], item => Array.isArray(item) ? {id:item[0],weight:item[1]} : item);
+  if (!selected.length) return {valid:false,error:tr('先选择需要计算的考试，再填写每次考试的权重。','Select exams and enter their weights.')};
+  if (new Set(selected.map(item=>item.id)).size !== selected.length) return {valid:false,error:tr('同一次考试不能重复计入。','An exam cannot be counted twice.')};
+  const rows = selected.map(item => ({exam:exams.find(exam=>exam.id === item.id),weight:numeric3(item.weight)}));
+  if (rows.some(row=>!row.exam || row.weight === null || row.weight < 0)) return {valid:false,error:tr('请为每次所选考试填写有效的非负权重。','Enter a valid, nonnegative weight for every selected exam.')};
+  const totalWeight = rows.reduce((sum,row)=>sum+row.weight,0);
+  if (!Number.isFinite(totalWeight) || totalWeight <= 0) return {valid:false,error:tr('权重合计必须大于 0。','The sum of weights must be greater than zero.')};
+  const effective = rows.filter(row=>row.weight>0);
+  const average = (field,positive=false) => {
+    const values = effective.map(row=>({value:numeric3(row.exam[field]),weight:row.weight / totalWeight}));
+    if (values.some(row=>row.value === null || (positive ? row.value<=0 : row.value<0))) return null;
+    const sum=values.reduce((sum,row)=>sum+row.value*row.weight,0);
+    return Number.isFinite(sum)?sum:null;
+  };
+  return {valid:true,totalWeight,count:effective.length,score:average('totalScore'),fullMark:average('totalFullMark',true),rank:average('rank',true)};
+}
+
+function weightedResultMarkup52() {
+  const result=calculateWeightedExams52(ctx.state.exams,weightedExamSelection52);
+  if (!result.valid) return '<p class="hint">'+esc(result.error)+'</p>';
+  return '<div class="weighted-results52"><div><span>'+tr('加权总分','Weighted total score')+'</span><strong data-weighted-score52>'+chartNumber52(result.score,'score')+'</strong><small>'+(result.score===null?tr('所选考试缺少有效总分，暂不能计算。','A selected exam has no valid score.'):result.fullMark===null?tr('按各次实际总分加权','Weighted from the recorded scores'):tr('对应加权满分 ','Weighted full mark ')+chartNumber52(result.fullMark,'score'))+'</small></div><div><span>'+tr('个人加权平均名次','Personal weighted average rank')+'</span><strong data-weighted-rank52>'+chartNumber52(result.rank,'rank')+'</strong><small>'+(result.rank===null?tr('所选考试缺少有效排名，暂不能计算。','A selected exam has no valid rank.'):tr('数值越小，平均名次越靠前。','A smaller number means a higher average rank.'))+'</small></div></div><p class="hint">'+tr('已计入 ','Included ')+result.count+tr(' 次考试 · 权重合计 ',' exams · Total weight ')+chartNumber52(result.totalWeight,'score')+'</p>';
+}
+function weightedCalculatorMarkup52() {
+  for (const id of weightedExamSelection52.keys()) if (!ctx.state.exams.some(exam=>exam.id===id)) weightedExamSelection52.delete(id);
+  return '<section class="panel weighted-calculator52"><div class="panel-title"><div><p class="eyebrow">WEIGHTED RESULTS</p><h2>'+tr('加权成绩计算器','Weighted results calculator')+'</h2><p class="hint">'+tr('选择考试并填写各次权重，例如 20、30、50。计算方式见右下角使用提示。','Choose exams and enter their weights, such as 20, 30, 50. Open Help at the bottom right for the calculation method.')+'</p></div></div><div class="weighted-exams52">'+(ctx.state.exams.length?ctx.state.exams.map(exam=>'<div class="weighted-exam52"><label class="weighted-exam-choice52"><input type="checkbox" data-weighted-exam52="'+esc(exam.id)+'" '+(weightedExamSelection52.has(exam.id)?'checked':'')+'><span><strong>'+esc(exam.title||exam.date||tr('未命名考试','Untitled exam'))+'</strong><small>'+esc(exam.date)+' · '+tr('总分 ','Score ')+esc(exam.totalScore||'—')+' / '+esc(exam.totalFullMark||'—')+' · '+tr('排名 ','Rank ')+esc(exam.rank||'—')+'</small></span></label><label class="weighted-weight52"><span>'+tr('权重','Weight')+'</span><input type="number" min="0" step="any" inputmode="decimal" data-weight52="'+esc(exam.id)+'" aria-label="'+esc((exam.title||exam.date)+' '+tr('权重','weight'))+'" value="'+esc(weightedExamSelection52.get(exam.id)??'')+'" '+(weightedExamSelection52.has(exam.id)?'':'disabled')+' placeholder="0"></label></div>').join(''):'<p class="hint">'+tr('先录入考试，再进行加权计算。','Add examination records to calculate weighted results.')+'</p>')+'</div><div id="weightedResult52" role="status" aria-live="polite">'+weightedResultMarkup52()+'</div><p class="weighted-reference52">'+tr('加权平均名次仅供参考，可能存在较大误差；不同考试的参考人数、排名范围和难度可能不同。加权总分直接使用已录入分数，满分不同的考试请结合得分率判断。','Weighted average rank is for reference only and may have substantial error. Cohort sizes, ranking groups and difficulty can vary. Weighted totals use recorded scores directly; consider score rates when full marks differ.')+'</p></section>';
 }
 
 function pieChart3 (arr, label) {
@@ -36,20 +74,22 @@ function selectedExams3 () {
   })
 }
 
-function chartValue3 (exam, rank = false) {
-  if (rank) return numeric3 (exam.rank);
-  if (ctx.state.chartMetric === 'subject') {
-    const sub = exam.subjects.find (s => s.name.trim () === ctx.state.chartSubject);
-    return numeric3 (sub?.score)
-  }
-  return numeric3 (exam.totalScore)
+function chartValue3 (exam, mode = chartDisplayMode52) {
+  if(typeof mode === 'boolean')mode=mode?'rank':'score';
+  const parts=chartParts52(exam);
+  if(mode==='rank')return parts.rank!==null&&parts.rank>0?parts.rank:null;
+  if(parts.score===null||parts.score<0)return null;
+  if(mode==='rate')return parts.fullMark!==null&&parts.fullMark>0&&parts.score<=parts.fullMark?parts.score/parts.fullMark*100:null;
+  return parts.score;
 }
 
-function lineChart3 (rank = false) {
+function lineChart3 (mode = chartDisplayMode52) {
+  if(typeof mode === 'boolean')mode=mode?'rank':'score';
+  const rank=mode==='rank';
   const exams = selectedExams3 (), points = exams.map ((e, i) => ( {
-    e, i, value : chartValue3 (e, rank)
+    e, i, value : chartValue3 (e, mode)
   })), valid = points.filter (x => x.value !== null), w = 680, h = 245, left = 56, right = 30, top = 24, bottom = 55;
-  if (! valid.length) return '<div class="chart-empty3">' + tr ('所选考试没有可绘制的数字。请填写分数或排名。', 'Selected exams have no numeric values. Enter scores or rankings.') +
+  if (! valid.length) return '<div class="chart-empty3">' + (mode==='rate'?tr('所选考试没有有效得分率。请同时填写得分与大于 0 的满分。','No valid score rates. Enter scores and full marks greater than zero.'):tr ('所选考试没有可绘制的数字。请填写对应总分或科目的分数、排名。', 'No numeric values for this selection. Enter the relevant total or subject scores and ranks.')) +
   '</div>';
   let min = Math.min (...valid.map (x => x.value)), max = Math.max (...valid.map (x => x.value));
   if (min === max) {
@@ -81,20 +121,20 @@ function lineChart3 (rank = false) {
   }, (_, i) => {
     const val = min + (max - min) * i / 4, y = yOf (val); return '<line x1="' + left + '" y1="' + y + '" x2="' + (w - right) +
     '" y2="' + y + '" class="chart-grid3"/><text x="' + (left - 9) + '" y="' + (y + 4) + '" text-anchor="end">' + (rank ?
-    Math.round (val) : Math.round (val * 10) / 10) + '</text>'
+    Math.round (val) : Math.round (val * 10) / 10) + (mode==='rate'?'%':'') + '</text>'
   }).join ('') + segments.map (s => '<polyline points="' + s.map (p => xOf (p.i) + ',' + yOf (p.value)).join (' ') +
   '" fill="none" stroke="' + (rank ? 'var(--chart2)' : 'var(--accent)') + '" stroke-width="2.5"/>').join ('') + points.map (p =>
   '<text x="' + xOf (p.i) + '" y="' + (h - 22) + '" text-anchor="middle">' + esc ((p.e.date || p.e.title || String (p.i +
   1)).slice (0, 11)) + '</text>' + (p.value !== null ? '<circle cx="' + xOf (p.i) + '" cy="' + yOf (p.value) + '" r="5" fill="' +
-  (rank ? 'var(--chart2)' : 'var(--accent)') + '"><title>' + esc (p.e.title) + '：' + p.value + '</title></circle><text x="' +
-  xOf (p.i) + '" y="' + (yOf (p.value) - 12) + '" text-anchor="middle">' + p.value + '</text>' : '')).join ('') + '</svg>'
+  (rank ? 'var(--chart2)' : 'var(--accent)') + '"><title>' + esc (p.e.title) + '：' + chartNumber52(p.value,mode) + '</title></circle><text x="' +
+  xOf (p.i) + '" y="' + (yOf (p.value) - 12) + '" text-anchor="middle">' + chartNumber52(p.value,mode) + '</text>' : '')).join ('') + '</svg>'
 }
 
 function dashboardPage3 () {
   const counts = [[ctx.state.awards.length, '个人荣誉', 'Awards', 'spark'], [ctx.state.experiences.length, '个人经历', 'Experience',
   'edit'], [ctx.state.practices.length, '社会实践', 'Practice', 'globe'], [ctx.state.learning.books.length, '阅读书目', 'Reading',
   'layers'], [ctx.state.achievements.length, '个人成果', 'Projects', 'folder'], [ctx.state.exams.length, '考试记录', 'Exams',
-  'chart']], subjects = [...new Set (ctx.state.exams.flatMap (e => e.subjects.map (s => s.name)).filter (Boolean))];
+  'chart']], subjects = [...new Set (ctx.state.exams.flatMap (e => (e.subjects||[]).map (s => String(s.name||'').trim())).filter (Boolean))];
   return heading3 ('OVERVIEW / DASHBOARD', tr ('成长的轨迹，一目了然。', 'See the shape of your growth.'), tr ('汇总已经收录的资料；成绩与排名只使用有效数字，不把缺失值当成零。',
   'A view of saved materials. Charts use valid numeric values; missing values are never treated as zero.')) + '<div class="stat-grid3">' +
   counts.map (([n, z, e, i]) => '<article class="stat-card3">' + icon3 (i) + '<strong>' + n + '</strong><span>' + tr (z,
@@ -105,17 +145,11 @@ function dashboardPage3 () {
   '</p></div></div><div class="exam-picks3">' + (ctx.state.exams.length ? ctx.state.exams.map (e => checkbox (! ctx.state.chartSelectionSet ||
   ctx.state.chartExamIds.includes (e.id), 'data-chart-exam3="' + e.id + '"', esc (e.title || e.date) + '<small>' + esc (e.date) +
   '</small>')).join ('') : '<p class="hint">' + tr ('先录入考试，再形成趋势。', 'Add exams to see trends.') + '</p>') + '</div><div class="chart-options3"><label>' +
-  tr ('成绩曲线', 'Score metric') + '<select id="chartMetric3"><option value="totalScore" ' + (ctx.state.chartMetric === 'totalScore' ?
-  'selected' : '') + '>' + tr ('总分', 'Total score') + '</option><option value="subject" ' + (ctx.state.chartMetric === 'subject' ?
-  'selected' : '') + '>' + tr ('分科成绩', 'Subject score') + '</option></select></label><label>' + tr ('选择科目', 'Subject') +
-  '<select id="chartSubject3">' + options (subjects, ctx.state.chartSubject) + '</select></label></div><div class="line-grid3"><section><h3>' +
-  tr ('成绩变化', 'Score trend') + '</h3><div id="scoreChart3">' + lineChart3 (false) + '</div></section><section><h3>' +
-  tr ('总排名变化 · 越靠上越好', 'Overall rank · higher on chart is better') + '</h3><div id="rankChart3">' + lineChart3 (true) +
-  '</div></section></div><div class="data-table-scroll3"><table class="data-table3"><thead><tr><th>' + tr ('考试', 'Exam') +
-  '</th><th>' + tr ('时间', 'Date') + '</th><th>' + tr ('所选成绩', 'Selected score') + '</th><th>' + tr ('总排名', 'Overall rank') +
+  tr ('选择总分或科目', 'Total or subject') + '<select id="chartMetric3"><option value="totalScore" ' + (ctx.state.chartMetric === 'totalScore' ?
+  'selected' : '') + '>' + tr ('总分', 'Total score') + '</option>'+subjects.map(subject=>'<option value="subject:'+esc(subject)+'" '+(ctx.state.chartMetric==='subject'&&ctx.state.chartSubject===subject?'selected':'')+'>'+esc(subject)+'</option>').join('')+'</select></label><label>'+tr('对比指标','Comparison metric')+'<select id="chartValueMode52">'+[['score','实际得分','Actual score'],['rate','得分率','Score rate'],['rank','排名','Rank']].map(([value,zh,en])=>'<option value="'+value+'" '+(chartDisplayMode52===value?'selected':'')+'>'+tr(zh,en)+'</option>').join('')+'</select></label></div><p class="hint chart-metric-note52">'+tr('得分率 = 实际得分 ÷ 对应满分 × 100%。缺失值不按 0 计算；选择科目时，排名使用该科目的单科排名。','Score rate = score ÷ its full mark × 100%. Missing values are not zero. Subject selections use that subject’s rank.')+'</p><div class="score-chart52"><h3>'+esc(ctx.state.chartMetric==='subject'?ctx.state.chartSubject:tr('总分','Total score'))+' · '+chartModeLabel52()+(chartDisplayMode52==='rank'?tr(' · 越靠上越好',' · higher on chart is better'):'')+'</h3><div id="scoreChart3">'+lineChart3()+'</div></div><div class="data-table-scroll3"><table class="data-table3"><thead><tr><th>' + tr ('考试', 'Exam') +
+  '</th><th>' + tr ('时间', 'Date') + '</th><th>' + chartModeLabel52() + '</th><th>' + tr ('实际得分 / 满分', 'Score / full mark') +
   '</th><th>' + tr ('排名范围', 'Ranking group') + '</th></tr></thead><tbody>' + selectedExams3 ().map (e => '<tr><td>' +
-  esc (e.title) + '</td><td>' + esc (e.date) + '</td><td>' + (chartValue3 (e) ?? '—') + '</td><td>' + esc (e.rank ||
-  '—') + '</td><td>' + esc (e.rankScope || '—') + '</td></tr>').join ('') + '</tbody></table></div></section><div class="overview-grid3">' +
+  esc (e.title) + '</td><td>' + esc (e.date) + '</td><td>' + chartNumber52(chartValue3(e)) + '</td><td>' + chartNumber52(chartParts52(e).score,'score')+' / '+chartNumber52(chartParts52(e).fullMark,'score') + '</td><td>' + esc (e.rankScope || '—') + '</td></tr>').join ('') + '</tbody></table></div></section>'+weightedCalculatorMarkup52()+'<div class="overview-grid3">' +
   [['awards', '荣誉一览', 'Honors overview'], ['experiences', '经历一览', 'Experience overview'], ['practices', '实践一览', 'Practice overview']].map (([k,
   z, e]) => '<section class="panel"><div class="panel-title"><h2>' + tr (z, e) + '</h2><button data-go3="' + k + '">' +
   tr ('录入 / 编辑', 'Add / edit') + '</button></div>' + ctx.state [k].map (x => '<div class="overview-row3"><strong>' +
@@ -143,16 +177,26 @@ function bindDashboardControls () {
     flip (ctx.state.chartExamIds, e.dataset.chartExam3, e.checked); render ()
   });
   if ($ ('#chartMetric3')) $ ('#chartMetric3').onchange = e => {
-    ctx.state.chartMetric = e.target.value;
-    if (! ctx.state.chartSubject) ctx.state.chartSubject = $ ('#chartSubject3').value;
+    const value=e.target.value;
+    ctx.state.chartMetric = value==='totalScore'?'totalScore':'subject';
+    if(value.startsWith('subject:'))ctx.state.chartSubject=value.slice(8);
     render ()
   };
-  if ($ ('#chartSubject3')) $ ('#chartSubject3').onchange = e => {
-    ctx.state.chartSubject = e.target.value;
+  if ($ ('#chartValueMode52')) $ ('#chartValueMode52').onchange = e => {
+    chartDisplayMode52 = e.target.value;
     render ()
   };
+  $$('[data-weighted-exam52]').forEach(input=>input.onchange=()=>{
+    if(input.checked)weightedExamSelection52.set(input.dataset.weightedExam52,'');else weightedExamSelection52.delete(input.dataset.weightedExam52);
+    render();
+    if(input.checked)$$('[data-weight52]').find(field=>field.dataset.weight52===input.dataset.weightedExam52)?.focus();
+  });
+  $$('[data-weight52]').forEach(input=>input.oninput=()=>{
+    weightedExamSelection52.set(input.dataset.weight52,input.value);
+    const result=$('#weightedResult52');if(result)result.innerHTML=weightedResultMarkup52();
+  });
 }
-export { bindDashboardControls };
+export { bindDashboardControls, calculateWeightedExams52 };
 
 // View filters are ephemeral, just like the existing examination chart filters.
 let quizDashboardSection='';

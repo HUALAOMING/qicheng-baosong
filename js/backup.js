@@ -11,6 +11,8 @@ import { validateResourceRecords, reloadResources, waitForResourceWrites } from 
 import { validateQuizRecords, initializeQuiz, waitForQuizWrites,getQuizDraftRecord,QUIZ_DRAFT_KEY,flushQuizDraft,hasPendingQuizWrites } from './modules/quiz.js';
 import { validateHomeRecords, initializeHome, waitForHomeWrites } from './modules/home.js';
 import {validateJournalRecords,initializeJournal,waitForJournalWrites} from './modules/journal.js';
+import {initializeExamCalendar,validateExamCalendarRecords,waitForExamCalendarWrites} from './modules/exam-calendar.js';
+import {resetIntroductions52} from './modules/introductions.js';
 const BACKUP_VERSION = 1;
 let manualSavePending = null;
 function saveAllLocal() {
@@ -19,7 +21,7 @@ function saveAllLocal() {
     if (ctx.persistencePaused || ctx.uploadBusy) throw new Error('请等待当前文件或数据操作完成后再保存。');
     // Attach to independent writes now, so a rejection while current is saving
     // cannot disappear from a queue before we observe it.
-    const [saved] = await Promise.all([save(),waitForQuizWrites(),waitForHomeWrites(),waitForResourceWrites(),waitForJournalWrites()]);
+    const [saved] = await Promise.all([save(),waitForQuizWrites(),waitForHomeWrites(),waitForResourceWrites(),waitForJournalWrites(),waitForExamCalendarWrites()]);
     if (!saved) throw new Error('本机资料未能保存，请导出完整 JSON 备份。');
     // Edits made while another queue was completing must also reach the database.
     if (ctx.dirty301 && !await save()) throw new Error('最新修改未能保存，请导出完整 JSON 备份。');
@@ -43,7 +45,7 @@ function createBackup (snapshot, otherRecords = {
   };
   assertJSON (data);
   Object.assign (data, validateResourceRecords (data));
-  validateQuizRecords (data); validateHomeRecords (data); validateJournalRecords(data);
+  validateQuizRecords (data); validateHomeRecords (data); validateJournalRecords(data); validateExamCalendarRecords(data);
   return {
     app : 'Qicheng', backupVersion : BACKUP_VERSION, appVersion : VERSION, createdAt : new Date ().toISOString (), data
   };
@@ -65,7 +67,7 @@ function parseBackup (input) {
   if (! backup.data || typeof backup.data !== 'object' || Array.isArray (backup.data) || ! backup.data.current) throw new Error ('备份缺少必要的用户数据。');
   assertJSON (backup.data);
   Object.assign (backup.data, validateResourceRecords (backup.data));
-  validateQuizRecords (backup.data); validateHomeRecords (backup.data); validateJournalRecords(backup.data);
+  validateQuizRecords (backup.data); validateHomeRecords (backup.data); validateJournalRecords(backup.data); validateExamCalendarRecords(backup.data);
   const draft = validateDraft (backup.data.current);
   return {
     backup, draft
@@ -83,7 +85,7 @@ function backupSummary (backup, draft) {
   'Restoring replaces all current local data.');
 }
 async function getCurrentBackup () {
-  await Promise.all ([ctx.saveChain, waitForResourceWrites (), waitForQuizWrites ().catch(()=>{}), waitForHomeWrites (), waitForJournalWrites()]);
+  await Promise.all ([ctx.saveChain, waitForResourceWrites (), waitForQuizWrites ().catch(()=>{}), waitForHomeWrites (), waitForJournalWrites(),waitForExamCalendarWrites()]);
   const other = await storage.getAll ();
   const quizDraft=getQuizDraftRecord();if(quizDraft)other[QUIZ_DRAFT_KEY]=quizDraft;else delete other[QUIZ_DRAFT_KEY];
   return createBackup (snapshot3 (), other);
@@ -108,6 +110,7 @@ async function exportBackup () {
 }
 function resetTransientState () {
   resetViewMemory50();
+  resetIntroductions52();
   ctx.schoolQuery = '';
   ctx.onlyDreams = false;
   ctx.schoolRegion3 = '';
@@ -136,7 +139,7 @@ async function commitBackup(input) {
     parsed.draft.sidebarHidden = true; parsed.draft.menuOpen = ['start'];
     records.current = compactSnapshot(parsed.draft);
     try {
-      await Promise.all ([ctx.saveChain, waitForResourceWrites (), waitForQuizWrites (), waitForHomeWrites (), waitForJournalWrites()]);
+      await Promise.all ([ctx.saveChain, waitForResourceWrites (), waitForQuizWrites (), waitForHomeWrites (), waitForJournalWrites(),waitForExamCalendarWrites()]);
       const installed = await storage.getAll ();
       for (const [key, value] of Object.entries (installed)) if (key.startsWith ('resource:official:')) records[key] = value;
       records['meta:device']={lastImportedAt:new Date().toISOString(),lastSavedAt:new Date().toISOString(),sourceCreatedAt:parsed.backup.createdAt,sourceAppVersion:parsed.backup.appVersion};
@@ -148,7 +151,7 @@ async function commitBackup(input) {
     // The transaction has committed; a display error must not masquerade as a failed restore.
     ctx.state = parsed.draft;
     try {
-      await reloadResources (); await Promise.all ([initializeQuiz (records), initializeHome (records),initializeJournal(records)]);
+      await reloadResources (); await Promise.all ([initializeQuiz (records), initializeHome (records),initializeJournal(records),initializeExamCalendar(records)]);
       resetTransientState(); initializeSaving301(records.current);
     }
     catch { location.reload(); }
@@ -180,6 +183,7 @@ async function restoreBackup (event) {
     catch {
       location.reload ();
     }
+    return true;
   }
   catch (error) {
     toast (error.message);
@@ -200,7 +204,7 @@ async function clearAll() {
     const empty = fresh(); empty.onboarded = true; empty.savedAt = new Date().toISOString();
     const snapshot = compactSnapshot(empty);
     try {
-      await Promise.all ([ctx.saveChain, waitForResourceWrites (), waitForQuizWrites (), waitForHomeWrites (), waitForJournalWrites()]);
+      await Promise.all ([ctx.saveChain, waitForResourceWrites (), waitForQuizWrites (), waitForHomeWrites (), waitForJournalWrites(),waitForExamCalendarWrites()]);
       // Keep an empty workspace so reopening an editable HTML copy cannot resurrect its embedded seed.
       await storage.replaceAll({current:snapshot});
     } catch (error) {
@@ -208,7 +212,7 @@ async function clearAll() {
     }
     ctx.state = empty;
     try {
-      await reloadResources (); await Promise.all ([initializeQuiz ({}), initializeHome ({}),initializeJournal({})]);
+      await reloadResources (); await Promise.all ([initializeQuiz ({}), initializeHome ({}),initializeJournal({}),initializeExamCalendar({})]);
       resetTransientState(); initializeSaving301(snapshot);
       for (const dialog of document.querySelectorAll('dialog[open]')) dialog.close();
       render(); toast(tr('本地数据已清除','Local data cleared'));
@@ -262,13 +266,13 @@ async function openBackupText () {
   }
 }
 async function offlineHTML () {
-  await Promise.all ([ctx.saveChain, waitForResourceWrites (), waitForQuizWrites ().catch(()=>{}), waitForHomeWrites (), waitForJournalWrites()]);
+  await Promise.all ([ctx.saveChain, waitForResourceWrites (), waitForQuizWrites ().catch(()=>{}), waitForHomeWrites (), waitForJournalWrites(),waitForExamCalendarWrites()]);
   const template = globalThis.QICHENG_PORTABLE_TEMPLATE || await (await resourceFetch ('assets/editable-template.html')).text ();
   const records = await storage.getAll ();
   const quizDraft=getQuizDraftRecord();if(quizDraft)records[QUIZ_DRAFT_KEY]=quizDraft;else delete records[QUIZ_DRAFT_KEY];
   delete records.current; delete records.__seedCleared;
   for(const key of Object.keys(records))if(key.startsWith('meta:')||key.startsWith('session:'))delete records[key];
-  assertJSON (records); validateQuizRecords (records); validateHomeRecords (records);validateJournalRecords(records);
+  assertJSON (records); validateQuizRecords (records); validateHomeRecords (records);validateJournalRecords(records);validateExamCalendarRecords(records);
   Object.assign (records, validateResourceRecords (records, {allowOfficial:true}));
   const payload = JSON.stringify ( {
     id : uid (), draft : snapshot3 (), records

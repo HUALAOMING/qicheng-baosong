@@ -6,6 +6,8 @@ const RESOURCE_SCHEMA_VERSION = 1;
 const RESOURCE_BANK_IDS = ['english-grammar', 'english-vocabulary', 'chinese-ancient-culture', 'chinese-usage'];
 const RESOURCE_SECTIONS = {english:['grammar','vocabulary'], chinese:['ancient-culture','chinese-usage'],custom:['custom']};
 const RESOURCE_MAX_BYTES = 12 * 1024 * 1024;
+// Verified source history for the unchanged 1.0.0 default banks (GitHub commit 7e4b621).
+const RESOURCE_DEFAULT_UPDATED_AT52 = '2026-10-15T22:46:16.000Z';
 let resourceBanks = [], resourceOfficialQuotes = null, resourceCustomQuotes = null;
 let resourceClassics = [];
 const EXAM_SCHEDULE_ID = 'exam-schedule';
@@ -61,6 +63,10 @@ function validateQuizBank(input) {
   if (bank.id === 'daily-quotes') throw new Error('daily-quotes 是名言资源的保留 ID。');
   resourceID(bank.subject,'科目 ID');resourceID(bank.section,'资源分组 ID');
   if (['english','chinese'].includes(bank.subject) && !RESOURCE_SECTIONS[bank.subject].includes(bank.section)) throw new Error('题库科目与章节不匹配。');
+  if (bank.updatedAt !== undefined) {
+    if(typeof bank.updatedAt!=='string'||bank.updatedAt.length>100||!Number.isFinite(Date.parse(bank.updatedAt)))throw new Error('题库更新时间必须是有效日期。');
+    cleanBank.updatedAt=new Date(bank.updatedAt).toISOString();
+  }
   if (bank.source !== undefined) cleanBank.source = resourceString(bank.source, '题库来源', 2000, true);
   if (!Array.isArray(data.questions) || data.questions.length > 20000) throw new Error('questions 必须是最多 20000 项的数组。');
   const seen = new Set();
@@ -319,7 +325,7 @@ function getClassicBooks() {
 function getResourceVersions() {
   const quotes = resourceCustomQuotes || resourceOfficialQuotes;
   const schedule=resourceCustomSchedule||resourceOfficialSchedule;
-  return {banks:resourceBanks.map(item => ({...item.bank, origin:item.origin, questionCount:item.questions.length})), classics:getClassicBooks().map(book=>({id:book.id,title:book.title,version:book.version,origin:book.origin})), quotes:quotes ? {id:'daily-quotes',version:quotes.version,origin:quotes.origin,count:quotes.quotes.length} : null,examSchedule:{id:EXAM_SCHEDULE_ID,version:schedule?.version||'1.0.0',origin:schedule?.origin||'bundled',count:schedule?.examSchedule.length||0}};
+  return {banks:resourceBanks.map(item => ({...item.bank, updatedAt:item.bank.updatedAt||(item.origin!=='custom'&&RESOURCE_BANK_IDS.includes(item.bank.id)&&item.bank.version==='1.0.0'?RESOURCE_DEFAULT_UPDATED_AT52:''), origin:item.origin, questionCount:item.questions.length})), classics:getClassicBooks().map(book=>({id:book.id,title:book.title,version:book.version,origin:book.origin})), quotes:quotes ? {id:'daily-quotes',version:quotes.version,origin:quotes.origin,count:quotes.quotes.length} : null,examSchedule:{id:EXAM_SCHEDULE_ID,version:schedule?.version||'1.0.0',origin:schedule?.origin||'bundled',count:schedule?.examSchedule.length||0}};
 }
 function importResourceJSON(input, {targetBankId,newBankName} = {}) {
   // Snapshot and validate before queuing, so callers cannot mutate queued input.
@@ -409,6 +415,10 @@ function updateResources(manifestURL = 'data/resources/manifest.json') {
       if ((clean.bank?.id || clean.book?.id || (clean.examSchedule?EXAM_SCHEDULE_ID:'daily-quotes')) !== entry.id || (clean.bank?.version || clean.book?.version || clean.version) !== entry.version) throw new Error('资源 ID 或版本与清单不一致：' + entry.id);
       const existing = resourceBanks.find(item => item.bank.id === entry.id);
       if (clean.bank && existing && (existing.bank.subject !== clean.bank.subject || existing.bank.section !== clean.bank.section)) throw new Error('资源更新不能改变题库所属科目或章节。');
+      if(clean.bank&&!clean.bank.updatedAt){
+        if(entry.updatedAt!==undefined&&(typeof entry.updatedAt!=='string'||!Number.isFinite(Date.parse(entry.updatedAt))))throw new Error('资源清单的更新时间无效：'+entry.id);
+        clean.bank.updatedAt=entry.updatedAt?new Date(entry.updatedAt).toISOString():new Date().toISOString();
+      }
       const record = {...clean, origin:'official'}; records['resource:official:' + (clean.book?'classic:':clean.examSchedule?'schedule:':'') + entry.id] = record; changed.push(record);
     }
     if (changed.length) {

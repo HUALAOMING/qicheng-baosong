@@ -16,6 +16,8 @@ let readingRecords = new Map(), dayRecords = new Map(), journalPreferences = {mo
 let journalWriteChain = Promise.resolve(), pendingWrites = new Set();
 let calendarView = 'month', calendarAnchor = journalDateKey(), selectedDate = journalDateKey();
 let readingDraft = null, readingVisible = 30, bindingAbort = null;
+let readingView = 'time', readingBookFilter = '';
+const READING_FIELDS = ['id','date','book','author','language','chapter','edition','pages','note'];
 
 function journalDateKey(date = new Date()) {
   return [date.getFullYear(), String(date.getMonth()+1).padStart(2,'0'), String(date.getDate()).padStart(2,'0')].join('-');
@@ -47,7 +49,10 @@ function validateJournalRecords(records) {
     let valid=false;
     if (key.startsWith('journal:reading:') && journalObject(value)) {
       readingCount++;
-      valid=typeof value.id==='string' && /^[A-Za-z0-9][A-Za-z0-9._-]{0,119}$/.test(value.id) && key==='journal:reading:'+value.id && journalValidDate(value.date) && typeof value.book==='string' && !!value.book.trim() && value.book.length<=200 && Number.isInteger(value.startPage) && Number.isInteger(value.endPage) && value.startPage>=1 && value.endPage>=value.startPage && value.endPage<=1000000 && journalTimestamp(value.updatedAt);
+      const text=(field,max,required=false)=>typeof value[field]==='string' && value[field].length<=max && (!required||!!value[field].trim());
+      const legacy=value.schemaVersion===undefined && Number.isInteger(value.startPage) && Number.isInteger(value.endPage) && value.startPage>=1 && value.endPage>=value.startPage && value.endPage<=1000000;
+      const current=value.schemaVersion===2 && text('author',200,true) && text('language',80,true) && text('chapter',1000,true) && text('edition',200) && text('pages',200) && text('note',20000) && journalTimestamp(value.createdAt);
+      valid=typeof value.id==='string' && /^[A-Za-z0-9][A-Za-z0-9._-]{0,119}$/.test(value.id) && key==='journal:reading:'+value.id && journalValidDate(value.date) && text('book',200,true) && (legacy||current) && journalTimestamp(value.updatedAt);
     } else if (key.startsWith('journal:day:') && journalObject(value)) {
       dayCount++;
       valid=journalValidDate(value.date) && key==='journal:day:'+value.date && !!journalStatus(value.status) && journalTimestamp(value.updatedAt);
@@ -71,7 +76,7 @@ async function initializeJournal(records) {
   }
   readingRecords=readings; dayRecords=days; sortedReadingCache=null;
   journalPreferences={motto:loaded['settings:journal']?.motto||''};
-  readingDraft=null; readingVisible=30;
+  readingDraft=null; readingVisible=30; readingView='time'; readingBookFilter='';
 }
 function journalWrite(operation) {
   const write=journalWriteChain.then(()=>{
@@ -88,11 +93,13 @@ async function waitForJournalWrites() {
   while (pendingWrites.size) await Promise.all([...pendingWrites]);
 }
 function saveReadingProgress(input) {
-  const value={id:input.id||uid(),date:input.date,book:String(input.book??'').trim(),startPage:Number(input.startPage),endPage:Number(input.endPage),updatedAt:new Date().toISOString()};
+  const now=new Date().toISOString();
+  const value={id:input.id||uid(),schemaVersion:2,date:input.date,...Object.fromEntries(READING_FIELDS.filter(key=>!['id','date'].includes(key)).map(key=>[key,String(input[key]??'').trim()])),createdAt:readingRecords.get(input.id)?.createdAt||readingRecords.get(input.id)?.updatedAt||now,updatedAt:now};
   validateJournalRecords({['journal:reading:'+value.id]:value});
   return journalWrite(async()=>{
     const prior=readingRecords.get(value.id);
-    if (prior && ['date','book','startPage','endPage'].every(key=>prior[key]===value[key])) return journalClone(prior);
+    if (prior && READING_FIELDS.every(key=>prior[key]===value[key])) return journalClone(prior);
+    if(prior)value.createdAt=prior.createdAt||prior.updatedAt;
     if (!readingRecords.has(value.id) && readingRecords.size>=JOURNAL_LIMIT) throw new Error('阅读记录已达到 10,000 条。');
     await storage.set('journal:reading:'+value.id,value);
     readingRecords.set(value.id,journalClone(value)); sortedReadingCache=null;
@@ -106,9 +113,25 @@ function deleteReadingProgress(id) {
     readingRecords.delete(id); sortedReadingCache=null; return true;
   });
 }
-function journalSortedReadings() { return sortedReadingCache??=( [...readingRecords.values()].sort((a,b)=>b.date.localeCompare(a.date)||b.updatedAt.localeCompare(a.updatedAt)||a.id.localeCompare(b.id)) ); }
+function journalSortedReadings() { return sortedReadingCache??=( [...readingRecords.values()].sort((a,b)=>(b.createdAt||b.updatedAt).localeCompare(a.createdAt||a.updatedAt)||b.updatedAt.localeCompare(a.updatedAt)||a.id.localeCompare(b.id)) ); }
 function getReadingProgress() { return journalSortedReadings().map(journalClone); }
 function getLatestReading() { return journalClone(journalSortedReadings()[0]||null); }
+function readingBookKey(book) { return String(book||'').normalize('NFKC').replace(/\s+/g,'').toLocaleLowerCase(); }
+function getReadingBooks() {
+  const books=new Map();
+  for(const reading of journalSortedReadings()) {
+    const key=readingBookKey(reading.book);
+    if(!books.has(key))books.set(key,{key,title:reading.book,author:reading.author||'',language:reading.language||'',records:[]});
+    books.get(key).records.push(journalClone(reading));
+  }
+  return [...books.values()];
+}
+function getReadingIntegration(book,date=journalDateKey()) {
+  const group=getReadingBooks().find(row=>row.key===readingBookKey(book));
+  if(!group)return null;
+  const rows=group.records.slice().sort((a,b)=>a.date.localeCompare(b.date)||(a.createdAt||a.updatedAt).localeCompare(b.createdAt||b.updatedAt));
+  return {title:group.title,author:group.records.find(row=>row.author)?.author||'',language:group.records.find(row=>row.language)?.language||'',date:journalValidDate(date)?date:journalDateKey(),reflection:rows.filter(row=>row.note?.trim()).map(row=>row.date+(row.chapter?' · '+row.chapter:'')+'\n'+row.note.trim()).join('\n\n'),count:rows.length,noteCount:rows.filter(row=>row.note?.trim()).length};
+}
 function saveDailyStatus(date,status) {
   const value={date,status,updatedAt:new Date().toISOString()};
   validateJournalRecords({['journal:day:'+date]:value});
@@ -171,12 +194,27 @@ function calendarPage() {
   const title=calendarView==='month'?month:journalDateLabel(days[0],{month:'short',day:'numeric'})+' — '+journalDateLabel(days[6],{month:'short',day:'numeric'});
   return '<div class="journal-page journal-calendar-page" id="journalCalendarPage"><header class="journal-heading"><div><p class="eyebrow">QICHENG / YOUR RHYTHM</p><h1>'+tr('学习日历','Learning calendar')+'</h1><p>'+tr('不必记录每一件事，留意每天的自己。','A small moment to reflect on your day.')+'</p></div><button data-go3="reading-progress">'+tr('阅读进度','Reading progress')+' ↗</button></header><section class="journal-calendar-panel"><div class="journal-calendar-motto"><h2>'+esc(journalPreferences.motto||tr('今日事，今日毕。','Make today count.'))+'</h2><details><summary>'+tr('自定义鼓励','Your encouragement')+'</summary><form id="journalMottoForm"><label class="field"><span>'+tr('日历标语','Calendar message')+'</span><input name="motto" maxlength="120" value="'+esc(journalPreferences.motto)+'" placeholder="'+tr('今日事，今日毕。','Make today count.')+'"></label><button type="submit">'+tr('保存标语','Save message')+'</button></form></details></div><div class="journal-calendar-toolbar"><div class="journal-calendar-navigation"><button type="button" data-journal-period="-1" aria-label="'+tr('上一段日期','Previous period')+'">‹</button><h2 aria-live="polite">'+esc(title)+'</h2><button type="button" data-journal-period="1" aria-label="'+tr('下一段日期','Next period')+'">›</button><button type="button" class="journal-today-button" data-journal-today>'+tr('今天','Today')+'</button></div><div class="journal-view-switch" role="group" aria-label="'+tr('日历视图','Calendar view')+'"><button type="button" data-journal-view="week" aria-pressed="'+(calendarView==='week')+'">'+tr('周','Week')+'</button><button type="button" data-journal-view="month" aria-pressed="'+(calendarView==='month')+'">'+tr('月','Month')+'</button></div></div>'+journalCalendarGrid()+'<p class="journal-calendar-hint">'+tr('轻点日期，记录当日状态，或设为首页倒计时目标日。','Choose a date to reflect on the day or set your Home countdown.')+'</p></section><div id="journalDayPopover" class="journal-popover" popover="auto" role="dialog" aria-modal="false" aria-labelledby="journalPopoverTitle" hidden></div></div>';
 }
-function journalBlankReading() { return {id:'',date:journalDateKey(),book:'',startPage:'',endPage:''}; }
+function journalBlankReading() { return {id:'',date:journalDateKey(),book:'',author:'',language:'',chapter:'',edition:'',pages:'',note:''}; }
+function readingEntryMarkup(row) {
+  const pages=row.pages||(row.startPage?row.startPage+' — '+row.endPage+' 页':'');
+  return '<article class="journal-reading-row"><time class="journal-reading-date" datetime="'+esc(row.date)+'"><strong>'+esc(row.date.slice(5).replace('-',' / '))+'</strong><small>'+esc(row.date.slice(0,4))+'</small></time><div class="journal-reading-detail"><h3>'+esc(row.chapter||tr('旧版页码记录','Legacy page entry'))+'</h3><p>'+esc([row.author,row.language,row.edition,pages].filter(Boolean).join(' · '))+'</p>'+(row.note?'<p class="reading-note52">'+esc(row.note)+'</p>':'')+'</div><div class="journal-reading-actions"><button type="button" data-journal-reading-edit="'+esc(row.id)+'" aria-label="'+esc(tr('编辑《'+row.book+'》阅读记录','Edit reading entry for '+row.book))+'">'+tr('编辑','Edit')+'</button><button type="button" data-journal-reading-delete="'+esc(row.id)+'" aria-label="'+esc(tr('删除《'+row.book+'》阅读记录','Delete reading entry for '+row.book))+'">'+tr('删除','Delete')+'</button></div></article>';
+}
+function readingTimelineMarkup(rows,book) {
+  return '<article class="reading-book52"><header><span class="reading-book-mark52" aria-hidden="true">'+esc(book.title.slice(0,1))+'</span><div><h3>《'+esc(book.title)+'》</h3><p>'+esc([book.author,book.language].filter(Boolean).join(' · '))+'</p></div><span class="badge">'+rows.length+tr(' 次阅读',' entries')+'</span></header><div class="reading-axis52">'+rows.map(readingEntryMarkup).join('')+'</div></article>';
+}
+function readingFootprintsMarkup() {
+  const readings=journalSortedReadings(),books=getReadingBooks();
+  if(readingBookFilter&&!books.some(book=>book.key===readingBookFilter))readingBookFilter='';
+  const filtered=readingView==='book'&&readingBookFilter?readings.filter(row=>readingBookKey(row.book)===readingBookFilter):readings;
+  const shown=filtered.slice(0,readingVisible),groups=new Map();
+  for(const row of shown){const key=readingBookKey(row.book);if(!groups.has(key))groups.set(key,[]);groups.get(key).push(row);}
+  return '<section class="journal-reading-history"><div class="journal-list-heading"><div><p class="eyebrow">READING FOOTPRINTS</p><h2>'+tr('阅读足迹','Your reading log')+'</h2></div><span>'+filtered.length+tr(' 条记录',' entries')+'</span></div><div class="reading-filters52"><label class="field"><span>'+tr('查看方式','View')+'</span><select id="readingHistoryView"><option value="time"'+(readingView==='time'?' selected':'')+'>'+tr('按时间排序 · 最近录入','By time · newest entries')+'</option><option value="book"'+(readingView==='book'?' selected':'')+'>'+tr('按书筛选','Filter by book')+'</option></select></label>'+(readingView==='book'?'<label class="field"><span>'+tr('选择书目','Choose a book')+'</span><select id="readingHistoryBook"><option value="">'+tr('全部书目','All books')+'</option>'+books.map(book=>'<option value="'+esc(book.key)+'"'+(book.key===readingBookFilter?' selected':'')+'>'+esc(book.title)+'</option>').join('')+'</select></label>':'')+'</div>'+(shown.length?'<p class="hint">'+tr('书目按最近录入时间排列，同一本书的阅读记录汇成一条纵向阅读轴。','Books appear by their latest entry, with each book collected on one reading timeline.')+'</p><div class="reading-timelines52">'+[...groups].map(([key,rows])=>readingTimelineMarkup(rows,books.find(book=>book.key===key))).join('')+'</div>'+(filtered.length>readingVisible?'<button class="journal-show-more" type="button" data-journal-reading-more>'+tr('查看更多阅读记录','Show more reading')+'</button>':''):'<div class="journal-empty"><strong>'+tr('每一页，都算数。','Every page counts.')+'</strong><p>'+tr('记下今天读到的章节，开始积累自己的阅读足迹。','Begin your reading trail with the chapter you reached today.')+'</p></div>')+'</section>';
+}
 function progressPage() {
-  const readings=journalSortedReadings(), draft=readingDraft||journalBlankReading(), recentNames=new Set();
-  for (const row of readings) { recentNames.add(row.book); if(recentNames.size>=100)break; }
-  const books=[...recentNames];
-  return '<div class="journal-page journal-progress-page" id="journalProgressPage"><header class="journal-heading"><div><p class="eyebrow">QICHENG / READING LOG</p><h1>'+tr('每日阅读进度','Reading progress')+'</h1><p>'+tr('留下一本书、一个日期和读到的页码。慢慢读，也在向前。','A book, a date and a few pages. Keep moving at your own pace.')+'</p></div><button data-go3="calendar">'+tr('学习日历','Learning calendar')+' ↗</button></header><section class="journal-reading-entry"><h2>'+tr(draft.id?'编辑阅读记录':'记下今天的阅读',draft.id?'Edit reading entry':'What did you read?')+'</h2><form id="journalReadingForm"><input type="hidden" name="id" value="'+esc(draft.id)+'"><div class="journal-reading-fields"><label class="field"><span>'+tr('阅读日期','Reading date')+'</span><input type="date" name="date" required value="'+esc(draft.date)+'"></label><label class="field journal-book-field"><span>'+tr('书目名称','Book title')+'</span><input name="book" maxlength="200" required value="'+esc(draft.book)+'" list="journalBookNames" placeholder="'+tr('例如：论语','For example: The Analects')+'"><datalist id="journalBookNames">'+books.map(book=>'<option value="'+esc(book)+'"></option>').join('')+'</datalist></label><label class="field"><span>'+tr('起始页','From page')+'</span><input type="number" name="startPage" min="1" max="1000000" step="1" required inputmode="numeric" value="'+esc(draft.startPage)+'"></label><label class="field"><span>'+tr('结束页','To page')+'</span><input type="number" name="endPage" min="1" max="1000000" step="1" required inputmode="numeric" value="'+esc(draft.endPage)+'"></label></div><div class="journal-form-actions"><button class="primary" type="submit">'+tr(draft.id?'保存修改':'保存阅读记录',draft.id?'Save changes':'Save reading')+'</button>'+(draft.id?'<button type="button" data-journal-reading-cancel>'+tr('取消编辑','Cancel edit')+'</button>':'')+'<span class="hint" id="journalReadingFeedback" role="status"></span></div></form><p class="hint">'+tr('保存后的最新书目与日期，可在“个性化内容 → 阅读与学习”一键填入；两份记录之后仍可独立修改。','Use your latest book and date in Personal content → Reading & learning. Both entries remain independently editable.')+'</p><button class="journal-reading-transfer" data-go3="learning">'+tr('前往阅读信息录入','Open reading information')+' ↗</button></section><section class="journal-reading-history"><div class="journal-list-heading"><h2>'+tr('阅读足迹','Your reading log')+'</h2><span>'+readings.length+tr(' 条记录',' entries')+'</span></div>'+(readings.length?'<div class="journal-reading-list">'+readings.slice(0,readingVisible).map(row=>'<article class="journal-reading-row"><div class="journal-reading-date"><strong>'+esc(row.date.slice(5).replace('-',' / '))+'</strong><small>'+esc(row.date.slice(0,4))+'</small></div><div class="journal-reading-detail"><h3>'+esc(row.book)+'</h3><p>'+tr('第 '+row.startPage+' — '+row.endPage+' 页','Pages '+row.startPage+' — '+row.endPage)+'<span> · '+(row.endPage-row.startPage+1)+tr(' 页',' pages')+'</span></p></div><div class="journal-reading-actions"><button type="button" data-journal-reading-edit="'+esc(row.id)+'" aria-label="'+esc(tr('编辑《'+row.book+'》阅读记录','Edit reading entry for '+row.book))+'">'+tr('编辑','Edit')+'</button><button type="button" data-journal-reading-delete="'+esc(row.id)+'" aria-label="'+esc(tr('删除《'+row.book+'》阅读记录','Delete reading entry for '+row.book))+'">'+tr('删除','Delete')+'</button></div></article>').join('')+'</div>'+(readings.length>readingVisible?'<button class="journal-show-more" type="button" data-journal-reading-more>'+tr('查看更多阅读记录','Show more reading')+'</button>':''):'<div class="journal-empty"><strong>'+tr('每一页，都算数。','Every page counts.')+'</strong><p>'+tr('添加第一条阅读记录，从今天读到的那一页开始。','Begin with the page you reached today.')+'</p></div>')+'</section></div>';
+  const draft={...journalBlankReading(),...(readingDraft||{})},books=getReadingBooks();
+  if(!draft.pages&&draft.startPage)draft.pages=draft.startPage+' — '+draft.endPage;
+  const field=(name,label,max,required=false,type='text',placeholder='')=>'<label class="field'+(name==='chapter'?' reading-chapter52':'')+'"><span>'+tr(...label)+(required?' *':tr('（选填）',' (optional)'))+'</span><input type="'+type+'" name="'+name+'" maxlength="'+max+'"'+(required?' required':'')+' value="'+esc(draft[name])+'"'+(name==='book'?' list="journalBookNames"':'')+' placeholder="'+esc(placeholder)+'"></label>';
+  return '<div class="journal-page journal-progress-page" id="journalProgressPage"><header class="journal-heading"><div><p class="eyebrow">QICHENG / READING LOG</p><h1>'+tr('每日阅读进度','Reading progress')+'</h1><p>'+tr('以章节记录阅读，把每一天的思考连成足迹。','Keep chapters and thoughts together, one reading day at a time.')+'</p></div><button data-go3="calendar">'+tr('学习日历','Learning calendar')+' ↗</button></header><section class="journal-reading-entry"><h2>'+tr(draft.id?'编辑阅读记录':'记下今天的阅读',draft.id?'Edit reading entry':'What did you read?')+'</h2><form id="journalReadingForm"><input type="hidden" name="id" value="'+esc(draft.id)+'"><div class="journal-reading-fields">'+field('date',['阅读日期','Reading date'],10,true,'date')+field('book',['书名','Book title'],200,true)+field('author',['作者','Author'],200,true)+field('language',['阅读语言','Reading language'],80,true)+field('chapter',['阅读章节','Chapters read'],1000,true,'text',tr('例如：第一章；学而篇 1—6 则','For example: Chapter 1; sections 1–6'))+field('edition',['书的版本','Edition'],200)+field('pages',['页码范围','Page range'],200,false,'text',tr('可自由填写，例如 12—30 页','For example: pages 12–30'))+'</div><datalist id="journalBookNames">'+books.map(book=>'<option value="'+esc(book.title)+'"></option>').join('')+'</datalist><label class="field"><span>'+tr('阅读小记（选填）','Reading note (optional)')+'</span><textarea name="note" rows="4" maxlength="20000" placeholder="'+tr('留下一点想法，之后可一键整合为阅读心得。','Save a thought to combine into your reading reflection later.')+'">'+esc(draft.note)+'</textarea></label><div class="journal-form-actions"><button class="primary" type="submit">'+tr(draft.id?'保存修改':'保存阅读记录',draft.id?'Save changes':'Save reading')+'</button>'+(draft.id?'<button type="button" data-journal-reading-cancel>'+tr('取消编辑','Cancel edit')+'</button>':'')+'<span class="hint" id="journalReadingFeedback" role="status"></span></div></form><p class="hint">'+tr('仅日期、书名、作者、阅读语言与章节必填。保存后自动加入阅读足迹。','Only date, title, author, reading language and chapters are required. Saved entries join your reading timeline.')+'</p><button class="journal-reading-transfer" data-go3="learning">'+tr('整合为阅读经历','Create a reading experience')+' ↗</button></section>'+readingFootprintsMarkup()+'</div>';
 }
 function journalPage() { return calendarPage(); }
 function journalRefresh(id,markup,focus) {
@@ -263,14 +301,16 @@ function bindJournalControls() {
   if (progress) {
     const form=$('#journalReadingForm');
     if (form) {
-      form.oninput=()=>{readingDraft=Object.fromEntries(['id','date','book','startPage','endPage'].map(key=>[key,form.elements[key].value]));const end=form.elements.endPage;end.setCustomValidity(end.value&&form.elements.startPage.value&&Number(end.value)<Number(form.elements.startPage.value)?tr('结束页不能早于起始页。','The last page cannot precede the first.'): '');};
+      form.oninput=()=>{readingDraft=Object.fromEntries(READING_FIELDS.map(key=>[key,form.elements[key].value]));};
       form.onsubmit=async event=>{
         event.preventDefault(); if(!form.reportValidity())return;
         const button=form.querySelector('[type="submit"]');button.disabled=true;
-        try {await saveReadingProgress(Object.fromEntries(['id','date','book','startPage','endPage'].map(key=>[key,form.elements[key].value])));readingDraft=null;journalRefresh('journalProgressPage',progressPage);const feedback=$('#journalReadingFeedback');if(feedback)feedback.textContent=tr('阅读记录已保存。','Reading saved.');}
+        try {await saveReadingProgress(Object.fromEntries(READING_FIELDS.map(key=>[key,form.elements[key].value])));readingDraft=null;journalRefresh('journalProgressPage',progressPage);const feedback=$('#journalReadingFeedback');if(feedback)feedback.textContent=tr('阅读记录已保存。','Reading saved.');}
         catch(error) {toast(error.message);button.disabled=false;}
       };
     }
+    const view=$('#readingHistoryView');if(view)view.onchange=()=>{readingView=view.value;readingVisible=30;journalRefresh('journalProgressPage',progressPage,'#readingHistoryView');};
+    const book=$('#readingHistoryBook');if(book)book.onchange=()=>{readingBookFilter=book.value;readingVisible=30;journalRefresh('journalProgressPage',progressPage,'#readingHistoryBook');};
     $$('[data-journal-reading-more]').forEach(button=>button.onclick=()=>{readingVisible+=30;journalRefresh('journalProgressPage',progressPage);});
     $$('[data-journal-reading-edit]').forEach(button=>button.onclick=()=>{readingDraft=journalClone(readingRecords.get(button.dataset.journalReadingEdit));journalRefresh('journalProgressPage',progressPage,'#journalReadingForm input[name="book"]');});
     $$('[data-journal-reading-cancel]').forEach(button=>button.onclick=()=>{readingDraft=null;journalRefresh('journalProgressPage',progressPage);});
@@ -282,4 +322,4 @@ function bindJournalControls() {
   }
 }
 
-export { initializeJournal, validateJournalRecords, waitForJournalWrites, calendarPage, progressPage, journalPage, bindJournalControls, getReadingProgress, getLatestReading, saveReadingProgress, deleteReadingProgress, saveDailyStatus, deleteDailyStatus, saveJournalPreferences, homeRecentStatusMarkup, getRecentStatus, journalDateKey, journalValidDate, journalShiftDate, getCalendarDays };
+export { initializeJournal, validateJournalRecords, waitForJournalWrites, calendarPage, progressPage, journalPage, bindJournalControls, getReadingProgress, getLatestReading, getReadingBooks, getReadingIntegration, readingBookKey, saveReadingProgress, deleteReadingProgress, saveDailyStatus, deleteDailyStatus, saveJournalPreferences, homeRecentStatusMarkup, getRecentStatus, journalDateKey, journalValidDate, journalShiftDate, getCalendarDays };

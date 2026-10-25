@@ -16,6 +16,7 @@ import { bindQuizControls } from './modules/quiz.js';
 import { bindExploreControls } from './modules/explore.js';
 import {bindJournalControls} from './modules/journal.js';
 import {bindExamCalendarControls} from './modules/exam-calendar.js';
+import {bindIntroductions52} from './modules/introductions.js';
 // Binding coordinator; each feature owns its controls.
 function bind () {
   bindProfileControls ();
@@ -36,5 +37,6 @@ function bind () {
   bindExploreControls ();
   bindJournalControls();
   bindExamCalendarControls();
+  bindIntroductions52();
 }
 export { bind };

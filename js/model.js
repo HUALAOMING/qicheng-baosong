@@ -13,7 +13,8 @@ function newVersion (name = '我的第一份简历') {
     }, breaks : [], palette : 'pudding', background : 'accent', margin : 18, fontSize : 11, lineHeight : 1.55, gap : 10,
     orientation : 'portrait', statementLang : 'both', exportLang : 'zh', photoMode : 'appendix', photosPerRow : 2, showAvatar : true,
     avatarSize : 30, avatarShape : 'square', avatarRatioW : 2, avatarRatioH : 3, boldLabels : true, showToc : false, wordImages : false,
-    wordBW : true, pptMode : 'editable', showPageNumbers : true, pageDecoration : 'plain'
+    wordBW : false, pptMode : 'editable', showPageNumbers : true, pageDecoration : 'plain',
+    paperColor : '#ffffff', lineColor : '#d6d6d6', titleColor : '#000000', paperImage : '', layoutPreset : 'standard'
   };
 }
 
@@ -33,7 +34,8 @@ function cleanModuleStyle (s) {
   return {
     titleSize : clamp (s?.titleSize, 10, 28, 14), titleAlign : s?.titleAlign === 'center' ? 'center' : 'left', titleBold : s?.titleBold !== false,
     subtitleSize : clamp (s?.subtitleSize, 9, 20, 12), subtitleAlign : s?.subtitleAlign === 'center' ? 'center' : 'left',
-    subtitleBold : s?.subtitleBold !== false, labelBold : s?.labelBold !== false
+    subtitleBold : s?.subtitleBold !== false, labelBold : s?.labelBold !== false,
+    titleColor : /^#[0-9a-f]{6}$/i.test(s?.titleColor) ? s.titleColor : ''
   }
 }
 
@@ -100,7 +102,7 @@ function fresh () {
     route : 'home', section : 'resume', step : 0, orientation : 'portrait', sidebarHidden : true, menuOpen : ['start'],
     profile : Object.fromEntries (PROFILE.map (([key]) => [key, ''])), education : EDU_STAGES.slice (0, 3).map (blankEducation),
     statement : {
-      zh : '', en : '', strengths : '', hobbies : ''
+      zh : '', en : '', otherLanguage : '', other : '', strengths : '', hobbies : ''
     }, academics : {
       languageLearning : '', certificates : ''
     }, awards : [], experiences : [], practices : [], achievements : [], exams : [], learning : {
@@ -114,6 +116,7 @@ function fresh () {
     }, avatar : null, avatarCrop : {
       x : 50, y : 50, zoom : 1
     }, customBlocks : [], media : [], versions : [version], activeVersion : version.id, assets : [], exportHistory : [],
+    introductions : [], introductionDraft : {id:'',title:'',language:'',minutes:'1',seconds:'0',note:'',body:''},
     chartExamIds : [], chartSelectionSet : false, chartMetric : 'totalScore', chartSubject : '', organizeModes : {
       awards : 'scope', experiences : 'custom', practices : 'custom'
     }, filePackageName : '我的个人资料', savedAt : null

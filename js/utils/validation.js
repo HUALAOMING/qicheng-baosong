@@ -66,12 +66,26 @@ function validateDraft (input) {
   object (input, 'current');
   if (input.format !== 'qicheng-resume' || input.version !== 6) throw new Error ('这不是当前 PWA 版本的启程数据。');
   const s = clone (input), defaults = fresh ();
+  // Additive 5.2 fields: old 5.1 workspaces and backups remain readable.
+  for (const key of ['introductions','introductionDraft']) if (!Object.hasOwn(s,key)) s[key]=clone(defaults[key]);
+  if (s.statement && !Object.hasOwn(s.statement,'other')) s.statement.other='';
+  if (s.statement && !Object.hasOwn(s.statement,'otherLanguage')) s.statement.otherLanguage='';
   // Navigation is deliberately omitted from backups. Older backups retain these fields.
   for (const key of ['route', 'section', 'step', 'sidebarHidden', 'menuOpen']) if (! Object.hasOwn (s, key)) s[key] = clone(defaults[key]);
   for (const key of Object.keys (defaults)) if (! Object.hasOwn (s, key)) fail ('current.' + key + '（必要字段缺失）');
   text (s.appVersion, 'appVersion');
   fields (s.profile, PROFILE, 'profile');
   fields (s.statement, [['zh'], ['en'], ['strengths'], ['hobbies']], 'statement');
+  fields(s.statement,[['otherLanguage'],['other']],'statement');
+  list(s.introductions,'introductions',1000);unique(s.introductions.map(x=>x?.id),'introductions');
+  for(const item of s.introductions){
+    object(item,'introductions');id(item.id,'introductions.id');
+    fields(item,[['title'],['language'],['note'],['body'],['updatedAt']],'introductions');
+    if(!item.language.trim()||!item.body.trim()||!Number.isFinite(Date.parse(item.updatedAt)))fail('introductions');
+    number(item.durationSeconds,1,86400,'introductions.durationSeconds');
+    if(!Number.isInteger(item.durationSeconds))fail('introductions.durationSeconds');
+  }
+  fields(s.introductionDraft,[['id'],['title'],['language'],['minutes'],['seconds'],['note'],['body']],'introductionDraft');
   fields (s.academics, [['languageLearning'], ['certificates']], 'academics');
   object (s.learning, 'learning');
   ['readingNotes', 'plan', 'notes'].forEach (k => text (s.learning [k], 'learning.' + k));
@@ -182,6 +196,10 @@ function validateDraft (input) {
   unique (s.versions.map (v => v?.id), 'versions');
   for (const v of s.versions) {
     object (v, 'versions');
+    for(const [key,value] of Object.entries({paperColor:'#ffffff',lineColor:'#d6d6d6',titleColor:'#000000',paperImage:'',layoutPreset:'custom'})) if(!Object.hasOwn(v,key))v[key]=value;
+    for(const key of ['paperColor','lineColor','titleColor'])if(!/^#[0-9a-f]{6}$/i.test(v[key]))fail('versions.'+key);
+    if(typeof v.paperImage!=='string'||v.paperImage.length>6000000||(v.paperImage&&!/^data:image\/(?:png|jpeg);base64,[A-Za-z0-9+/]+={0,2}$/.test(v.paperImage)))fail('versions.paperImage');
+    choice(v.layoutPreset,['compact','standard','airy','custom'],'versions.layoutPreset');
     id (v.id, 'versions.id');
     ['name', 'target', 'filename'].forEach (k => text (v [k], 'versions.' + k));
     for (const k of ['order', 'disabled', 'excluded', 'hiddenFields', 'includedFields', 'breaks']) stringList (v [k],
@@ -194,6 +212,7 @@ function validateDraft (input) {
     for (const [key, st] of Object.entries (v.moduleStyles)) {
       choice (key, MODULES, 'moduleStyles');
       object (st, 'moduleStyles.' + key);
+      if(Object.hasOwn(st,'titleColor')&&st.titleColor!==''&&!/^#[0-9a-f]{6}$/i.test(st.titleColor))fail('moduleStyles.titleColor');
       for (const k of ['titleSize', 'subtitleSize']) number (st [k], k === 'titleSize' ? 10 : 9, k === 'titleSize' ? 28 : 20,
       'moduleStyles.' + k);
       for (const k of ['titleAlign', 'subtitleAlign']) choice (st [k], ['left', 'center'], 'moduleStyles.' + k);

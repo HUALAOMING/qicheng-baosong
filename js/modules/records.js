@@ -8,13 +8,15 @@ import { confirmAction, render, changed, go3 } from '../app.js';
 import { draftFor3 } from './resume.js';
 import { attachmentPanel3 } from './materials.js';
 import { organizeMode3, scopeOrder3 } from './organization.js';
-import {getLatestReading} from './journal.js';
+import {getReadingBooks,getReadingIntegration,journalDateKey} from './journal.js';
+let readingEntryMode='manual', readingImportBook='';
 // 启程 · js/modules/records.js
 
 
 async function collect22 (kind) {
   if (ctx.busy) return;
   const d = ctx.state [draftKeys [kind]];
+  if(kind==='books'&&!d.date)d.date=journalDateKey();
   if (kind === 'exams') {
     if (! draftHasContent (kind)) return toast ('请填写考试日期、名称或成绩。');
     if (! d.title.trim ()) d.title = [d.date, d.type].filter (Boolean).join (' ');
@@ -98,19 +100,13 @@ function recordsCards3 (kind) {
 }
 
 function learningPage3 () {
-  const b = ctx.state.bookDraft;
-  const progress=getLatestReading();
-  return heading3 ('PERSONAL / READING', tr ('为读过的书，留下自己的思考。', 'Keep your thoughts on what you read.'), tr ('阅读、资料与学习计划可单独导出为阅读档案，也可选入简历。',
-  'Export a reading dossier, or choose selected records for your resume.')) + (progress?'<aside class="reading-progress-shortcut"><p>'+tr('最新阅读：','Latest progress: ')+esc(progress.book)+' · '+esc(progress.date)+' · '+progress.startPage+'–'+progress.endPage+tr(' 页',' pages')+'</p><button data-reading-quickfill>'+tr('用最新进度填入书名与日期','Fill title and date from latest progress')+'</button></aside>':'') + '<div class="entry-grid3"><div><section class="panel"><h2>' +
-  tr (ctx.editing.books ? '编辑阅读记录' : '添加书目与学习资料', ctx.editing.books ? 'Edit reading record' : 'Add reading or study materials') +
-  '</h2><form id="bookForm">' + input ('bookDraft.title', '书名 / 学习主题 *', b.title, '', 'text', 'required') + '<div class="grid2">' +
-  input ('bookDraft.author', '作者 / 资料来源', b.author) + input ('bookDraft.language', '阅读语言', b.language) + select ('bookDraft.status',
-  '阅读进度', b.status, ['计划阅读', '在读', '已读完']) + input ('bookDraft.date', '记录日期', b.date, '', 'date') + '</div>' + area ('bookDraft.reflection',
-  '阅读心得与学习记录', b.reflection) + attachmentPanel3 ('bookDraft') + formActions ('books', '这条记录') + '</form></section><section class="panel learning-notes">' +
-  area ('learning.readingNotes', '阅读随记与已有书单', ctx.state.learning.readingNotes) + area ('learning.plan', '学习计划', ctx.state.learning.plan) +
-  area ('learning.notes', '其他学习记录', ctx.state.learning.notes) + '</section></div><section class="panel entry-list3"><div class="panel-title"><h2>' +
-  tr ('阅读与学习资料', 'Your reading & learning') + '</h2><span class="badge">' + ctx.state.learning.books.length + '</span></div>' +
-  recordsCards3 ('books') + '</section></div>'
+  const b=ctx.state.bookDraft,books=getReadingBooks();
+  if(!books.some(book=>book.key===readingImportBook))readingImportBook=books[0]?.key||'';
+  const selected=books.find(book=>book.key===readingImportBook),integration=selected?getReadingIntegration(selected.title):null;
+  return heading3('PERSONAL / READING',tr('阅读经历','Reading experiences'),tr('从头写一段阅读经历，或将每日阅读进度整理成自己的阅读心得。','Write a reading experience, or bring your daily reading entries together.'))+
+  '<div class="entry-grid3"><section class="panel reading-experience52"><div class="panel-title"><h2>'+tr(ctx.editing.books?'编辑阅读经历':'添加阅读经历',ctx.editing.books?'Edit reading experience':'Add a reading experience')+'</h2><button data-go3="reading-progress">'+tr('每日阅读进度','Daily reading')+' ↗</button></div><div class="reading-entry-modes52" role="group" aria-label="'+tr('阅读录入方式','Reading entry method')+'"><button type="button" data-reading-mode="manual" aria-pressed="'+(readingEntryMode==='manual')+'">'+tr('自己撰写','Write from scratch')+'</button><button type="button" data-reading-mode="progress" aria-pressed="'+(readingEntryMode==='progress')+'">'+tr('从每日进度整合','Combine daily progress')+'</button></div>'+
+  (readingEntryMode==='progress'?'<aside class="reading-import52">'+(books.length?'<label class="field"><span>'+tr('选择已有阅读足迹的书目','Choose a book from your reading log')+'</span><select id="readingExperienceBook">'+books.map(book=>'<option value="'+esc(book.key)+'"'+(book.key===readingImportBook?' selected':'')+'>'+esc(book.title)+'</option>').join('')+'</select></label><p class="hint">'+(integration?integration.count:0)+tr(' 条阅读记录；',' reading entries; ')+(integration?integration.noteCount:0)+tr(' 条阅读小记。书名、作者和语言将自动填入，日期默认为今天，均可继续修改。',' reading notes. Title, author and language are filled automatically; the date defaults to today and remains editable.')+'</p><div class="actions"><button type="button" data-reading-import>'+tr('填入书目信息','Fill book details')+'</button><button type="button" data-reading-merge-notes'+(integration?.noteCount?'':' disabled')+'>'+tr('一键合并全部小记','Combine all reading notes')+'</button></div>':'<p>'+tr('先在每日阅读进度中添加一本书，再回到这里整合。','Add a daily reading entry first to combine it here.')+'</p>')+'</aside>':'')+
+  '<form id="bookForm">'+input('bookDraft.title','书名 *',b.title,'','text','required')+'<div class="grid2">'+input('bookDraft.author','作者',b.author)+input('bookDraft.language','阅读语言',b.language)+select('bookDraft.status','阅读进度',b.status,['计划阅读','在读','已读完'])+input('bookDraft.date','阅读日期',b.date||journalDateKey(),'','date')+'</div>'+area('bookDraft.reflection','阅读心得',b.reflection,'可以自由撰写，也可以整合阅读小记后继续修改。','rows="9"')+attachmentPanel3('bookDraft')+formActions('books','这段阅读经历')+'</form></section><section class="panel entry-list3"><div class="panel-title"><h2>'+tr('已收录阅读经历','Saved reading experiences')+'</h2><span class="badge">'+ctx.state.learning.books.length+'</span></div>'+recordsCards3('books')+'</section></div><section class="panel learning-notes reading-other-learning52"><h2>'+tr('其他学习记录与计划','Other study notes & plans')+'</h2>'+area('learning.readingNotes','阅读随记与已有书单',ctx.state.learning.readingNotes)+area('learning.plan','学习计划',ctx.state.learning.plan)+area('learning.notes','其他学习记录',ctx.state.learning.notes)+'</section>';
 }
 
 async function collect (kind) {
@@ -144,11 +140,19 @@ export { collect22, editRecord, deleteRecord, entryPage3, recordsCards3, learnin
 
 // All controls for this feature, in their original override order.
 function bindRecordsControls () {
-  const quickfill=$('[data-reading-quickfill]');if(quickfill)quickfill.onclick=()=>{
-    const reading=getLatestReading();if(!reading||ctx.busy)return;
-    if(ctx.state.bookDraft.title===reading.book&&ctx.state.bookDraft.date===reading.date)return;
-    ctx.state.bookDraft.title=reading.book;ctx.state.bookDraft.date=reading.date;
-    changed();toast(tr('已填入书名与日期，可继续编辑后收录','Title and date filled. Edit freely before saving the record.'));
+  $$('[data-reading-mode]').forEach(button=>button.onclick=()=>{readingEntryMode=button.dataset.readingMode;render();});
+  const bookChoice=$('#readingExperienceBook');if(bookChoice)bookChoice.onchange=()=>{readingImportBook=bookChoice.value;render();};
+  const selectedIntegration=()=>{const book=getReadingBooks().find(row=>row.key===readingImportBook);return book?getReadingIntegration(book.title):null;};
+  const fill=$('[data-reading-import]');if(fill)fill.onclick=()=>{
+    const reading=selectedIntegration();if(!reading||ctx.busy)return;
+    Object.assign(ctx.state.bookDraft,{title:reading.title,author:reading.author,language:reading.language,date:reading.date});
+    changed();toast(tr('书目信息已填入，日期默认为今天，可继续修改','Book details filled with today’s date. You can edit every field.'));
+  };
+  const merge=$('[data-reading-merge-notes]');if(merge)merge.onclick=async()=>{
+    const reading=selectedIntegration();if(!reading?.reflection||ctx.busy)return;
+    const current=ctx.state.bookDraft.reflection?.trim();
+    if(current&&current!==reading.reflection&&!await confirmAction(tr('用全部阅读小记替换当前心得？','Replace the reflection with all reading notes?'),tr('当前心得将替换为这本书全部已录入的小记，合并后仍可自行修改。','This combines all saved notes for the selected book. You can edit the result afterward.')))return;
+    ctx.state.bookDraft.reflection=reading.reflection;changed();toast(tr('全部阅读小记已合并，可继续修改','All reading notes combined. You can keep editing.'));
   };
   $$ ('[data-edit]').forEach (b => b.onclick = () => editRecord (...b.dataset.edit.split (':')));
   $$ ('[data-delete]').forEach (b => b.onclick = () => deleteRecord (...b.dataset.delete.split (':')));

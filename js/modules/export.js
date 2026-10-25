@@ -2,7 +2,7 @@ import { ctx } from '../state.js';
 import { $, $$, clone, dataBytes, download, esc, loadImage, readFile, safeFilename3, toast, tr, uid } from '../utils/helpers.js';
 import { FONT_CJK, FONT_LATIN } from '../data.js';
 import { currentVersion, fieldVisible, moduleStyle } from '../model.js';
-import { PALETTES } from '../constants.js';
+import { VERSION } from '../constants.js';
 import { exportLabel, exportRows, preflight3, textRows } from './resume.js';
 import { avatarData, exportPhotoData } from './images.js';
 import { assetBy3 } from './materials.js';
@@ -61,16 +61,29 @@ function wrapText (text, size, width) {
 }
 
 function exportColors (v = currentVersion ()) {
-  if (v.palette === 'bw' || v.background === 'none') return {
-    bg : '#ffffff', paper : '#ffffff', ink : '#111111', muted : '#555555', accent : '#111111', line : '#cccccc'
-  };
-  const p = PALETTES [v.palette];
-  return v.background === 'full' ? {
-    bg : p [0], paper : p [1], ink : p [2], muted : p [3], accent : p [4], line : p [5]
-  } : {
-    bg : '#ffffff', paper : '#ffffff', ink : '#222222', muted : '#666666', accent : v.palette === 'pudding' ? '#936600' : v.palette === 'jade' ?
-    '#176856' : p [4], line : '#d6d6d6'
-  };
+  const hex = (value, fallback) => /^#[0-9a-f]{6}$/i.test (value || '') ? value : fallback;
+  return { bg : hex (v.paperColor, '#ffffff'), paper : hex (v.paperColor, '#ffffff'), ink : '#000000', muted : '#000000',
+    accent : hex (v.titleColor, '#000000'), line : hex (v.lineColor, '#d6d6d6') };
+}
+
+const paperImageCache52 = new Map ();
+async function paperBackground52 (v, width, height) {
+  if (!/^data:image\/(png|jpeg);base64,[A-Za-z0-9+/=]+$/.test (v.paperImage || '')) return '';
+  const key = v.paperImage + '|' + width + '|' + height + '|' + exportColors (v).paper;
+  if (!paperImageCache52.has (key)) {
+    const task = (async () => {
+      const image = await loadImage (v.paperImage), canvas = document.createElement ('canvas'), scale = 2;
+      canvas.width = Math.round (width * scale); canvas.height = Math.round (height * scale);
+      const draw = canvas.getContext ('2d'), ratio = Math.max (canvas.width / image.width, canvas.height / image.height);
+      draw.fillStyle = exportColors (v).paper; draw.fillRect (0, 0, canvas.width, canvas.height);
+      draw.drawImage (image, (canvas.width - image.width * ratio) / 2, (canvas.height - image.height * ratio) / 2, image.width * ratio, image.height * ratio);
+      return canvas.toDataURL ('image/jpeg', .92);
+    }) ();
+    paperImageCache52.set (key, task);
+    if (paperImageCache52.size > 3) paperImageCache52.delete (paperImageCache52.keys ().next ().value);
+    task.catch (() => paperImageCache52.delete (key));
+  }
+  return paperImageCache52.get (key);
 }
 
 // Page numbers refer to physical pages, including every contents page. No fixed +1 assumption.
@@ -104,7 +117,7 @@ function decorateDocumentPages (plan, margin) {
   const { W, H, pages, colors : c, version : v } = plan, m = margin, width = W - 2 * m;
   const decoration = v.pageDecoration || 'plain';
   pages.forEach ((page, index) => {
-    const chrome = [];
+    const chrome = plan.backgroundData ? [{ kind : 'image', role : 'paper-background', data : plan.backgroundData, x : 0, y : 0, w : W, h : H }] : [];
     if (decoration === 'frame') {
       const edge = Math.max (10, m * .45), line = .6;
       chrome.push ({ kind : 'line', role : 'page-frame', x : edge, y : edge, w : W - edge * 2, h : line, color : c.line },
@@ -112,7 +125,7 @@ function decorateDocumentPages (plan, margin) {
       { kind : 'line', role : 'page-frame', x : edge, y : edge, w : line, h : H - edge * 2, color : c.line },
       { kind : 'line', role : 'page-frame', x : W - edge, y : edge, w : line, h : H - edge * 2, color : c.line });
     }
-    chrome.push ({ kind : 'line', role : 'page-accent', x : m, y : m, w : decoration === 'editorial' ? Math.min (90, width * .25) : width, h : decoration === 'editorial' ? 3 : 1.2, color : c.accent });
+    chrome.push ({ kind : 'line', role : 'page-accent', x : m, y : m, w : decoration === 'editorial' ? Math.min (90, width * .25) : width, h : decoration === 'editorial' ? 3 : 1.2, color : c.line });
     page.items.unshift (...chrome);
     if (v.showPageNumbers !== false) {
       const number = (index + 1) + ' / ' + pages.length;
@@ -258,7 +271,7 @@ async function documentPlan () {
         portraitLeft = W - m - size
       }
       y += v.gap;
-      const headingPage = text (r.text, style.titleSize, c.accent, style.titleBold, 5, m, contentW, style.titleAlign);
+      const headingPage = text (r.text, style.titleSize, /^#[0-9a-f]{6}$/i.test (style.titleColor || '') ? style.titleColor : c.accent, style.titleBold, 5, m, contentW, style.titleAlign);
       // The actual text placement wins over estimates, including oversized/wrapped custom headings.
       tocEntries.push ({ text : r.text, page : headingPage });
       items.push ( {
@@ -304,7 +317,7 @@ async function documentPlan () {
   }
   const contents = buildContentsPages (tocEntries, { W, H, m, contentW, bottom, version : v, colors : c });
   pages.unshift (...contents);
-  return decorateDocumentPages ({ W, H, pages, colors : c, version : v, tocPageCount : contents.length,
+  return decorateDocumentPages ({ W, H, pages, colors : c, version : v, backgroundData : await paperBackground52 (v, W, H), tocPageCount : contents.length,
     tocEntries : tocEntries.map (entry => ({ ...entry, page : entry.page + contents.length })) }, m);
 }
 
@@ -418,13 +431,13 @@ async function pdfBytes (plan) {
     }
   }
   d.setTitle (currentVersion ().name);
-  d.setCreator ('Qicheng Personal Studio 5.1');
+  d.setCreator ('Qicheng Personal Studio ' + VERSION);
   return d.save ();
 }
 
 async function wordBlob () {
   const v = clone (currentVersion ()), rows = v.wordImages ? exportRows () : textRows (), col = v.wordBW ? {
-    ink : '#000000', accent : '#000000', muted : '#444444', line : '#bbbbbb'
+    bg : '#ffffff', paper : '#ffffff', ink : '#000000', accent : '#000000', muted : '#000000', line : '#bbbbbb'
   } : exportColors (v), {
     Document, Paragraph, TextRun, Packer, ImageRun, PageBreak, HeadingLevel, AlignmentType, Footer, Header, PageNumber, TableOfContents, BorderStyle
   }
@@ -505,18 +518,25 @@ async function wordBlob () {
     }
     else runs = String (r.text || '').split ('\n').map ((t, j) => new TextRun ( {
       text : t, break : j ? 1 : 0, bold : r.kind === 'section' ? style.titleBold : r.kind === 'entry' ? style.subtitleBold : false,
-      font : 'Microsoft YaHei', size, color : (r.kind === 'section' ? col.accent : col.ink).slice (1)
+      font : 'Microsoft YaHei', size, color : (r.kind === 'section' ? !v.wordBW && /^#[0-9a-f]{6}$/i.test (style.titleColor || '') ? style.titleColor : col.accent : col.ink).slice (1)
     }));
     children.push (new Paragraph ( {
       heading, alignment : (r.kind === 'section' ? style.titleAlign : r.kind === 'entry' ? style.subtitleAlign : 'left') === 'center' ?
       AlignmentType.CENTER : AlignmentType.LEFT, keepNext : ! ! heading, spacing : {
         before : r.kind === 'section' ? v.gap * 20 : 40, after : 80, line : Math.round (v.lineHeight * 240)
-      }, children : runs
+      }, border : r.kind === 'section' ? { bottom : { style : BorderStyle.SINGLE, size : 4, color : col.line.slice (1), space : 5 } } : undefined, children : runs
     }))
   }
-  const landscape = v.orientation === 'landscape', border = { style : BorderStyle.SINGLE, size : 4, color : col.line.slice (1), space : 12 },
+  const landscape = v.orientation === 'landscape', background = !v.wordBW ? await paperBackground52 (v, landscape ? 841.89 : 595.28, landscape ? 595.28 : 841.89) : '',
+  headerChildren = [], border = { style : BorderStyle.SINGLE, size : 4, color : col.line.slice (1), space : 12 };
+  if (background) headerChildren.push (new Paragraph ({ children : [new ImageRun ({
+    data : dataBytes (background), type : 'jpg', transformation : { width : landscape ? 1122.52 : 793.71, height : landscape ? 793.71 : 1122.52 },
+    floating : { horizontalPosition : { relative : 'page', offset : 0 }, verticalPosition : { relative : 'page', offset : 0 }, behindDocument : true, allowOverlap : true, layoutInCell : false, zIndex : 0 }
+  })] }));
+  headerChildren.push (new Paragraph ({ border : { bottom : { style : BorderStyle.SINGLE, size : v.pageDecoration === 'editorial' ? 12 : 4, color : col.line.slice (1), space : 3 } }, children : [] }));
+  const
   doc = new Document ( {
-    creator : 'Qicheng Personal Studio 5.1', title : v.name, features : { updateFields : true }, styles : {
+    creator : 'Qicheng Personal Studio ' + VERSION, title : v.name, background : { color : col.paper.slice (1) }, features : { updateFields : true }, styles : {
       default : {
         document : {
           run : {
@@ -540,7 +560,7 @@ async function wordBlob () {
         }
       }, footers : v.showPageNumbers !== false ? { default : new Footer ({ children : [new Paragraph ({ alignment : AlignmentType.RIGHT,
         children : [new TextRun ({ children : [PageNumber.CURRENT, ' / ', PageNumber.TOTAL_PAGES], size : 16, color : col.muted.slice (1) })] })] }) } : undefined,
-      headers : v.pageDecoration === 'editorial' ? { default : new Header ({ children : [new Paragraph ({ border : { bottom : { style : BorderStyle.SINGLE, size : 12, color : col.accent.slice (1), space : 3 } }, children : [] })] }) } : undefined,
+      headers : { default : new Header ({ children : headerChildren }) },
       children : children.length ? children : [new Paragraph ('')]
     }]
   });

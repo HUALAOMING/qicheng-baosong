@@ -26,7 +26,10 @@ import { explorePage, readingPage, classicPage, exploreBook } from './modules/ex
 import { academicsPage, educationPage, profilePage, statementPage } from './modules/profile.js';
 import { bind } from './events.js';
 import {initializeJournal,validateJournalRecords,calendarPage,progressPage} from './modules/journal.js';
-import {examCalendarPage} from './modules/exam-calendar.js';
+import {examCalendarPage,initializeExamCalendar,validateExamCalendarRecords} from './modules/exam-calendar.js';
+import {introductionsPage52} from './modules/introductions.js';
+import {saveLocalFile52,showStartupChoice52} from './local-files52.js';
+import {getPageHelp52} from './modules/page-help52.js';
 // 启程 · js/app.js
 
 function confirmAction (title, message, label = '确认') {
@@ -112,7 +115,7 @@ function routeName3 (route = ctx.state.route) {
 
 function routeGroup3 (route = ctx.state.route) {
   if (['settings','backup','daily-quote'].includes(route)) return undefined;
-  if (['quiz', 'reading', 'explore','calendar','reading-progress'].includes(route) || route.startsWith ('classic:')) return NAV3.find (g => g.id === 'learning-center');
+  if (['quiz', 'reading', 'explore','calendar','reading-progress','self-introductions'].includes(route) || route.startsWith ('classic:')) return NAV3.find (g => g.id === 'learning-center');
   return NAV3.find (g => g.items.some (x => x [0] === route)) || NAV3.find (g => g.id === 'info')
 }
 
@@ -138,7 +141,7 @@ function shell (content) {
   const navVisible = isMobile ? document.body.classList.contains ('nav-mobile-open') : ! ctx.state.sidebarHidden;
   const breadcrumb = isHome ? '<strong>'+tr('首页','Home')+'</strong>' : tr(active?.zh||'工作台',active?.en||'Workspace')+' <em>/</em> <strong>'+esc(routeName3())+'</strong>';
   const navigation = NAV3.map (g => g.standalone ? '<button data-go3="home" class="nav-home ' + (isHome ? 'active' : '') + '" ' + (isHome ? 'aria-current="page"' : '') + '>' + icon3('home') + '<span>' + tr(g.zh,g.en) + '</span></button>' : '<section class="nav-group ' + (ctx.state.menuOpen.includes (g.id) ? 'is-open' : '') + '"><button class="nav-group-toggle ' + (g.id === active?.id ? 'active-group' : '') + '" data-nav-group="' + g.id + '" aria-expanded="' + ctx.state.menuOpen.includes (g.id) + '">' + icon3 (g.icon) + '<span>' + tr (g.zh, g.en) + '</span><i>' + icon3 ('chevron') + '</i></button><div class="nav-sub" ' + (ctx.state.menuOpen.includes (g.id) ? '' : 'inert') + '><div>' + g.items.map (x => '<button data-go3="' + x[0] + '" class="nav-item ' + ((ctx.state.route === x[0] || (x[0] === 'reading' && ctx.state.route.startsWith('classic:'))) ? 'active' : '') + '" ' + ((ctx.state.route === x[0] || (x[0] === 'reading' && ctx.state.route.startsWith('classic:'))) ? 'aria-current="page"' : '') + '>' + tr (x[1], x[2]) + '</button>').join ('') + '</div></div></section>').join ('');
-  return '<div class="shell3 '+(ctx.state.sidebarHidden?'nav-hidden':'')+'"><button class="nav-backdrop" data-action3="toggleNav" aria-label="'+tr('收起菜单','Close menu')+'"></button><aside class="sidebar3" id="sidebar3" '+(navVisible?'':'inert')+'><a class="brand3" href="#" data-go3="home"><span class="brand-mark">'+LOGO+'</span><span><strong>启程</strong><small>PERSONAL STUDIO</small></span></a><button class="sidebar-close50" data-action3="toggleNav" aria-label="'+tr('收起菜单','Close menu')+'">'+icon3('close')+'</button><div class="nav-caption">'+tr('我的成长档案','YOUR PERSONAL WORKSPACE')+'</div><nav aria-label="'+tr('工作台导航','Workspace navigation')+'">'+navigation+'</nav><div class="sidebar-tools"><div id="savedStatus" class="save-status">'+tr('已保存','Saved')+'</div><button class="sidebar-bottom-link" data-go3="settings">'+GEAR+'<span>'+tr('设置','Settings')+'</span></button></div></aside><main class="main3"><header class="topbar3"><div class="topbar-left"><button class="menu-toggle" data-action3="toggleNav" aria-controls="sidebar3" aria-expanded="'+navVisible+'" aria-label="'+tr('展开或收起菜单','Toggle menu')+'">'+icon3('menu')+'</button><div class="topbar-context"><span class="breadcrumb">'+breadcrumb+'</span>'+(isSettings?'':dailyQuoteMarkup(true))+'</div></div><div class="topbar-actions">'+(isHome||isSettings?'':'<button data-go3="studio">'+tr('导出成果','Create document')+' '+icon3('export')+'</button><button class="primary" data-action="save">'+tr('保存进度','Save')+'</button>')+'</div></header><div class="page-content3" id="workspaceContent">'+content+'</div><footer class="quiet-footer"><span>QICHENG PERSONAL STUDIO</span><span>'+tr('在这里，记录成长的每一步。','A place for every step of your growth.')+'</span></footer></main></div>'+help()+'<input type="file" id="backupInput" accept=".json,application/json" hidden><datalist id="awardCategories">'+options(cats('awards'),'')+'</datalist><datalist id="experienceCategories">'+options(cats('experiences'),'')+'</datalist><datalist id="languageList">'+options(['英语','德语','西班牙语','法语','日语','俄语'],'')+'</datalist>';
+  return '<div class="shell3 '+(ctx.state.sidebarHidden?'nav-hidden':'')+'"><button class="nav-backdrop" data-action3="toggleNav" aria-label="'+tr('收起菜单','Close menu')+'"></button><aside class="sidebar3" id="sidebar3" '+(navVisible?'':'inert')+'><a class="brand3" href="#" data-go3="home"><span class="brand-mark">'+LOGO+'</span><span><strong>启程</strong><small>PERSONAL STUDIO</small></span></a><button class="sidebar-close50" data-action3="toggleNav" aria-label="'+tr('收起菜单','Close menu')+'">'+icon3('close')+'</button><div class="nav-caption">'+tr('我的成长档案','YOUR PERSONAL WORKSPACE')+'</div><nav aria-label="'+tr('工作台导航','Workspace navigation')+'">'+navigation+'</nav><div class="sidebar-tools"><div class="sidebar-save52" data-save-state="saved"><div class="sidebar-save-copy52"><span class="sidebar-save-eyebrow52">'+tr('工作进度','WORKSPACE')+'</span><div id="savedStatus" class="save-status" role="status" aria-live="polite">'+tr('已保存','Saved')+'</div></div><button class="sidebar-save-button52" data-action="saveFile52" aria-label="'+tr('手动保存为本地文件','Save a complete local file')+'">'+icon3('download')+'<span>'+tr('手动保存','Save file')+'</span></button></div><button class="sidebar-bottom-link" data-go3="settings">'+GEAR+'<span>'+tr('设置','Settings')+'</span></button></div></aside><main class="main3"><header class="topbar3"><div class="topbar-left"><button class="menu-toggle" data-action3="toggleNav" aria-controls="sidebar3" aria-expanded="'+navVisible+'" aria-label="'+tr('展开或收起菜单','Toggle menu')+'">'+icon3('menu')+'</button><div class="topbar-context"><span class="breadcrumb">'+breadcrumb+'</span>'+(isSettings?'':dailyQuoteMarkup(true))+'</div></div><div class="topbar-actions">'+(isHome||isSettings?'':'<button data-go3="studio">'+tr('导出成果','Create document')+' '+icon3('export')+'</button><button class="primary" data-action="save">'+tr('保存进度','Save')+'</button>')+'</div></header><div class="page-content3" id="workspaceContent">'+content+'</div><footer class="quiet-footer"><span>QICHENG PERSONAL STUDIO</span><span>'+tr('在这里，记录成长的每一步。','A place for every step of your growth.')+'</span></footer></main></div>'+help()+'<input type="file" id="backupInput" accept=".json,application/json" hidden><datalist id="awardCategories">'+options(cats('awards'),'')+'</datalist><datalist id="experienceCategories">'+options(cats('experiences'),'')+'</datalist><datalist id="languageList">'+options(['英语','德语','西班牙语','法语','日语','俄语'],'')+'</datalist>';
 }
 
 // View position belongs to this running session, never to the user's saved data.
@@ -221,7 +224,7 @@ function render () {
     'sort-awards' : () => organizationPage3 ('awards'), 'sort-experiences' : () => organizationPage3 ('experiences'),
     'sort-practices' : () => organizationPage3 ('practices'), learning : learningPage3, achievements : () => entryPage3 ('achievements'),
     custom : customPage3, dashboard : dashboardPage3, 'practice-dashboard':practiceDashboardPage, home : homePage, explore : explorePage, reading : readingPage, quiz : quizPage, settings : settingsPage, backup : settingsPage, 'daily-quote' : dailyQuotePage, images : () => materialsPage3 ('image'), files : () => materialsPage3 ('file'),
-    outputs : outputsPage3, studio : previewPage, archive : archivePage3, schools : schoolPage, calendar:calendarPage,'reading-progress':progressPage,'exam-calendar':examCalendarPage
+    outputs : outputsPage3, studio : previewPage, archive : archivePage3, schools : schoolPage, calendar:calendarPage,'reading-progress':progressPage,'exam-calendar':examCalendarPage,'self-introductions':introductionsPage52
   };
   const page = ctx.state.route.startsWith ('classic:') ? () => classicPage (ctx.state.route.slice (8)) : ctx.state.route.startsWith ('school:') ? () => schoolDetail3 (decodeURIComponent (ctx.state.route.slice (7))) : pages3 [ctx.state.route] ||
   profilePage;
@@ -237,6 +240,7 @@ function render () {
   } else root.innerHTML = shell(page());
   const nextContent = root.querySelector?.('#workspaceContent');
   document.title = '启程 · ' + routeName3 ();
+  refreshPageHelp52(!samePage);
   bind ();
   translateUI(languageChanged || !nextContent ? document.body : nextContent);
   updateSaveStatus301 ();
@@ -263,15 +267,20 @@ function changed (rerender = true) {
   }
 }
 
+function helpPanelContents52(info=getPageHelp52()) {
+  return '<div class="panel-title"><div><p class="eyebrow">'+tr('此页指南','PAGE GUIDE')+'</p><h2 id="helpTitle52">'+esc(info.title)+'</h2></div><button data-action="closeHelp" aria-label="'+tr('关闭使用帮助','Close page guide')+'">'+icon3('close')+'</button></div><div class="page-help-content52">'+info.html+'</div>';
+}
 function help () {
-  return '<button class="help-toggle" id="helpToggle" data-action="help" aria-label="' + tr ('打开帮助', 'Open help') +
-  '" aria-expanded="false">' + BULB + '</button><aside id="helpPanel" class="help-panel" hidden><div class="panel-title"><h2>' +
-  tr ('使用帮助', 'Help') + '</h2><button data-action="closeHelp">×</button></div><p>' + tr ('菜单按录入、整理、个性内容、看板、资料与导出分区。点击三道杠可隐藏或展开菜单。',
-  'Use the menu for information, organization, personal content, dashboard, materials and export. The menu button expands or hides navigation.') +
-  '</p><p>' + tr ('所有上传内容都会进入资料中心。移除记录中的附件只解除关联；在资料中心删除会二次确认并同时解除全部关联。', 'Uploads appear in Materials. Removing an attachment from a record only unlinks it. Deleting in Materials asks for confirmation and removes all links.') +
-  '</p><p>' + tr ('导出内容、字段、照片、顺序与排版设置仍独立保存在每份文档版本中。导出前检查会列出缺项与重复记录。', 'Each document version keeps its own fields, photos, order and styling. Preflight checks flag omissions and repeated records.') +
-  '</p><p>' + tr ('填写后约半秒自动保存；保存失败会提示。可在设置中的保存与备份区域导出完整 JSON 备份，离线时也可编辑、预览和导出。资料中心的个人资料 ZIP 与可编辑 HTML 副本继续保留。', 'Edits save after half a second. Failures are reported. Use Save & backup to export a complete JSON backup; editing, previews and exports work offline. Personal archive ZIP and editable HTML copies remain available.') +
-  '</p></aside>'
+  const info=getPageHelp52();
+  return '<button class="help-toggle" id="helpToggle" data-action="help" aria-controls="helpPanel" aria-label="'+esc(info.title)+'" aria-expanded="false">'+BULB+'</button><aside id="helpPanel" class="help-panel" role="region" aria-labelledby="helpTitle52" tabindex="-1" data-help-key="'+esc(info.key)+'" hidden>'+helpPanelContents52(info)+'</aside>';
+}
+function refreshPageHelp52(close=false) {
+  const panel=$('#helpPanel'),button=$('#helpToggle');if(!panel||!button)return;
+  const info=getPageHelp52();
+  if(panel.dataset.helpKey!==info.key){panel.innerHTML=helpPanelContents52(info);panel.dataset.helpKey=info.key;}
+  button.setAttribute('aria-label',info.title);
+  if(close)panel.hidden=true;
+  button.setAttribute('aria-expanded',String(!panel.hidden));
 }
 
 function toggleNav3 () {
@@ -299,6 +308,7 @@ async function action (name) {
     catch(error) { toast(tr('尚未全部保存：','Some changes are not saved: ')+error.message); }
     return;
   }
+  if (name === 'saveFile52') return saveLocalFile52();
   if (name === 'backup') return exportBackup ();
   if (name === 'restore') return $ ('#backupInput').click ();
   if (name === 'clearAll') return clearAll ();
@@ -316,9 +326,11 @@ async function action (name) {
     return;
   }
   if (name === 'help' || name === 'closeHelp') {
+    refreshPageHelp52();
     const panel = $ ('#helpPanel');
     panel.hidden = name === 'closeHelp' ? true : ! panel.hidden;
     $ ('#helpToggle').setAttribute ('aria-expanded', String (! panel.hidden));
+    if(!panel.hidden)panel.focus?.({preventScroll:true});else $('#helpToggle').focus?.({preventScroll:true});
     return;
   }
   if (name === 'previous') return navigate ('resume', ctx.state.step - 1);
@@ -348,7 +360,7 @@ async function boot () {
     ctx.state = validateDraft (embedded);
     const extra = globalThis.QICHENG_EMBEDDED.records || {};
     validateResourceRecords (extra, {allowOfficial:true});
-    validateQuizRecords (extra); validateHomeRecords (extra);validateJournalRecords(extra);
+    validateQuizRecords (extra); validateHomeRecords (extra);validateJournalRecords(extra);validateExamCalendarRecords(extra);
     await storage.setMany ({...extra, current:snapshot3 ()});
   }
   // Startup always opens Home, regardless of the route in an old draft or backup.
@@ -356,7 +368,7 @@ async function boot () {
   ctx.state.section = 'resume'; ctx.state.step = 0;
   ctx.state.menuOpen = ['start']; ctx.state.sidebarHidden = true;
   await initializeResources ();
-  await Promise.all ([initializeQuiz (), initializeHome (),initializeJournal()]);
+  await Promise.all ([initializeQuiz (), initializeHome (),initializeJournal(),initializeExamCalendar()]);
   storage.enableActivityTracking();
   // Export/preview prepares its own document fonts; Home never waits for font decoding.
   ctx.initialized = true;
@@ -387,7 +399,7 @@ async function boot () {
   });
   document.addEventListener ('keydown', event => {
     if (event.key !== 'Escape') return; if ($ ('#helpPanel')) {
-      $ ('#helpPanel').hidden = true; $ ('#helpToggle')?.setAttribute ('aria-expanded', 'false');
+      const helpPanel=$('#helpPanel'),returnToHelp=!helpPanel.hidden&&helpPanel.contains?.(document.activeElement);helpPanel.hidden=true;$('#helpToggle')?.setAttribute('aria-expanded','false');if(returnToHelp)$('#helpToggle')?.focus?.({preventScroll:true});
     }
     if (document.body.classList.contains ('nav-mobile-open')) toggleNav3 (); closeProvince31 ();
   });
@@ -408,6 +420,7 @@ async function boot () {
       changed ();
     }
   };
+  showStartupChoice52();
   // First launch stays on Home; appearance is available on the regular Settings page.
   pwa.init ().catch (error => toast (tr ('离线支持初始化失败：', 'Offline support failed: ') + error.message));
   return window.ResumeStudio;

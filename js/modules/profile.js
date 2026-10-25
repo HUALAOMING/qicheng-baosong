@@ -5,6 +5,7 @@ import { currentVersion, records } from '../model.js';
 import { save, scheduleSave } from '../autosave.js';
 import { changed, confirmAction, render } from '../app.js';
 import { collect } from './records.js';
+import {introductionPicker52,bindIntroductionImports52} from './introductions.js';
 // 启程 · js/modules/profile.js
 
 
@@ -43,10 +44,10 @@ function educationPage () {
 }
 
 function statementPage () {
-  return head ('INFORMATION / STATEMENT', '把经历串成你的故事。') + '<section class="panel statement-panel">' + area ('statement.zh',
-  '个人陈述 · 中文', ctx.state.statement.zh, '成长经历、专业兴趣与申请动机。', 'class="statement-text" lang="zh-CN"') + area ('statement.en',
+  return head ('INFORMATION / STATEMENT', '把经历串成你的故事。') + '<section class="panel statement-panel">' + introductionPicker52('zh') + area ('statement.zh',
+  '个人陈述 · 中文', ctx.state.statement.zh, '成长经历、专业兴趣与申请动机。', 'class="statement-text" lang="zh-CN"') + introductionPicker52('en') + area ('statement.en',
   'Personal Statement · English', ctx.state.statement.en, 'Tell your story, academic interests and motivation.', 'class="statement-text" lang="en" spellcheck="true"') +
-  '<div class="grid2">' + area ('statement.strengths', '个人特长', ctx.state.statement.strengths, '具体能力及相关实践。') + area ('statement.hobbies',
+  '<h2>小语种个人陈述（选填）</h2>' + input('statement.otherLanguage','语种',ctx.state.statement.otherLanguage,'例如：德语、法语、日语') + introductionPicker52('other') + area('statement.other','个人陈述正文（选填）',ctx.state.statement.other,'使用所填写的语种撰写。','class="statement-text"') + '<div class="grid2">' + area ('statement.strengths', '个人特长', ctx.state.statement.strengths, '具体能力及相关实践。') + area ('statement.hobbies',
   '兴趣爱好', ctx.state.statement.hobbies, '例如：足球、音乐、摄影、旅行。') + '</div></section>';
 }
 
@@ -125,6 +126,7 @@ export { profilePage, educationPage, statementPage, itemActions, recordList, for
 
 // All controls for this feature, in their original override order.
 function bindProfileControls () {
+  bindIntroductionImports52();
   $$ ('[data-bind]').forEach (el => el.addEventListener ('input', () => {
     const [g, k] = el.dataset.bind.split ('.'); ctx.state [g] [k] = el.value; scheduleSave (); if (g === 'profile' &&
     ['name', 'school'].includes (k)) {

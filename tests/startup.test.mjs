@@ -37,7 +37,7 @@ test('exported standalone HTML executes without any network imports/resources an
   const context=vm.createContext({window,self:window,document,indexedDB:new FakeFactory(),innerWidth:1280,innerHeight:900,console,Blob,File,URL,DOMException,
     Uint8Array,Uint16Array,Uint32Array,Int16Array,ArrayBuffer,DataView,TextDecoder,TextEncoder,AbortController,atob,btoa,structuredClone,
     FontFace:class{load(){return Promise.resolve(this);}},navigator:{onLine:false,userAgent:'Node test harness'},location:{reload(){}},
-    setTimeout:()=>0,clearTimeout(){},requestAnimationFrame:fn=>fn(),matchMedia:()=>({matches:false}),fetch:()=>{network++;throw new Error('network forbidden');}});
+    setTimeout:()=>0,clearTimeout(){},setInterval:()=>0,clearInterval(){},requestAnimationFrame:fn=>fn(),matchMedia:()=>({matches:false}),fetch:()=>{network++;throw new Error('network forbidden');}});
   context.window=context;context.self=context;Object.assign(context,window);
   for(const match of html.matchAll(/<script(?: [^>]*)?>([\s\S]*?)<\/script>/g)) if(!match[0].startsWith('<script id="qichengEmbedded"'))new vm.Script(match[1]).runInContext(context);
   const deadline=Date.now()+3000;
