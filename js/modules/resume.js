@@ -1,5 +1,5 @@
 import { ctx } from '../state.js';
-import { $, $$, checkbox, esc, flip, head, heading3, icon3, tr, translateLabel, clamp, loadImage, readFile, toast } from '../utils/helpers.js';
+import { $, $$, checkbox, clone, esc, flip, head, heading3, icon3, tr, translateLabel, clamp, loadImage, readFile, toast } from '../utils/helpers.js';
 import { photoTiles, selectedPhotos } from './images.js';
 import { cleanCrop, currentVersion, fieldVisible, moduleStyle } from '../model.js';
 import { ACHIEVEMENT_FIELDS, AWARD_FIELDS, BOOK_FIELDS, EDU_FIELDS, EXAM_FIELDS, EXP_FIELDS, MODULE_NAMES, PROFILE, MODULES } from '../constants.js';
@@ -196,7 +196,7 @@ function orderSpring(row,x,y,vx=0,vy=0,done) {
   if(!orderFrame)orderFrame=requestAnimationFrame(orderSpringFrame);
 }
 function cancelOrderInteraction() { orderCleanup?.(); densityCleanup52?.(); }
-export { cancelOrderInteraction };
+export { cancelOrderInteraction, orderSpring };
 
 function settleOrder () {
   const rows=orderRows(), v=currentVersion(), next=rows.map(row=>row.dataset.orderKey);
@@ -553,7 +553,9 @@ function allPhotos () {
   return result
 }
 
-function exportRows () {
+function exportRows (options = {}) {
+  const resolved53=options.resolved || resolveExportContext53(options, false);
+  if(resolved53?.modules)return rowsFromResolved53(resolved53);
   const v = currentVersion (), legacy = exportRows22 (), groups = new Map (), appendix = [];
   let last = '';
   for (const r of legacy) {
@@ -620,18 +622,20 @@ function exportRows () {
   return v.order.flatMap (k => groups.get (k) || []).concat (appendix)
 }
 
-function textRows () {
-  const rows = exportRows (), first = rows.findIndex (r => r.module === 'appendix'), main = first < 0 ? rows : rows.slice (0,
+function textRows (options = {}) {
+  const textVersion53=options.resolved?.version||currentVersion(),captionVisible53=key=>!(textVersion53.hiddenFields||[]).includes(key);
+  const exportLabel=(zh,en)=>textVersion53.exportLang==='en'?en:zh;
+  const rows = exportRows(options), first = rows.findIndex (r => r.module === 'appendix'), main = first < 0 ? rows : rows.slice (0,
   first), caption = (p, module) => ( {
     kind : 'body', module, label : exportLabel ('照片说明', 'Photo caption') + '：', value : p.caption, text : exportLabel ('照片说明',
     'Photo caption') + '：' + p.caption, fieldKey : 'photo:' + p.id + ':caption'
-  }), caps = (r) => r.photos.filter (p => p.caption && fieldVisible ('photo:' + p.id + ':caption')).map (p => caption (p,
+  }), caps = (r) => r.photos.filter (p => p.caption && captionVisible53 ('photo:' + p.id + ':caption')).map (p => caption (p,
   r.module)), out = main.flatMap (r => r.kind === 'photos' ? caps (r) : r.kind === 'custom' ? [...(r.text ? [ {
     ...r, kind : 'body', photos : undefined
   }] : []), ...caps (r)] : [r]);
   if (first >= 0) {
     const photos = rows.slice (first).filter (r => r.kind === 'photos').flatMap (r => r.photos).filter (p => p.caption &&
-    fieldVisible ('photo:' + p.id + ':caption'));
+    captionVisible53 ('photo:' + p.id + ':caption'));
     if (photos.length) {
       out.push ( {
         kind : 'section', module : 'appendix', text : exportLabel ('照片说明', 'Photo captions'), breakBefore : true
@@ -656,36 +660,37 @@ function mediaPanel () {
   '</button><button data-go3="images">' + tr ('打开图片管理', 'Open image management') + '</button></div>'
 }
 
-function preflight3 () {
-  const errors = [], suggestions = [], v = currentVersion (), add = (list, message, route = 'studio') => list.push ( {
+function preflight3 (options={}) {
+  const state53=options.resolved?.workspace||ctx.state,fieldVisible53=(key,defaultOn=true)=>defaultOn?!v.hiddenFields.includes(key):v.includedFields.includes(key);
+  const errors = [], suggestions = [], v = options.resolved?.version||currentVersion (), add = (list, message, route = 'studio') => list.push ( {
     message, route
   });
   if (v.purpose === 'resume') {
     for (const [k, z, e] of [['name', '姓名', 'Name'], ['school', '就读中学', 'High school'], ['birthday', '出生年月日', 'Date of birth'],
-    ['schoolLanguage', '高中所学语种', 'High-school foreign language']]) if (! ctx.state.profile [k].trim ()) add (errors, tr ('基本信息缺少：' +
+    ['schoolLanguage', '高中所学语种', 'High-school foreign language']]) if (! state53.profile [k].trim ()) add (errors, tr ('基本信息缺少：' +
     z, 'Missing basic information: ' + e), 'profile');
-    if (! ctx.state.profile.email.trim () && ! ctx.state.profile.phone.trim ()) add (errors, tr ('至少填写一种联系方式：邮箱或电话。',
+    if (! state53.profile.email.trim () && ! state53.profile.phone.trim ()) add (errors, tr ('至少填写一种联系方式：邮箱或电话。',
     'Enter an email address or phone number.'), 'profile');
-    if (ctx.state.profile.email && ! /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test (ctx.state.profile.email)) add (errors, tr ('电子邮箱格式可能有误。',
+    if (state53.profile.email && ! /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test (state53.profile.email)) add (errors, tr ('电子邮箱格式可能有误。',
     'The email address format appears invalid.'), 'profile');
-    if (ctx.state.profile.birthday && (isNaN (Date.parse (ctx.state.profile.birthday)) || Date.parse (ctx.state.profile.birthday) > Date.now ())) add (errors,
+    if (state53.profile.birthday && (isNaN (Date.parse (state53.profile.birthday)) || Date.parse (state53.profile.birthday) > Date.now ())) add (errors,
     tr ('出生日期无效，或晚于当前日期。', 'The birth date is invalid or in the future.'), 'profile');
-    if (v.disabled.includes ('profile') || ! fieldVisible ('profile.name')) add (errors, tr ('当前简历未选择基本信息或姓名字段。', 'Basic information or the name field is excluded from this resume.'));
+    if (v.disabled.includes ('profile') || ! fieldVisible53 ('profile.name')) add (errors, tr ('当前简历未选择基本信息或姓名字段。', 'Basic information or the name field is excluded from this resume.'));
     for (const [k, z, e] of [['targetSchool', '目标院校', 'target university'], ['targetMajor', '申请专业', 'intended major'],
-    ['grade', '毕业届别', 'graduation year']]) if (! (k === 'targetSchool' && v.target) && ! ctx.state.profile [k]) add (suggestions,
+    ['grade', '毕业届别', 'graduation year']]) if (! (k === 'targetSchool' && v.target) && ! state53.profile [k]) add (suggestions,
     tr ('建议补充基本信息：' + z, 'Consider adding your ' + e), 'profile');
-    for (const [condition, z, e, route] of [[! ctx.state.education.some (x => x.school), '教育经历', 'education', 'education'],
-    [! ctx.state.statement.zh && ! ctx.state.statement.en && ! ctx.state.statement.other, '个人陈述', 'a personal statement', 'statement'], [! ctx.state.exams.length,
-    '考试成绩', 'exam results', 'academics'], [! ctx.state.awards.length, '个人荣誉', 'honors & awards', 'awards'], [! ctx.state.experiences.length &&
-    ! ctx.state.practices.length, '个人经历或社会实践', 'experience or social practice', 'experiences']]) if (condition) add (suggestions,
+    for (const [condition, z, e, route] of [[! state53.education.some (x => x.school), '教育经历', 'education', 'education'],
+    [! state53.statement.zh && ! state53.statement.en && ! state53.statement.other, '个人陈述', 'a personal statement', 'statement'], [! state53.exams.length,
+    '考试成绩', 'exam results', 'academics'], [! state53.awards.length, '个人荣誉', 'honors & awards', 'awards'], [! state53.experiences.length &&
+    ! state53.practices.length, '个人经历或社会实践', 'experience or social practice', 'experiences']]) if (condition) add (suggestions,
     tr ('尚未填写' + z + '，可按需要补充。', 'No ' + e + ' saved. Add it if relevant.'), route);
   }
-  else if (v.purpose === 'reading' && ! ctx.state.learning.books.length && ! ctx.state.learning.readingNotes && ! ctx.state.learning.notes &&
-  ! ctx.state.learning.plan) add (suggestions, tr ('还没有阅读与学习记录，可先录入再导出。', 'No reading or learning records saved yet.'),
+  else if (v.purpose === 'reading' && ! state53.learning.books.length && ! state53.learning.readingNotes && ! state53.learning.notes &&
+  ! state53.learning.plan) add (suggestions, tr ('还没有阅读与学习记录，可先录入再导出。', 'No reading or learning records saved yet.'),
   'learning');
   const normalized = s => String (s || '').toLowerCase ().replace (/[\s，。·：:()（）\-_]/g, '');
-  for (const [kind, arr] of [['awards', ctx.state.awards], ['experiences', ctx.state.experiences], ['practices', ctx.state.practices],
-  ['achievements', ctx.state.achievements], ['exams', ctx.state.exams], ['learning', ctx.state.learning.books]]) {
+  for (const [kind, arr] of [['awards', state53.awards], ['experiences', state53.experiences], ['practices', state53.practices],
+  ['achievements', state53.achievements], ['exams', state53.exams], ['learning', state53.learning.books]]) {
     const seen = new Map ();
     for (const x of arr) {
       const key = normalized (x.title) + '|' + normalized (x.date);
@@ -695,10 +700,10 @@ function preflight3 () {
       else seen.set (key, x)
     }
   }
-  for (const x of ctx.state.practices) if (ctx.state.experiences.some (y => normalized (y.title) === normalized (x.title) &&
+  for (const x of state53.practices) if (state53.experiences.some (y => normalized (y.title) === normalized (x.title) &&
   normalized (y.date) === normalized (x.date))) add (suggestions, tr ('经历与社会实践中可能重复：', 'May be duplicated across experience and practice: ') +
   x.title, 'practices');
-  for (const e of (v.disabled.includes ('exams') ? [] : ctx.state.exams.filter (x => ! v.excluded.includes ('exams:' +
+  for (const e of (v.disabled.includes ('exams') ? [] : state53.exams.filter (x => ! v.excluded.includes ('exams:' +
   x.id)))) {
     if (numeric3 (e.totalScore) !== null && numeric3 (e.totalFullMark) !== null && numeric3 (e.totalScore) > numeric3 (e.totalFullMark)) add (errors,
     tr ('考试总分高于满分：', 'Total score exceeds full mark: ') + e.title, 'academics');
@@ -708,7 +713,7 @@ function preflight3 () {
     tr ('排名超过参考人数：', 'Rank exceeds participant count: ') + e.title, 'academics')
   }
   for (const kind of ['awards', 'experiences', 'practices', 'achievements', 'books', 'exams']) {
-    const d = ctx.state [draftFor3 (kind)], arr = kind === 'books' ? ctx.state.learning.books : ctx.state [kind], saved = arr.find (x =>
+    const d = state53 [draftFor3 (kind)], arr = kind === 'books' ? state53.learning.books : state53 [kind], saved = arr.find (x =>
     x.id === ctx.editing [kind]), content = kind === 'exams' ? draftHasContent ('exams') : Object.entries (d || {
     }).some (([k, v]) => ! ['id', 'category', 'status', 'priority'].includes (k) && (typeof v === 'string' ? v.trim () : Array.isArray (v) &&
     v.length));
@@ -716,7 +721,7 @@ function preflight3 () {
     'An unsaved draft or edit will not be exported: ') + (d.title || tr ('未命名记录', 'Untitled record')), kind === 'books' ?
     'learning' : kind === 'exams' ? 'academics' : kind)
   }
-  if (! exportRows ().length) add (errors, tr ('没有选择可导出的内容。', 'No exportable content has been selected.'));
+  if (! exportRows (options).length) add (errors, tr ('没有选择可导出的内容。', 'No exportable content has been selected.'));
   return {
     errors, suggestions
   }
@@ -980,3 +985,49 @@ function bindResumeControls () {
   };
 }
 export { bindResumeControls };
+
+// Lazy editor registers its pure resolver. The base application never imports editor UI.
+let resumeResolverHook53=null;
+function configureResumeResolver53(resolver){resumeResolverHook53=resolver;}
+function effectiveExportVersion53(version){
+ const v=clone(version),r=v.resume53;if(!r)return v;
+ const design=r.design||{},template=r.template||'classic',defaults={classic:{},modern:{titleColor:'#244c70',pageDecoration:'editorial'},academic:{titleColor:'#253449',lineHeight:1.45,gap:8},original:{}};
+ Object.assign(v,defaults[template]||{},design.presets?.[template]||{});
+ v._columns53=design.columns===2?2:1;v._fontFamily53=design.fontFamily||'Microsoft YaHei';v._sectionLines53=design.sectionLines!==false;v._template53=template;
+ v.showToc=!!r.toc?.enabled;v._tocSections53=Array.isArray(r.toc?.sections)?r.toc.sections:null;
+ v._cover53=r.cover?.enabled?{title:String(r.cover.title||v.name||''),enabled:true}:null;
+ if(template==='original'){Object.assign(v,{wordBW:true,paperColor:'#ffffff',paperImage:'',titleColor:'#000000',lineColor:'#000000',pageDecoration:'plain',_sectionLines53:false});v.moduleStyles=Object.fromEntries(Object.entries(v.moduleStyles||{}).map(([k,style])=>[k,{...style,titleColor:'#000000'}]));}
+ return v;
+}
+function resolveExportContext53(options={},legacySnapshot=true){
+ if(options.resolved)return options.resolved;
+ const version=ctx.state?.versions?.find(v=>v.id===(options.versionId||ctx.state.activeVersion))||currentVersion();
+ if(version?.resume53){if(!resumeResolverHook53)throw new Error('简历编辑数据尚未加载，请从简历管理中心重新打开。');const result=resumeResolverHook53(version.id);return {...result,version:effectiveExportVersion53(result.version||version)};}
+ return legacySnapshot?{workspace:clone(ctx.state),version:clone(version),rows:clone(exportRows())}:null;
+}
+function photoChoices53(resolved){
+ const result=[],used=new Set(),photoIDs=new Set(),workspace=resolved.workspace;
+ for(const module of resolved.modules||[])for(const entry of module.entries||[])for(const p of entry.photos||[]){used.add(p.assetId);if(!photoIDs.has(p.id)){photoIDs.add(p.id);result.push({...p,module:module.key,owner:module.key+':'+entry.id,heading:entry.title||module.title});}}
+ for(const p of workspace.media||[]){if(!photoIDs.has(p.id)){photoIDs.add(p.id);used.add(p.assetId);result.push({...p,module:'appendix',heading:'补充照片'});}}
+ for(const asset of workspace.assets||[])if(asset.kind==='image'&&!used.has(asset.id)&&asset.id!==workspace.avatar?.assetId){used.add(asset.id);result.push({id:asset.id,assetId:asset.id,name:asset.name,data:asset.data,caption:asset.caption||'',crop:cleanCrop(asset.crop),module:'appendix',heading:'补充照片'});}
+ return result;
+}
+function rowsFromResolved53(resolved){
+ const v=effectiveExportVersion53(resolved.version),out=[],appendix53=[],assets=new Map((resolved.workspace.assets||[]).map(a=>[a.id,a]));
+ for(const module of resolved.modules){
+  if(module.hidden)continue;const rows=[];
+  for(const entry of module.entries||[]){if(entry.hidden)continue;
+   if(entry.title&&!entry.titleHidden)rows.push({kind:'entry',text:String(entry.title),module:module.key,style:{...(entry.style||{}),subtitleSize:entry.style?.fontSize||entry.style?.subtitleSize},fieldKey:entry.path||module.key+':'+entry.id+':title'});
+   for(const field of entry.fields||[]){if(field.hidden||field.role==='title')continue;const statementLanguageField53=module.key==='statement'&&['statement.zh','statement.en','statement.other','statement.otherLanguage'].includes(field.path);if(statementLanguageField53&&v.statementLang==='zh'&&field.path!=='statement.zh')continue;if(statementLanguageField53&&v.statementLang==='en'&&field.path!=='statement.en')continue;const value=Array.isArray(field.value)?field.value.join('、'):String(field.value??'');if(!value.trim())continue;const displayLabel=v.exportLang==='en'?(EN[field.label]||field.label):field.label,label=displayLabel?String(displayLabel)+'：':'';rows.push({kind:'body',text:label+value,label,value,module:module.key,fieldKey:field.path,style:field.style||{}});}
+   const pictures53=(entry.photos||[]).filter(p=>!(v.excluded||[]).includes('photo:'+p.id));if(v.photoMode!=='none'&&pictures53.length){const photoRow53={kind:'photos',module:v.photoMode==='appendix'?'appendix':module.key,photos:pictures53};if(v.photoMode==='appendix')appendix53.push({kind:'entry',module:'appendix',text:entry.title||module.title},photoRow53);else rows.push(photoRow53);}
+   for(const aid of entry.attachments||[]){const a=assets.get(aid);if(a&&!(v.hiddenFields||[]).includes('attachment:'+module.key+':'+entry.id+':'+aid))rows.push({kind:'body',module:module.key,label:'文件附件：',value:a.name,text:'文件附件：'+a.name,attachmentId:aid});}
+  }
+  if(rows.length)out.push({kind:'section',text:String(v.exportLang==='en'?(EN[module.title]||module.title):module.title),module:module.key,style:{...(module.style||{}),titleSize:module.style?.titleSize||module.style?.fontSize,titleColor:module.style?.titleColor||module.style?.color},breakBefore:(v.breaks||[]).includes(module.key),avatar:module.key==='profile'&&v.showAvatar&&!!resolved.workspace.avatar},...rows);
+ }
+ if(v.photoMode==='appendix'){const attachedIDs53=new Set((resolved.modules||[]).flatMap(m=>(m.entries||[]).flatMap(e=>(e.photos||[]).map(p=>p.id))));const extras53=photoChoices53(resolved).filter(p=>!attachedIDs53.has(p.id)&&!(v.excluded||[]).includes('photo:'+p.id));if(extras53.length)appendix53.push({kind:'photos',module:'appendix',photos:extras53});}
+ if(appendix53.length)out.push({kind:'section',module:'appendix',text:v.exportLang==='en'?'Evidence & photo appendix':'证明材料与照片附件',breakBefore:true},...appendix53);
+ return out;
+}
+function preflightResolved53(resolved){return preflight3({resolved});}
+
+export {photoChoices53,configureResumeResolver53,effectiveExportVersion53,resolveExportContext53,rowsFromResolved53,preflightResolved53};

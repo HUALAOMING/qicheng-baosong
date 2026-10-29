@@ -1,3 +1,4 @@
+import {preserveResumeReferences53} from '../resume-model53.js';
 import { $, $$, area, esc, head, input, options, select, tr, translateLabel } from '../utils/helpers.js';
 import { ctx } from '../state.js';
 import { EDU_FIELDS, EDU_STAGES, EXAM_TYPES, PROFILE, blankEducation, draftKeys } from '../constants.js';
@@ -104,7 +105,7 @@ function draftHasContent (kind) {
 
 function avatarEditor22 () {
   return '<div class="avatar-editor"><div class="avatar-thumb ' + (currentVersion ().avatarShape === 'id' ? 'portrait-id' : '') +
-  '">' + (ctx.state.avatar ? '<img src="' + esc (ctx.state.avatar.data) + '" alt="' + tr ('个人照片', 'Portrait') + '" style="object-position:' +
+  '">' + (ctx.state.avatar ? '<img data-original-asset521="' + esc(ctx.state.avatar.assetId||'') + '" src="' + esc (ctx.state.avatar.data) + '" alt="' + tr ('个人照片', 'Portrait') + '" style="object-position:' +
   ctx.state.avatarCrop.x + '% ' + ctx.state.avatarCrop.y + '%;transform:scale(' + ctx.state.avatarCrop.zoom + ');transform-origin:' +
   ctx.state.avatarCrop.x + '% ' + ctx.state.avatarCrop.y + '%">' : '<span>＋</span>') + '</div><div><h3>' + tr ('个人照片',
   'Portrait') + '</h3><label class="file-button">' + tr ('上传 / 更换照片', 'Upload / replace') + '<input type="file" data-upload="avatar" accept="image/*" hidden></label>' +
@@ -157,7 +158,7 @@ function bindProfileControls () {
   });
   $$ ('[data-edu-delete]').forEach (e => e.onclick = async () => {
     if (await confirmAction (tr ('移除此培训经历？', 'Remove this training entry?'), tr ('删除后可通过进度备份恢复。', 'It can be restored from a backup.'))) {
-      ctx.state.education = ctx.state.education.filter (x => x.id !== e.dataset.eduDelete); changed ()
+      preserveResumeReferences53();ctx.state.education = ctx.state.education.filter (x => x.id !== e.dataset.eduDelete); changed ()
     }
   });
 }

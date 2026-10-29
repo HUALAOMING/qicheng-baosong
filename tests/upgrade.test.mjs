@@ -29,10 +29,11 @@ test('beta1 schema and every original user field remain readable; transient fiel
   assert.equal(DATABASE_NAME,'qicheng-v4');
   const old=JSON.parse(await readFile(path.join(root,'tests/fixtures/input.json'),'utf8'));
   assert.equal(old.format,'qicheng-resume');assert.equal(old.version,6);
-  assert.deepEqual(validateDraft(old),old);
+  const expected={...old,introductions:[],introductionDraft:{id:'',title:'',language:'',minutes:'1',seconds:'0',note:'',body:''},statement:{...old.statement,other:'',otherLanguage:''},versions:old.versions.map(v=>({paperColor:'#ffffff',lineColor:'#d6d6d6',titleColor:'#000000',paperImage:'',layoutPreset:'custom',...v}))};
+  assert.deepEqual(validateDraft(old),expected);
   const portable=structuredClone(old);for(const key of ['route','section','step','sidebarHidden','menuOpen'])delete portable[key];
   const restored=validateDraft(portable);assert.equal(restored.route,'home');
-  for(const key of Object.keys(portable))assert.deepEqual(restored[key],old[key],key);
+  for(const key of Object.keys(portable))assert.deepEqual(restored[key],expected[key],key);
 });
 test('countdown calendar days handle leap days, today, past targets and invalid dates',async()=>{
   await home.initializeHome({'settings:countdown':{name:'Leap target',date:'2028-03-01'}});
@@ -49,7 +50,7 @@ test('daily quote is fixed for local calendar date, changes next day, and accept
   assert.notDeepEqual(home.homeQuoteForDate(data,new Date(2026,9,14,0)),home.homeQuoteForDate(data,new Date(2026,9,15,0)));
   assert.equal(home.homeQuoteForDate({quotes:[]}),null);assert.equal(home.homeQuoteForDate(null),null);
 });
-test('full backup covers independent user keys, omits navigation and official resources, restores atomically while keeping installed official version',async()=>{
+test('v2 full backup covers independent user keys and official resources, omits navigation, and restores the backed-up resource version atomically',async()=>{
   ctx.state=fresh();ctx.state.onboarded=true;ctx.state.theme='blue';ctx.state.profile.name='Backup fixture';ctx.state.route='quiz';
   initializeSaving301();await save();
   const custom={schemaVersion:1,bank:{id:'upgrade-custom',name:'Custom fixture',subject:'chinese',section:'chinese-usage',version:'1.0.0'},questions:[{id:'TF1',type:'true-false',question:'Fixture only',answer:false,explanation:''}]};
@@ -59,23 +60,23 @@ test('full backup covers independent user keys, omits navigation and official re
   quiz.quizStart('chinese-usage','random',10);quiz.quizAnswer(0,true);await quiz.quizFavorite('upgrade-custom','TF1');await quiz.quizSubmit();
   await storage.set('future-user-note',{text:'Retain unknown user records'});
   const file=await backup.getCurrentBackup();
-  assert.equal(file.backupVersion,1);assert.equal(file.data.current.profile.name,'Backup fixture');
+  assert.equal(file.backupVersion,2);assert.equal(file.integrity.algorithm,'SHA-256');assert.equal(file.data.current.profile.name,'Backup fixture');
   for(const key of ['route','section','step','sidebarHidden','menuOpen'])assert.equal(Object.hasOwn(file.data.current,key),false);
-  assert.equal(Object.keys(file.data).some(key=>key.startsWith('resource:official:')),false);
+  assert.ok(Object.keys(file.data).some(key=>key.startsWith('resource:official:')));
   assert.ok(file.data['resource:custom:upgrade-custom']);assert.ok(file.data['settings:countdown']);assert.ok(file.data['future-user-note']);
   assert.ok(Object.keys(file.data).some(key=>key.startsWith('quiz:record:')));
-  assert.deepEqual(file.data[quiz.quizMarkKey('upgrade-custom','TF1')],{bankId:'upgrade-custom',questionId:'TF1',wrong:true,favorite:true});
-  const installed=await storage.get('resource:official:english-grammar');installed.bank.version='8.0.0';await storage.set('resource:official:english-grammar',installed);
+  const mark53=file.data[quiz.quizMarkKey('upgrade-custom','TF1')];assert.deepEqual({...mark53,lastWrongAt:undefined},{bankId:'upgrade-custom',questionId:'TF1',wrong:true,favorite:true,mastered:false,reviewPending:true,lastWrongAt:undefined});assert.ok(Number.isFinite(Date.parse(mark53.lastWrongAt)));
+  const installed=await storage.get('resource:official:english-grammar');installed.bank.version='8.0.0';await storage.set('resource:official:english-grammar',installed);assert.equal((await storage.get('resource:official:english-grammar')).bank.version,'8.0.0');
   ctx.state.profile.name='Changed';await save();await backup.commitBackup(file);
-  assert.equal(ctx.state.profile.name,'Backup fixture');assert.equal(ctx.state.theme,'blue');assert.equal(ctx.state.route,'home');
-  assert.equal((await storage.get('resource:official:english-grammar')).bank.version,'8.0.0');
-  assert.equal(resources.listQuizBanks().find(item=>item.bank.id==='english-grammar').bank.version,'8.0.0');
+  assert.equal(ctx.state.profile.name,'Backup fixture');assert.equal(ctx.state.theme,'pudding');assert.equal(ctx.state.route,'home');
+  assert.equal((await storage.get('resource:official:english-grammar')).bank.version,file.data['resource:official:english-grammar'].bank.version);
+  assert.equal(resources.listQuizBanks().find(item=>item.bank.id==='english-grammar').bank.version,file.data['resource:official:english-grammar'].bank.version);
   assert.equal(quiz.getRecentQuiz().correct,0);assert.equal(home.homeCountdownDays(new Date(2027,0,1)),0);
 });
 test('invalid countdown, quiz and custom-bank records are rejected before restoring any user data',async()=>{
   const valid=await backup.getCurrentBackup();const before=await storage.getAll();
   for(const corrupt of [file=>file.data['settings:countdown'].date='2027-02-30',file=>file.data[quiz.quizMarkKey('upgrade-custom','TF1')].wrong='yes',file=>file.data['resource:custom:upgrade-custom'].questions[0].answer='false']) {
-    const file=structuredClone(valid);corrupt(file);await assert.rejects(()=>backup.commitBackup(file));assert.deepEqual(await storage.getAll(),before);
+    const file=structuredClone(valid);corrupt(file);await assert.rejects(()=>backup.commitBackup(file),/完整性校验失败/);assert.deepEqual(await storage.getAll(),before);
   }
 });
 test('Home reads existing target data and export history without creating duplicate fields',()=>{

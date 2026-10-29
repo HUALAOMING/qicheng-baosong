@@ -22,7 +22,7 @@ test('old imported packs join the default four without migration writes and pres
   assert.equal(r.listPracticeBanks().length,4);assert.equal(r.listPracticeBanks()[0].questions.length,119);
   const session=quiz.quizStart('english-grammar','wrong',10);assert.equal(session.questions.length,1);assert.equal(session.questions[0].learningBankId,'legacy');
   assert.doesNotMatch(quiz.quizPage(),/Private answer/);quiz.quizAnswer(0,false);await quiz.quizSubmit();
-  assert.deepEqual(await storage.get(key),{bankId:'legacy',questionId:'Q1',wrong:false,favorite:true});
+  assert.deepEqual(await storage.get(key),{bankId:'legacy',questionId:'Q1',wrong:false,favorite:true,reviewPending:true,mastered:false});
   assert.equal(quiz.quizStart('english-grammar','favorites',10).questions.length,1);
 });
 test('multiple JSON packs with the same question ID merge safely into one chosen bank',async()=>{
@@ -39,7 +39,7 @@ test('users create named banks; empty banks, assignments and imported packs surv
   const file=await backup.getCurrentBackup();assert.ok(file.data[r.QUIZ_LIBRARY_KEY]);assert.ok(file.data['resource:custom:pack-one']);
   await r.deletePracticeBank(bank.id);await backup.commitBackup(file);
   assert.equal(r.listPracticeBanks().find(item=>item.bank.id===bank.id).questions.length,1);
-  const before=await storage.getAll(),invalid=structuredClone(file);invalid.data[r.QUIZ_LIBRARY_KEY].assignments['pack-one']='missing';
+  const before=await storage.getAll(),invalid=structuredClone(file);invalid.data[r.QUIZ_LIBRARY_KEY].assignments['pack-one']='missing';invalid.integrity.digest=await backup.backupDigest521(invalid);
   await assert.rejects(backup.commitBackup(invalid),/目标题库/);assert.deepEqual(await storage.getAll(),before);
 });
 test('a local JSON with an official ID imports as a personal pack without overwriting official content',async()=>{

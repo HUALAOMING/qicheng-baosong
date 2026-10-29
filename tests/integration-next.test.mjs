@@ -30,16 +30,16 @@ beforeEach(async()=>{
 });
 test('manual save commits edited materials and independent quiz/home/reading writes before reporting success',async()=>{
   ctx.state.profile.name='统一保存';saving.scheduleSave();const session=quiz.quizStart('english-grammar','random',7);quiz.quizAnswer(0,session.questions[0].answer);
-  const writes=[home.saveHomeCountdown({name:'目标',date:'2027-01-15'}),journal.saveReadingProgress({date:'2026-10-23',book:'管子',startPage:1,endPage:3})];
+  const writes=[home.saveHomeCountdown({name:'目标',date:'2027-01-15'}),journal.saveReadingProgress({date:'2026-10-23',book:'管子',author:'管仲',language:'汉语',chapter:'牧民',pages:'1–3'})];
   await backup.saveAllLocal();await Promise.all(writes);
   assert.equal((await storage.get('current')).profile.name,'统一保存');assert.equal((await storage.get(quiz.QUIZ_DRAFT_KEY)).answers[0],session.questions[0].answer);assert.equal((await storage.get('settings:countdown')).name,'目标');assert.equal(journal.getLatestReading().book,'管子');assert.equal(quiz.getRecentQuiz(),null);
 });
 test('repeated manual saves and navigation never write unchanged data; settings does not open Information',async()=>{
-  let currentWrites=0;const original=storage.set;storage.set=(key,value)=>{if(key==='current')currentWrites++;return original(key,value);};
+  let currentWrites=0;const original=storage.commitCurrent;storage.commitCurrent=(...args)=>{currentWrites++;return original(...args);};
   try{ctx.state.menuOpen=['start'];const before=await storage.getAll();await app.go3('settings');assert.deepEqual(ctx.state.menuOpen,['start']);assert.equal(app.routeGroup3('settings'),undefined);
     for(const route of ['practice-dashboard','dashboard','exam-calendar','home'])await app.go3(route);
     await backup.saveAllLocal();await backup.saveAllLocal();assert.equal(currentWrites,0);assert.deepEqual(await storage.getAll(),before);
-  }finally{storage.set=original;}
+  }finally{storage.commitCurrent=original;}
 });
 test('manual saving retries an answer draft failure and never reports success while storage fails',async()=>{
   const session=quiz.quizStart('english-grammar','random',7);quiz.quizAnswer(0,session.questions[0].answer);env.factory.failWrite=true;
@@ -47,8 +47,16 @@ test('manual saving retries an answer draft failure and never reports success wh
   env.factory.failWrite=false;await backup.saveAllLocal();assert.equal((await storage.get(quiz.QUIZ_DRAFT_KEY)).answers[0],session.questions[0].answer);
 });
 test('manual save observes a pending resource failure even while current is being saved',async()=>{
-  const original=storage.setMany;storage.setMany=async(records,...rest)=>{if(Object.keys(records).some(key=>key.startsWith('resource:custom:')))throw Error('Resource write failure');return original(records,...rest);};
-  try{ctx.state.profile.name='并行保存';saving.scheduleSave();const importing=r.importResourceJSON(schedule());const handled=importing.catch(()=>{});await assert.rejects(backup.saveAllLocal(),/Resource write failure/);await handled;assert.equal(r.getExamScheduleResource().examSchedule.length,0);}finally{storage.setMany=original;}
+  const original=storage.setMany;
+  let enter,fail;const entered=new Promise(resolve=>enter=resolve),fault=new Promise((_,reject)=>fail=reject);
+  storage.setMany=(records,...rest)=>{if(Object.keys(records).some(key=>key.startsWith('resource:custom:'))){enter();return fault;}return original(records,...rest);};
+  try{
+    ctx.state.profile.name='并行保存';saving.scheduleSave();
+    const importing=r.importResourceJSON(schedule()),handled=importing.catch(()=>{});await entered;
+    const pending=backup.saveAllLocal();fail(Error('Resource write failure'));
+    await assert.rejects(pending,/Resource write failure/);await handled;
+    assert.equal(r.getExamScheduleResource().examSchedule.length,0);
+  }finally{storage.setMany=original;}
 });
 test('settings has one set of JSON controls and keeps independent HTML copies under Advanced tools',()=>{
   const html=settings.settingsPage();assert.equal((html.match(/data-action="backup"/g)||[]).length,1);assert.equal((html.match(/data-transfer-import>/g)||[]).length,1);assert.equal((html.match(/data-local-save>/g)||[]).length,1);

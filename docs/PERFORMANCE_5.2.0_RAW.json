@@ -1,0 +1,75 @@
+{
+  "version": "5.2.0",
+  "engine": "156.0.4314.50",
+  "date": "2026-10-28T15:59:52.738Z",
+  "conditions": "Windows Edge headless, 1440×1000, serviceWorkers blocked for equal application measurements; 5000 synthetic questions and 40 256×256 PNGs",
+  "runs": [
+    {
+      "run": 1,
+      "coldMs": 1196.0788,
+      "warmWithStressMs": 578.5306,
+      "firstScreenBytes": 8425803,
+      "firstScreenRequests": 72,
+      "heapCold": 27252013,
+      "imageSave": 54.799999952316284,
+      "imagePreviewMs": 152.40000009536743,
+      "importMs": 24.899999856948853,
+      "quizOpen": 31.40000009536743,
+      "saveMs": [
+        54,
+        54.60000014305115,
+        55.200000047683716,
+        50.299999952316284,
+        68
+      ],
+      "switches": 349.39999985694885,
+      "heap": 168896125,
+      "dom": 382
+    },
+    {
+      "run": 2,
+      "coldMs": 688.0461999999998,
+      "warmWithStressMs": 514.9216999999999,
+      "firstScreenBytes": 8425803,
+      "firstScreenRequests": 72,
+      "heapCold": 27252437,
+      "imageSave": 57.700000047683716,
+      "imagePreviewMs": 139.29999995231628,
+      "importMs": 26.399999856948853,
+      "quizOpen": 30,
+      "saveMs": [
+        52.59999990463257,
+        49.299999952316284,
+        51.200000047683716,
+        47.90000009536743,
+        69.40000009536743
+      ],
+      "switches": 351.7000000476837,
+      "heap": 168898129,
+      "dom": 382
+    },
+    {
+      "run": 3,
+      "coldMs": 860.3372999999992,
+      "warmWithStressMs": 503.4296999999988,
+      "firstScreenBytes": 8425803,
+      "firstScreenRequests": 72,
+      "heapCold": 27222993,
+      "imageSave": 55.200000047683716,
+      "imagePreviewMs": 143.90000009536743,
+      "importMs": 26.90000009536743,
+      "quizOpen": 24,
+      "saveMs": [
+        55.299999952316284,
+        51.30000019073486,
+        51.299999952316284,
+        52.59999990463257,
+        69.5
+      ],
+      "switches": 393.60000014305115,
+      "heap": 168892736,
+      "dom": 382
+    }
+  ],
+  "errors": []
+}

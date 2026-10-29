@@ -1,6 +1,6 @@
 import { $, $$, esc, tr, toast, uid } from '../utils/helpers.js';
 import { storage } from '../storage.js';
-import { listPracticeBanks as listQuizBanks } from '../resources.js';
+import { listPracticeBankSummaries, getPracticeBank, loadPracticeSample, countPracticeMarks } from '../resources.js';
 import { render, confirmAction, go3 } from '../app.js';
 import { ctx } from '../state.js';
 
@@ -11,6 +11,16 @@ let quizSubmitting = false, quizMarkBusy = false, quizReady = false;
 let quizCountdown = false, quizMinutes = 20, quizClockTimer = null;
 const QUIZ_MAX_SIZE = 200;
 const QUIZ_DRAFT_KEY = 'quiz:draft:active';
+const QUIZ_OVERVIEW_KEY521='@521:quiz:overview';
+let quizUnfinishedSummary521=null,quizExpectedDraftRevision521;
+let quizExpectedMarkRevisions521=new Map();
+function quizOverview521(draft=quizDraft){return {schemaVersion:1,recent:quizHistory.length?quizRecordSummary(quizHistory[0]):null,unfinished:draft?{id:draft.id,bankId:draft.bankId,bankTitle:draft.bankTitle,answered:draft.answers.filter(answer=>answer!==null).length,total:draft.questions.length,startedAt:draft.startedAt,saveError:false,protectedIdentities:draft.questions.map(q=>[q.learningBankId||draft.bankId,q.learningQuestionId||q.id])}:null};}
+async function initializeQuizSummary(){
+ const overview=await storage.get(QUIZ_OVERVIEW_KEY521);
+ if(!overview){await initializeQuiz();await storage.set(QUIZ_OVERVIEW_KEY521,quizOverview521());return;}
+ resetQuiz();if(overview.recent)quizHistory=[overview.recent];quizUnfinishedSummary521=overview.unfinished;
+}
+
 let quizDraftTimer = null, quizDraftDirty = false, quizDraftError = false, quizDraftRevision = 0;
 let quizDraftChain = Promise.resolve(), quizDraftGeneration = 0;
 let quizDraftEditedAt = '';
@@ -54,10 +64,9 @@ function flushQuizDraft() {
     // A newer flush can already have committed this revision while this one was queued.
     if (generation !== quizDraftGeneration || (!quizDraftDirty && quizDraftRevision === revision)) return;
     try {
-      await storage.update(QUIZ_DRAFT_KEY,previous => {
-        const base = previous?.id === session.id ? previous : {schemaVersion:1,id:session.id,bankId:session.bankId,bankTitle:session.bankTitle,section:session.section,mode:session.mode,requestedSize:session.requestedSize,questions:session.questions,startedAt:session.startedAt,limitSeconds:session.limitSeconds};
-        return {...base,answers,updatedAt};
-      });
+      const next={schemaVersion:1,id:session.id,bankId:session.bankId,bankTitle:session.bankTitle,section:session.section,mode:session.mode,requestedSize:session.requestedSize,questions:session.questions,startedAt:session.startedAt,limitSeconds:session.limitSeconds,answers,updatedAt};
+      await storage.setMany({[QUIZ_DRAFT_KEY]:next,[QUIZ_OVERVIEW_KEY521]:quizOverview521(next)},[],{expected:quizExpectedDraftRevision521===undefined?{}:{[QUIZ_DRAFT_KEY]:quizExpectedDraftRevision521}});
+      quizExpectedDraftRevision521=storage.revision?.(QUIZ_DRAFT_KEY);
       if (generation === quizDraftGeneration && quizDraft === session) {
         quizDraftError = false;
         if (quizDraftRevision === revision) quizDraftDirty = false;
@@ -74,7 +83,7 @@ function flushQuizDraft() {
   return pending;
 }
 function getUnfinishedQuiz() {
-  return quizDraft ? {id:quizDraft.id,bankId:quizDraft.bankId,bankTitle:quizDraft.bankTitle,answered:quizDraft.answers.filter(answer=>answer!==null).length,total:quizDraft.questions.length,startedAt:quizDraft.startedAt,saveError:quizDraftError} : null;
+  return quizDraft ? {id:quizDraft.id,bankId:quizDraft.bankId,bankTitle:quizDraft.bankTitle,answered:quizDraft.answers.filter(answer=>answer!==null).length,total:quizDraft.questions.length,startedAt:quizDraft.startedAt,saveError:quizDraftError} : quizUnfinishedSummary521;
 }
 function getQuizDraftRecord() {
   if (!quizDraft) return null;
@@ -101,6 +110,8 @@ function quizIsObject(value) { return !!value && typeof value === 'object' && !A
 function quizValidQuestion(question) {
   if (!quizIsObject(question) || typeof question.id !== 'string' || !question.id || typeof question.question !== 'string' || !question.question.trim() || typeof question.explanation !== 'string') return false;
   if ((question.learningBankId !== undefined || question.learningQuestionId !== undefined) && (typeof question.learningBankId !== 'string' || !question.learningBankId || typeof question.learningQuestionId !== 'string' || !question.learningQuestionId)) return false;
+  if(question.category!==undefined&&(typeof question.category!=='string'||question.category.length>200))return false;
+  if(question.tags!==undefined&&(!Array.isArray(question.tags)||question.tags.length>30||question.tags.some(t=>typeof t!=='string'||!t.trim()||t.length>100)||new Set(question.tags).size!==question.tags.length))return false;
   if (question.type === 'true-false') return typeof question.answer === 'boolean';
   if (question.type !== 'single-choice' || !Array.isArray(question.options) || question.options.length < 2 || question.options.length > 26) return false;
   const ids = new Set();
@@ -144,13 +155,14 @@ function quizValidDraft(value) {
 function validateQuizRecords(records) {
   if (!quizIsObject(records)) throw new Error('练习备份格式无效。');
   for (const [key, value] of Object.entries(records)) {
+    if(key.startsWith('learning:folder:')){if(!value||value.schemaVersion!==1||key!=='learning:folder:'+value.id||typeof value.name!=='string'||!value.name.trim()||value.name.length>200||!Array.isArray(value.questions)||value.questions.length>20000||new Set(value.questions.map(q=>JSON.stringify([q.bankId,q.questionId]))).size!==value.questions.length||value.questions.some(q=>typeof q.bankId!=='string'||!q.bankId||typeof q.questionId!=='string'||!q.questionId)||!Number.isFinite(Date.parse(value.updatedAt)))throw new Error('收藏夹记录无效：'+key);continue;}
     if (!key.startsWith('quiz:')) continue;
     let valid = false;
     if (key === QUIZ_DRAFT_KEY) {
       // null is an atomic submission tombstone, not an unfinished group.
       valid = value === null || quizValidDraft(value);
     } else if (key.startsWith('quiz:mark:')) {
-      valid = quizIsObject(value) && typeof value.bankId === 'string' && !!value.bankId && typeof value.questionId === 'string' && !!value.questionId && typeof value.wrong === 'boolean' && typeof value.favorite === 'boolean' && key === quizMarkKey(value.bankId, value.questionId);
+      valid = quizIsObject(value) && typeof value.bankId === 'string' && !!value.bankId && typeof value.questionId === 'string' && !!value.questionId && typeof value.wrong === 'boolean' && typeof value.favorite === 'boolean' && key === quizMarkKey(value.bankId, value.questionId) && (value.mastered===undefined||typeof value.mastered==='boolean') && (value.reviewPending===undefined||typeof value.reviewPending==='boolean') && (value.lastWrongAt===undefined||Number.isFinite(Date.parse(value.lastWrongAt)));
     } else if (key.startsWith('quiz:record:') && quizIsObject(value)) {
       valid = typeof value.id === 'string' && !!value.id && key === 'quiz:record:' + value.id && typeof value.bankId === 'string' && !!value.bankId && typeof value.bankTitle === 'string' && quizSections.some(section => section[0] === value.section) && ['random', 'wrong', 'favorites'].includes(value.mode) && Number.isInteger(value.requestedSize) && value.requestedSize >= 1 && value.requestedSize <= QUIZ_MAX_SIZE && quizValidTiming(value.timing) && Array.isArray(value.questions) && value.questions.length > 0 && value.questions.length <= value.requestedSize && value.questions.every(quizValidQuestion) && new Set(value.questions.map(question => question.id)).size === value.questions.length && Array.isArray(value.answers) && value.answers.length === value.questions.length && value.questions.every((question, index) => quizValidAnswer(question, value.answers[index])) && value.total === value.questions.length && Number.isInteger(value.correct) && value.correct === value.questions.filter((question, index) => question.answer === value.answers[index]).length && typeof value.submittedAt === 'string' && Number.isFinite(Date.parse(value.submittedAt));
     }
@@ -162,8 +174,9 @@ function resetQuiz() {
   clearTimeout(quizDraftTimer); quizDraftTimer = null;
   quizDraftDirty = false; quizDraftError = false; quizDraftRevision = 0; quizDraftGeneration++; quizDraftEditedAt = '';
   quizStopClock();quizCountdown=false;quizMinutes=20;
+  quizUnfinishedSummary521=null;quizExpectedMarkRevisions521=new Map();
   quizHistory = []; quizMarks = new Map(); quizSession = null; quizDraft = null;
-  quizSelectedBank = ''; quizMode = 'random'; quizSize = 10; quizView = 'setup';
+  quizSelectedBank = ''; quizMode = 'random'; quizSize = ctx.device53?.practiceSize||10; quizView = 'setup';
   quizSubmitting = false; quizMarkBusy = false; quizReady = false;
 }
 async function initializeQuiz(records) {
@@ -173,7 +186,7 @@ async function initializeQuiz(records) {
   const history = [];
   for (const [key, value] of Object.entries(loaded)) {
     if (key.startsWith('quiz:record:')) history.push(value);
-    if (key.startsWith('quiz:mark:')) quizMarks.set(key, quizClone(value));
+    if (key.startsWith('quiz:mark:')) {quizMarks.set(key, quizClone(value));quizExpectedMarkRevisions521.set(key,storage.revision?.(key)||0);}
   }
   if (loaded[QUIZ_DRAFT_KEY]) {
     const draft = quizClone(loaded[QUIZ_DRAFT_KEY]);
@@ -188,6 +201,7 @@ async function initializeQuiz(records) {
   // Retain one complete recent result for the existing synchronous API. Older
   // question snapshots stay in IndexedDB and are loaded only when reviewed.
   quizHistory = history.map((record,index)=>index===0?quizClone(record):quizRecordSummary(record));
+  quizExpectedDraftRevision521=storage.revision?.(QUIZ_DRAFT_KEY);
   quizReady = true;
 }
 function getRecentQuiz() { return quizHistory.length ? quizClone(quizHistory[0]) : null; }
@@ -198,7 +212,7 @@ function quizRecordSummary(record) {
 function getRecentQuizSummary() { return quizHistory.length ? quizRecordSummary(quizHistory[0]) : null; }
 // Read only: unfinished drafts never enter this aggregation, nor trigger storage writes.
 function getQuizDashboard(section = '') {
-  const banks=listQuizBanks(), names=new Map(banks.filter(item=>item.origin==='custom').map(item=>[item.bank.id,item.bank.name]));
+  const banks=listPracticeBankSummaries(), names=new Map(banks.filter(item=>item.origin==='custom').map(item=>[item.bank.id,item.bank.name]));
   for(const record of quizHistory)if(record.section==='custom'&&!names.has(record.bankId))names.set(record.bankId,record.bankTitle);
   const matches=(record,id)=>id.startsWith('bank:')?record.bankId===id.slice(5):record.section===id&&!names.has(record.bankId);
   const records=quizHistory.filter(record=>!section||matches(record,section));
@@ -211,24 +225,24 @@ function getQuizDashboard(section = '') {
   const marks=[...quizMarks.values()].filter(mark=>!sectionBanks||sectionBanks.has(mark.bankId));
   return {groups:records.length,total,correct,accuracy:total?Math.round(correct/total*100):null,
     elapsedSeconds:timed.reduce((sum,record)=>sum+record.timing.elapsedSeconds,0),timedGroups:timed.length,
-    wrong:marks.filter(mark=>mark.wrong).length,favorites:marks.filter(mark=>mark.favorite).length,
+    wrong:marks.filter(mark=>mark.reviewPending??mark.wrong).length,favorites:marks.filter(mark=>mark.favorite).length,
     sections,recent:records.slice(0,7).map(quizRecordSummary)};
 }
 
 export { getQuizDashboard, getRecentQuizSummary };
 function quizGetMark(bankId, questionId, suppliedQuestion) {
-  const question = suppliedQuestion || (quizSession?.bankId === bankId && quizSession.questions.find(q => q.id === questionId)) || listQuizBanks().find(item => item.bank.id === bankId)?.questions.find(q => q.id === questionId);
+  const question = suppliedQuestion || (quizSession?.bankId === bankId && quizSession.questions.find(q => q.id === questionId)) || getPracticeBank(bankId)?.questions.find(q => q.id === questionId);
   if (question?.learningBankId) { bankId = question.learningBankId; questionId = question.learningQuestionId; }
   return quizMarks.get(quizMarkKey(bankId, questionId)) || {bankId, questionId, wrong: false, favorite: false};
 }
 function quizPool(resource, mode) {
-  return resource.questions.filter(question => mode === 'random' || quizGetMark(resource.bank.id, question.id, question)[mode === 'wrong' ? 'wrong' : 'favorite']);
+  return resource.questions.filter(question => mode === 'random' || (mode==='wrong'?(quizGetMark(resource.bank.id,question.id,question).reviewPending??quizGetMark(resource.bank.id,question.id,question).wrong):quizGetMark(resource.bank.id,question.id,question).favorite));
 }
-function quizStart(bankId, mode = 'random', requestedSize = 10, random = Math.random, {limitSeconds=0} = {}) {
+function quizStart(bankId, mode = 'random', requestedSize = 10, random = Math.random, {limitSeconds=0,sampleResource521} = {}) {
   if (!quizReady || quizSubmitting || quizMarkBusy || ctx.persistencePaused) throw new Error('请等待本地数据准备完成。');
   if (!Number.isInteger(requestedSize) || requestedSize<1 || requestedSize>QUIZ_MAX_SIZE || !['random', 'wrong', 'favorites'].includes(mode)) throw new Error('每组题数请输入 1–200 的整数。');
   if(!Number.isInteger(limitSeconds)||limitSeconds<0||limitSeconds>10800)throw new Error('倒计时应为 1–180 分钟，关闭时为 0。');
-  const resource = listQuizBanks().find(item => item.bank.id === bankId);
+  const resource = sampleResource521||getPracticeBank(bankId);
   if (!resource) throw new Error('题库已移除，请重新选择。');
   const pool = [...quizPool(resource, mode)];
   if (!pool.length) throw new Error(mode === 'wrong' ? '此题库暂无待巩固错题。' : mode === 'favorites' ? '此题库暂无收藏题。' : '此题库暂未收录题目。');
@@ -263,8 +277,10 @@ async function quizFavorite(bankId, questionId) {
   try {
     const mark = {...quizGetMark(bankId, questionId)};
     mark.favorite = !mark.favorite;
-    await quizTrackWrite(storage.set(quizMarkKey(mark.bankId, mark.questionId), mark));
-    quizMarks.set(quizMarkKey(mark.bankId, mark.questionId), mark);
+    const key=quizMarkKey(mark.bankId,mark.questionId);
+    await quizTrackWrite(storage.set(key,mark,{expected:{[key]:quizExpectedMarkRevisions521.get(key)||0}}));
+    quizExpectedMarkRevisions521.set(key,storage.revision?.(key)||0);
+    quizMarks.set(key,mark);
     return mark.favorite;
   } finally { quizMarkBusy = false; }
 }
@@ -279,14 +295,18 @@ async function quizSubmit() {
     clearTimeout(quizDraftTimer); quizDraftTimer = null;
     await quizDraftChain;
     const record = {id: session.id, bankId: session.bankId, bankTitle: session.bankTitle, section: session.section, mode: session.mode, requestedSize: session.requestedSize, questions: quizClone(session.questions), answers: [...session.answers], correct: session.questions.filter((question, index) => question.answer === session.answers[index]).length, total: session.questions.length, submittedAt: new Date().toISOString(),timing:{startedAt:new Date(session.startedAt).toISOString(),elapsedSeconds:quizTimeState(session).elapsedSeconds,limitSeconds:session.limitSeconds}};
-    const writes = {['quiz:record:' + record.id]: record};
+    const writes = {['quiz:record:' + record.id]: record,[QUIZ_OVERVIEW_KEY521]:{schemaVersion:1,recent:quizRecordSummary(record),unfinished:null}};
     for (let index = 0; index < session.questions.length; index++) {
       const question = session.questions[index], previous = quizGetMark(session.bankId, question.id, question), wrong = question.answer !== session.answers[index];
-      if (previous.wrong !== wrong) writes[quizMarkKey(previous.bankId, previous.questionId)] = {...previous, wrong};
+      if (previous.wrong !== wrong || wrong) writes[quizMarkKey(previous.bankId, previous.questionId)] = {...previous, wrong,...(wrong?{lastWrongAt:record.submittedAt,mastered:false,reviewPending:true}:previous.reviewPending!==undefined?{reviewPending:previous.reviewPending}:previous.wrong?{reviewPending:true,mastered:false}:{})};
     }
-    await quizTrackWrite(storage.setMany(writes,[QUIZ_DRAFT_KEY]));
+    const nextMarks53=new Map(quizMarks);for(const [key,value]of Object.entries(writes))if(key.startsWith('quiz:mark:'))nextMarks53.set(key,value);
+    writes['settings:learning-overview53']=quizHomeSummary53([record,...quizHistory],[...nextMarks53.values()]);
+    const expectedMarks521=Object.fromEntries(Object.keys(writes).filter(key=>key.startsWith('quiz:mark:')).map(key=>[key,quizExpectedMarkRevisions521.get(key)||0]));
+    await quizTrackWrite(storage.setMany(writes,[QUIZ_DRAFT_KEY],{expected:{...expectedMarks521,...(quizExpectedDraftRevision521===undefined?{}:{[QUIZ_DRAFT_KEY]:quizExpectedDraftRevision521})}}));
+    quizExpectedDraftRevision521=storage.revision?.(QUIZ_DRAFT_KEY);
     // Statistics and review become visible only after the complete transaction commits.
-    for (const [key, value] of Object.entries(writes)) if (key.startsWith('quiz:mark:')) quizMarks.set(key, value);
+    for (const [key, value] of Object.entries(writes)) if (key.startsWith('quiz:mark:')) {quizMarks.set(key,value);quizExpectedMarkRevisions521.set(key,storage.revision?.(key)||0);}
     quizHistory.unshift(quizClone(record)); session.record = record;quizStopClock();
     if (quizHistory.length>1) quizHistory[1] = quizRecordSummary(quizHistory[1]);
     quizDraft = null; quizDraftDirty = false; quizDraftError = false; quizDraftGeneration++;
@@ -298,26 +318,27 @@ function quizChoiceLabel(question, answer) {
   const option = question.options.find(item => item.id === answer);
   return option ? esc(option.id) + '. ' + quizText(option.text) : '';
 }
-function quizBankCard(resource) { return '<button type="button" class="quiz-bank ' + (resource.bank.id === quizSelectedBank ? 'selected' : '') + '" data-quiz-bank="' + esc(resource.bank.id) + '" aria-pressed="' + (resource.bank.id === quizSelectedBank) + '"><span class="quiz-selection-indicator" aria-hidden="true">✓</span><strong>' + esc(resource.bank.name) + '</strong><span>' + resource.questions.length + tr(' 题', ' questions') + (resource.origin === 'custom' ? tr(' · 自定义', ' · Custom') : '') + '</span>' + (resource.questions.length ? '' : '<small>' + tr('暂无题目 · 可导入题库', 'No questions · Import a bank') + '</small>') + '</button>'; }
+function quizBankCard(resource) { return '<button type="button" class="quiz-bank ' + (resource.bank.id === quizSelectedBank ? 'selected' : '') + '" data-quiz-bank="' + esc(resource.bank.id) + '" aria-pressed="' + (resource.bank.id === quizSelectedBank) + '"><span class="quiz-selection-indicator" aria-hidden="true">✓</span><strong>' + esc(resource.bank.name) + '</strong><span>' + (resource.questionCount??resource.questions.length) + tr(' 题', ' questions') + (resource.origin === 'custom' ? tr(' · 自定义', ' · Custom') : '') + '</span>' + ((resource.questionCount??resource.questions.length) ? '' : '<small>' + tr('暂无题目 · 可导入题库', 'No questions · Import a bank') + '</small>') + '</button>'; }
 function quizSetupPage() {
-  const banks = listQuizBanks();
-  if (!banks.some(resource => resource.bank.id === quizSelectedBank)) quizSelectedBank = banks.find(resource => resource.questions.length)?.bank.id || banks[0]?.bank.id || '';
+  const banks = listPracticeBankSummaries();
+  if (!banks.some(resource => resource.bank.id === quizSelectedBank)) quizSelectedBank = banks.find(resource => (resource.questionCount??resource.questions.length))?.bank.id || banks[0]?.bank.id || '';
   const selected = banks.find(resource => resource.bank.id === quizSelectedBank);
-  const count = selected ? quizPool(selected, quizMode).length : 0;
+  const count=selected?(quizMode==='random'?selected.questionCount:countPracticeMarks(selected.bank.id,quizMode==='wrong'?'wrong':'favorite',[...quizMarks.values()].map(m=>({...m,wrong:m.reviewPending??m.wrong})))):0;
   const cards=banks.map(quizBankCard).join('');
   const resume = quizDraft ? '<div class="quiz-notice">' + tr('有一组练习尚未交卷，答案已保留。', 'Your unfinished answers are kept.') + ' <button type="button" data-quiz-resume>' + tr('继续作答', 'Resume') + '</button></div>' : '';
   const history = quizHistory.length ? '<div class="quiz-history"><h2>' + tr('已完成的练习', 'Completed groups') + '</h2>' + quizHistory.slice(0, 30).map(record => '<button type="button" data-quiz-review="' + esc(record.id) + '"><span>' + esc(record.bankTitle) + '</span><span>' + record.correct + ' / ' + record.total + ' · ' + Math.round(record.correct / record.total * 100) + '%</span><small>' + esc(new Date(record.submittedAt).toLocaleString()) + '</small></button>').join('') + '</div>' : '<p class="quiz-empty">' + tr('交卷后，这里会显示成绩与解析。', 'Submit a group to see results and explanations here.') + '</p>';
   return '<div class="quiz-setup"><div class="actions"><button data-action="resources">'+tr('管理题库 / 导入题目','Manage banks / import questions')+'</button></div>' + resume + '<div class="quiz-grid">' + cards + '</div><section class="quiz-controls card"><label>' + tr('练习方式', 'Practice mode') + '<select id="quizMode">' + [['random', '随机练习', 'Random'], ['wrong', '错题巩固', 'Wrong answers'], ['favorites', '收藏练习', 'Favorites']].map(([value, zh, en]) => '<option value="' + value + '"' + (value === quizMode ? ' selected' : '') + '>' + tr(zh, en) + '</option>').join('') + '</select></label><label>' + tr('每组题数', 'Group size') + '<input id="quizSize" type="number" inputmode="numeric" min="1" max="200" step="1" value="'+(Number.isFinite(quizSize)?quizSize:'')+'" required></label><div class="quiz-timing-controls"><label class="quiz-timing-toggle"><input id="quizCountdown" type="checkbox" '+(quizCountdown?'checked':'')+'>'+tr('开启倒计时','Countdown')+'</label><label>'+tr('时长（分钟）','Minutes')+'<input id="quizMinutes" type="number" inputmode="numeric" min="1" max="180" step="1" value="'+quizMinutes+'" '+(quizCountdown?'':'disabled')+'></label></div><button type="button" class="primary" data-quiz-start' + (!count || !quizReady ? ' disabled' : '') + '>' + tr('开始练习', 'Start practice') + '</button><p class="quiz-notice" id="quizSetupStatus" role="status">' + (!quizReady ? tr('正在读取本地练习记录。', 'Loading local practice records.') : !count ? tr('当前范围暂无题目，请更换题库或练习方式。', 'No questions in this selection. Choose another bank or mode.') : count < quizSize ? tr('当前范围只有 ', 'Only ') + count + tr(' 题，本组将练习全部可用题目。', ' questions available; this group uses all of them.') : count + tr(' 道可用题目 · 交卷后统一批改', ' available questions · Graded on submission')) + '</p><p class="quiz-notice">'+tr('题数可手填 1–200；不足时练习全部可用题。倒计时到时只提醒，不自动交卷；计时不触发保存。','Enter 1–200 questions. A smaller pool uses all available questions. Countdown gives a reminder without auto-submission.')+'</p></section>' + history + '</div>';
 }
 function quizSessionPage() {
-  const session = quizSession, question = session.questions[session.index], answer = session.answers[session.index], reviewed = !!session.record;
+  const session = quizSession, question = session.questions[session.index], answer = session.answers[session.index], reviewed = !!session.record && !questionProtected53(question.learningBankId||session.bankId,question.learningQuestionId||question.id);
+  if(session.record&&session.questions.some(q=>questionProtected53(q.learningBankId||session.bankId,q.learningQuestionId||q.id)))return '<section class="panel"><h2>先完成正在进行的练习</h2><p>历史题组与尚未交卷的题组有重叠，暂时隐藏整组历史选择、答案、解析与笔记。</p><button data-quiz-resume>继续练习</button></section>';
   const answered = session.answers.filter(value => value !== null).length;
   const choices = question.type === 'true-false' ? [{id: true, text: tr('正确', 'True')}, {id: false, text: tr('错误', 'False')}] : question.options;
   const favorite = quizGetMark(session.bankId, question.id, question).favorite;
   const time=quizTimeState(),limit=session.record?.timing?.limitSeconds??session.limitSeconds??0;
   const clock=reviewed?(session.record.timing?'<p class="quiz-time-summary">'+tr('本组用时 ','Time spent ')+quizFormatTime(time.elapsedSeconds)+(limit?' · '+tr('限时 ','Limit ')+quizFormatTime(limit):'')+'</p>':''):'<section class="quiz-clock-bar" aria-label="'+tr('本组计时','Session timer')+'"><div><span>'+tr(limit?'剩余时间':'已用时间',limit?'Time left':'Time spent')+'</span><strong id="quizClock" role="timer" aria-live="off">'+quizFormatTime(time.remainingSeconds??time.elapsedSeconds)+'</strong></div>'+(limit?'<small>'+tr('已用时 ','Elapsed ')+ '<span id="quizElapsed">'+quizFormatTime(time.elapsedSeconds)+'</span></small>':'')+'<p id="quizTimeNotice" role="status" '+(time.expired?'':'hidden')+'>'+ (time.expired?tr('时间到。答案已保留，可继续完成后提交本组。','Time is up. Finish and submit when ready.'):'')+'</p></section>';
   const result = reviewed ? '<section class="quiz-result card" role="status"><h2>' + tr('本组已交卷', 'Group submitted') + '</h2><dl class="quiz-result-stats">' + [[tr('总题数', 'Questions'), session.record.total], [tr('正确题数', 'Correct'), session.record.correct], [tr('错误题数', 'Incorrect'), session.record.total - session.record.correct], [tr('正确率', 'Accuracy'), Math.round(session.record.correct / session.record.total * 100) + '%']].map(([label, value]) => '<div><dt>' + label + '</dt><dd>' + value + '</dd></div>').join('') + '</dl><p>' + tr('可逐题查看答案与解析，错题已更新。', 'Review answers and explanations. Wrong answers have been updated.') + '</p></section>' : '';
-  return '<div class="quiz-session">' + clock + result + '<div class="quiz-actions"><button type="button" data-quiz-back>' + tr('返回题库', 'Back to banks') + '</button><strong>' + esc(session.bankTitle) + '</strong><span class="quiz-progress" role="status">' + tr('已答 ', 'Answered ') + answered + ' / ' + session.questions.length + '</span></div>' + (session.questions.length < session.requestedSize ? '<p class="quiz-notice">' + tr('当前范围不足所选题数，本组共 ', 'Fewer questions were available. This group has ') + session.questions.length + tr(' 题。', ' questions.') + '</p>' : '') + '<nav class="quiz-jumps" aria-label="' + tr('题目导航', 'Question navigation') + '">' + session.questions.map((item, index) => '<button type="button" class="quiz-jump' + (index === session.index ? ' active' : '') + (session.answers[index] !== null ? ' answered' : '') + (reviewed ? item.answer === session.answers[index] ? ' correct' : ' incorrect' : '') + '" data-quiz-jump="' + index + '" aria-label="' + tr('第 ', 'Question ') + (index + 1) + (session.answers[index] !== null ? tr(' 题，已答', ', answered') : tr(' 题，未答', ', unanswered')) + (reviewed ? item.answer === session.answers[index] ? tr('，正确', ', correct') : tr('，错误', ', incorrect') : '') + '"' + (index === session.index ? ' aria-current="step"' : '') + '>' + (index + 1) + '</button>').join('') + '</nav><section class="quiz-question card" aria-labelledby="quizQuestion"><div class="quiz-actions"><span>' + (session.index + 1) + ' / ' + session.questions.length + ' · ' + esc(question.learningQuestionId || question.id) + '</span><button type="button" data-quiz-favorite aria-pressed="' + favorite + '"' + (quizSubmitting || quizMarkBusy ? ' disabled' : '') + '>' + (favorite ? tr('★ 已收藏', '★ Saved') : tr('☆ 收藏此题', '☆ Save question')) + '</button></div><h2 id="quizQuestion">' + quizText(question.question) + '</h2><div class="quiz-options" role="group" aria-label="' + tr('选择答案', 'Choose an answer') + '">' + choices.map((option, index) => '<button type="button" class="quiz-option' + (answer === option.id ? ' selected' : '') + (reviewed && option.id === question.answer ? ' correct' : reviewed && answer === option.id ? ' incorrect' : '') + '" data-quiz-option="' + index + '" aria-pressed="' + (answer === option.id) + '"' + (reviewed || quizSubmitting ? ' disabled' : '') + '>' + (question.type === 'single-choice' ? '<b>' + esc(option.id) + '</b> ' : '') + '<span>' + quizText(option.text) + '</span></button>').join('') + '</div>' + (reviewed ? '<div class="quiz-explanation"><p><strong>' + tr('你的答案：', 'Your answer: ') + '</strong>' + quizChoiceLabel(question, answer) + '</p><p><strong>' + tr('正确答案：', 'Correct answer: ') + '</strong>' + quizChoiceLabel(question, question.answer) + '</p><p><strong>' + tr('解析：', 'Explanation: ') + '</strong>' + quizText(question.explanation || tr('此题暂未提供解析。', 'No explanation provided.')) + '</p></div>' : '<p class="quiz-notice">' + tr('交卷前可自由修改答案，交卷后统一查看结果与解析。', 'You can change answers until submission. Results and explanations appear afterwards.') + '</p><p class="quiz-notice" id="quizDraftStatus" role="status"></p>') + '<div class="quiz-actions"><button type="button" data-quiz-prev' + (session.index === 0 ? ' disabled' : '') + '>' + tr('上一题', 'Previous') + '</button><button type="button" data-quiz-next' + (session.index === session.questions.length - 1 ? ' disabled' : '') + '>' + tr('下一题', 'Next') + '</button>' + (!reviewed ? '<button type="button" class="primary" data-quiz-submit' + (quizSubmitting || quizMarkBusy ? ' disabled' : '') + '>' + (quizSubmitting ? tr('正在保存…', 'Saving…') : tr('提交本组', 'Submit group')) + '</button>' : '') + '</div></section></div>';
+  return '<div class="quiz-session">' + clock + result + '<div class="quiz-actions"><button type="button" data-quiz-back>' + tr('返回题库', 'Back to banks') + '</button><strong>' + esc(session.bankTitle) + '</strong><span class="quiz-progress" role="status">' + tr('已答 ', 'Answered ') + answered + ' / ' + session.questions.length + '</span></div>' + (session.questions.length < session.requestedSize ? '<p class="quiz-notice">' + tr('当前范围不足所选题数，本组共 ', 'Fewer questions were available. This group has ') + session.questions.length + tr(' 题。', ' questions.') + '</p>' : '') + '<nav class="quiz-jumps" aria-label="' + tr('题目导航', 'Question navigation') + '">' + session.questions.map((item, index) => '<button type="button" class="quiz-jump' + (index === session.index ? ' active' : '') + (session.answers[index] !== null ? ' answered' : '') + (reviewed ? item.answer === session.answers[index] ? ' correct' : ' incorrect' : '') + '" data-quiz-jump="' + index + '" aria-label="' + tr('第 ', 'Question ') + (index + 1) + (session.answers[index] !== null ? tr(' 题，已答', ', answered') : tr(' 题，未答', ', unanswered')) + (reviewed ? item.answer === session.answers[index] ? tr('，正确', ', correct') : tr('，错误', ', incorrect') : '') + '"' + (index === session.index ? ' aria-current="step"' : '') + '>' + (index + 1) + '</button>').join('') + '</nav><section class="quiz-question card" aria-labelledby="quizQuestion"><div class="quiz-actions"><span>' + (session.index + 1) + ' / ' + session.questions.length + ' · ' + esc(question.learningQuestionId || question.id) + '</span><button type="button" data-quiz-favorite aria-pressed="' + favorite + '"' + (quizSubmitting || quizMarkBusy ? ' disabled' : '') + '>' + (favorite ? tr('★ 已收藏', '★ Saved') : tr('☆ 收藏此题', '☆ Save question')) + '</button></div><h2 id="quizQuestion">' + quizText(question.question) + '</h2><div class="quiz-options" role="group" aria-label="' + tr('选择答案', 'Choose an answer') + '">' + choices.map((option, index) => '<button type="button" class="quiz-option' + (answer === option.id ? ' selected' : '') + (reviewed && option.id === question.answer ? ' correct' : reviewed && answer === option.id ? ' incorrect' : '') + '" data-quiz-option="' + index + '" aria-pressed="' + (answer === option.id) + '"' + (reviewed || quizSubmitting ? ' disabled' : '') + '>' + (question.type === 'single-choice' ? '<b>' + esc(option.id) + '</b> ' : '') + '<span>' + quizText(option.text) + '</span></button>').join('') + '</div>' + (reviewed ? '<div class="quiz-explanation"><p><strong>' + tr('你的答案：', 'Your answer: ') + '</strong>' + quizChoiceLabel(question, answer) + '</p><p><strong>' + tr('正确答案：', 'Correct answer: ') + '</strong>' + quizChoiceLabel(question, question.answer) + '</p><p><strong>' + tr('解析：', 'Explanation: ') + '</strong>' + quizText(question.explanation || tr('此题暂未提供解析。', 'No explanation provided.')) + '</p><section class="question-note53" data-note53-bank="'+esc(question.learningBankId||session.bankId)+'" data-note53-question="'+esc(question.learningQuestionId||question.id)+'"><h3>我的笔记</h3><p>正在读取个人笔记…</p></section></div>' : '<p class="quiz-notice">' + tr('交卷前可自由修改答案，交卷后统一查看结果与解析。', 'You can change answers until submission. Results and explanations appear afterwards.') + '</p><p class="quiz-notice" id="quizDraftStatus" role="status"></p>') + '<div class="quiz-actions"><button type="button" data-quiz-prev' + (session.index === 0 ? ' disabled' : '') + '>' + tr('上一题', 'Previous') + '</button><button type="button" data-quiz-next' + (session.index === session.questions.length - 1 ? ' disabled' : '') + '>' + tr('下一题', 'Next') + '</button>' + (!reviewed ? '<button type="button" class="primary" data-quiz-submit' + (quizSubmitting || quizMarkBusy ? ' disabled' : '') + '>' + (quizSubmitting ? tr('正在保存…', 'Saving…') : tr('提交本组', 'Submit group')) + '</button>' : '') + '</div></section></div>';
 }
 function quizPage() {
   return '<button class="home-text-button" data-go3="explore">← ' + tr('返回学习中心','Back to learning center') + '</button><div class="page-head"><div><div class="eyebrow">LEARNING / PRACTICE</div><h1>' + tr('练习中心', 'Practice center') + '</h1><p>' + tr('选择题库，完成一组练习，再统一复盘。', 'Choose a bank, complete a group, then review it together.') + '</p></div></div>' + (quizView === 'session' && quizSession ? quizSessionPage() : quizSetupPage());
@@ -335,9 +356,13 @@ function bindQuizControls() {
   if (start) start.onclick = async () => {
     if(!$('#quizSize').reportValidity() || (quizCountdown&&!$('#quizMinutes').reportValidity()))return;
     if (quizDraft && !await confirmAction(tr('开始新一组练习？', 'Start another group?'), tr('当前未交卷答案将被替换，不计入成绩。', 'Your unfinished answers will be replaced without recording a result.'))) return;
-    try { quizStart(quizSelectedBank, quizMode, quizSize,Math.random,{limitSeconds:quizCountdown?quizMinutes*60:0}); quizRender(); } catch (error) { toast(error.message); }
+    try { start.disabled=true;const sampleResource521=await loadPracticeSample(quizSelectedBank,{size:quizSize,mode:quizMode,marks:[...quizMarks.values()].map(m=>({...m,wrong:m.reviewPending??m.wrong}))});quizStart(quizSelectedBank, quizMode, quizSize,Math.random,{limitSeconds:quizCountdown?quizMinutes*60:0,sampleResource521}); quizRender(); } catch (error) { toast(error.message); }
   };
-  $$('[data-quiz-resume]').forEach(button => button.onclick = quizResume);
+  $$('[data-quiz-resume]').forEach(button => button.onclick = async()=>{
+    // Home intentionally holds only an overview; read the real draft before resuming.
+    if(!quizDraft&&quizUnfinishedSummary521)await go3('quiz');
+    quizResume();
+  });
   const back = $('[data-quiz-back]'); if (back) back.onclick = () => { quizView = 'setup'; quizRender(); };
   $$('[data-quiz-review]').forEach(button => button.onclick = async () => {
     // Reviewing past results keeps the independent unfinished group available to resume.
@@ -379,3 +404,27 @@ function bindQuizControls() {
 }
 
 export { initializeQuiz, resetQuiz, quizPage, bindQuizControls, getRecentQuiz, validateQuizRecords, waitForQuizWrites, quizStart, quizAnswer, quizSubmit, quizFavorite, quizMarkKey, quizText, quizTimeState, quizFormatTime, QUIZ_MAX_SIZE, QUIZ_DRAFT_KEY, flushQuizDraft, getUnfinishedQuiz, getQuizDraftRecord, quizResume, refreshQuizClock, hasPendingQuizWrites };
+
+export {initializeQuizSummary};
+
+let externalProtected53=new Set();
+function protectedQuestionIds53(){const ids=new Set(externalProtected53);if(quizDraft)for(const q of quizDraft.questions)ids.add(JSON.stringify([q.learningBankId||quizDraft.bankId,q.learningQuestionId||q.id]));else if(quizUnfinishedSummary521)for(const key of quizUnfinishedSummary521.protectedIdentities?.map(pair=>JSON.stringify(pair))||['*'])ids.add(key);return ids;}
+function updateExternalProtected53(ids){externalProtected53=new Set(ids);}
+export {updateExternalProtected53};
+function questionProtected53(bankId,questionId){const ids=protectedQuestionIds53();return ids.has('*')||ids.has(JSON.stringify([bankId,questionId]));}
+async function openQuizHistory53(id){const record=await storage.get('quiz:record:'+id);if(!record)throw new Error('练习记录不存在。');validateQuizRecords({['quiz:record:'+id]:record});quizSession={...quizClone(record),index:0,record:quizClone(record)};quizView='session';await go3('quiz');quizRender();}
+async function startReview53(questions,title,{size=10,limitSeconds=0}={}){
+ await initializeQuiz();if(quizDraft&&!await confirmAction('开始新一组复习？','当前未完成练习将被替换，不计入成绩。'))return false;
+ const resource={origin:'custom',bank:{id:'review53',name:title,section:'custom'},questions:questions.map(q=>({...q,id:JSON.stringify([q.learningBankId,q.learningQuestionId])}))};
+ quizStart('review53','random',size,Math.random,{limitSeconds,sampleResource521:resource});await flushQuizDraft();await go3('quiz');quizRender();return true;
+}
+export {protectedQuestionIds53,questionProtected53,openQuizHistory53,startReview53};
+
+function quizHomeSummary53(records,marks){const today=new Date(),week=new Date(today.getFullYear(),today.getMonth(),today.getDate());week.setDate(week.getDate()-(week.getDay()+6)%7);const weekStart=[week.getFullYear(),String(week.getMonth()+1).padStart(2,'0'),String(week.getDate()).padStart(2,'0')].join('-');return {schemaVersion:1,weekStart,weekAnswers:records.filter(r=>new Date(r.submittedAt)>=week).reduce((n,r)=>n+r.total,0),pendingWrong:marks.filter(m=>m.reviewPending??m.wrong).length,recent:records[0]?quizRecordSummary(records[0]):null,lastBankId:records[0]?.bankId||'',updatedAt:new Date().toISOString()};}
+export {quizHomeSummary53};
+
+async function refreshQuizMarks53(){const rows=await storage.getPrefix('quiz:mark:');validateQuizRecords(rows);quizMarks=new Map(Object.entries(rows));quizExpectedMarkRevisions521=new Map(Object.keys(rows).map(key=>[key,storage.revision?.(key)||0]));}
+export {refreshQuizMarks53};
+
+function selectQuizBank53(bankId){if(!listPracticeBankSummaries().some(b=>b.bank.id===bankId))return false;quizSelectedBank=bankId;quizView='setup';quizRender();return true;}
+export {selectQuizBank53};

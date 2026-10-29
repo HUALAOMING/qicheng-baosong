@@ -1,7 +1,7 @@
 import { uid } from './utils/helpers.js';
 // 启程 · js/constants.js
 
-const VERSION = '5.2.0';
+const VERSION = '5.3.0';
 
 const THEMES = {
   pudding : '布丁奶油', obsidian : '黑橙质感', blue : '墨蓝学院', jade : '深海翡翠', berry : '莓果银白'
@@ -100,7 +100,7 @@ const blanks = {
 const NAV3 = [ {
   id : 'start', zh : '首页', en : 'Home', icon : 'home', standalone : true, items : [['home', '首页', 'Home']]
 }, {
-  id : 'learning-center', zh : '学习中心', en : 'Learning center', icon : 'bulb', items : [['quiz', '练习中心', 'Practice center'], ['reading', '阅读扩展', 'Reading'], ['reading-progress', '每日阅读进度', 'Reading progress'], ['calendar', '学习日历', 'Learning calendar'], ['self-introductions','自我介绍汇总','Self introductions']]
+  id : 'learning-center', zh : '学习中心', en : 'Learning center', icon : 'bulb', items : [['quiz', '练习中心', 'Practice center'], ['learning-review','错题与收藏','Review & collections'],['question-bank','题库管理','Question banks'],['quiz-history','答题历史','Practice history'],['learning-stats','学习统计','Learning statistics'], ['reading', '阅读扩展', 'Reading'], ['reading-progress', '每日阅读进度', 'Reading progress'], ['calendar', '学习日历', 'Learning calendar'], ['self-introductions','自我介绍汇总','Self introductions']]
 }, {
   id : 'entry', zh : '信息录入', en : 'Information', icon : 'edit', items : [['profile', '个人基本信息', 'Basic information'],
   ['education', '教育经历', 'Education'], ['statement', '个人陈述', 'Personal statement'], ['academics', '语言与考试成绩', 'Languages & exams'],
@@ -117,7 +117,7 @@ const NAV3 = [ {
   id : 'materials', zh : '资料中心', en : 'Materials', icon : 'folder', items : [['images', '图片管理', 'Images'], ['files',
   '文件管理', 'Files'], ['outputs', '导出内容管理', 'Exported documents']]
 }, {
-  id : 'export', zh : '导出成果', en : 'Create documents', icon : 'export', items : [['studio', '编排与导出', 'Compose & export'],
+  id : 'export', zh : '编辑与导出', en : 'Edit & export', icon : 'export', items : [['resumes', '简历管理中心', 'Resume manager'],['export-center','统一导出中心','Export center'],
   ['archive', '个人资料打包', 'Download all materials']]
 }, {
   id : 'info', zh : '信息栏', en : 'Universities', icon : 'globe', items : [['schools', '目标院校与地图', 'Universities & map'], ['exam-calendar', '考试信息', 'Examination calendar']]
@@ -129,7 +129,6 @@ const ACHIEVEMENT_FIELDS = [['title', '成果名称'], ['category', '成果类�
 const ROUTE22 = ['profile', 'education', 'statement', 'academics', 'awards', 'sort-awards', 'experiences', 'sort-experiences',
 'custom', 'studio'];
 
-const UI_THEMES3 = [['pudding', '浅色', 'Light', '布丁奶油 / PUDDING'], ['obsidian', '深色', 'Dark', '黑橙质感 / OBSIDIAN'], ['blue',
-'蓝图', 'Blueprint', '墨蓝学院 / BLUEPRINT']];
+const UI_THEMES3 = [['pudding', '浅色', 'Light', 'Pudding'], ['obsidian', '深色', 'Dark', 'Obsidian']];
 
 export { VERSION, THEMES, PALETTES, AWARD_CATS, EXP_CATS, PRIORITIES, SCOPES, EXAM_TYPES, PROFILE, AWARD_FIELDS, EXP_FIELDS, EXAM_FIELDS, BOOK_FIELDS, EDU_FIELDS, EDU_STAGES, blankEducation, LOGO, BULB, STAR, blankAward, blankExp, blankSubject, blankExam, blankBook, MODULES, MODULE_NAMES, GEAR, draftKeys, blanks, NAV3, ACHIEVEMENT_FIELDS, ROUTE22, UI_THEMES3 };

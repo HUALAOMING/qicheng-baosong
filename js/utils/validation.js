@@ -61,7 +61,27 @@ function crop (value, path) {
   number (value.w, 1, 20, path + '.w');
   number (value.h, 1, 20, path + '.h');
 }
-function validateDraft (input) {
+function validateResumeVersion53(v,assets){
+ const r=v.resume53;object(r,'resume53');if(r.schemaVersion!==1)fail('resume53.schemaVersion');object(r.base,'resume53.base');flag(r.blank,'resume53.blank');
+ let count53=0;const bounded53=(value,depth=0)=>{if(++count53>100000||depth>18)fail('resume53（内容过多或嵌套过深）');if(typeof value==='string'){text(value,'resume53.text');return;}if(value===null||typeof value==='boolean'||typeof value==='number')return;if(Array.isArray(value)){list(value,'resume53.list',2000);value.forEach(x=>bounded53(x,depth+1));return;}object(value,'resume53.object');for(const [key,val]of Object.entries(value)){if(['data','_assetBlobRef','_assetPreview','assets','versions'].includes(key))fail('resume53（不得复制附件原文或本机指针）');if(key==='assetId'&&!assets.has(val))fail('resume53.assetId（引用资料已缺失）');if(key==='attachments'){list(val,'resume53.attachments',1500);for(const ref of val)if(!assets.has(ref))fail('resume53.attachments');}bounded53(val,depth+1);}};
+ for(const key of Object.keys(r.base))if(!['profile','education','statement','academics','awards','experiences','practices','achievements','exams','learning','customBlocks','avatar','avatarCrop','media'].includes(key))fail('resume53.base.'+key);bounded53(r.base);
+ const path=value=>{text(value,'resume53.path');if(value.length>300||! /^[A-Za-z0-9_.:-]+$/.test(value)||value.split(/[.:]/).some(k=>['__proto__','constructor','prototype'].includes(k)))fail('resume53.path');};
+ const style=value=>{object(value,'resume53.style');for(const key of Object.keys(value))if(!['fontSize','titleSize','color','titleColor','titleAlign','titleBold','subtitleSize','subtitleAlign','subtitleBold','labelBold','layout','bodyColor'].includes(key))fail('resume53.style.'+key);for(const key of ['fontSize','titleSize','subtitleSize'])if(value[key]!==undefined)number(value[key],6,36,'resume53.style.'+key);for(const key of ['color','titleColor','bodyColor'])if(value[key]!==undefined&&value[key]!==''&&!/^#[0-9a-f]{6}$/i.test(value[key]))fail('resume53.style.'+key);};
+ for(const key of ['overrides','labels','styles','recordOrder','fieldOrder','addedRecords','addedFields'])object(r[key],'resume53.'+key);
+ for(const [key,value]of Object.entries(r.overrides)){path(key);text(value,'resume53.overrides');}
+ for(const [key,value]of Object.entries(r.labels)){path(key);text(value,'resume53.labels');}
+ for(const [key,value]of Object.entries(r.styles)){path(key);style(value);}
+ for(const key of ['hidden','sectionOrder']){stringList(r[key],'resume53.'+key,10000);unique(r[key],'resume53.'+key);r[key].forEach(path);}
+ for(const kind of ['recordOrder','fieldOrder'])for(const [key,items]of Object.entries(r[kind])){path(key);stringList(items,'resume53.order',10000);unique(items,'resume53.order');items.forEach(path);}
+ const customField=f=>{object(f,'resume53.field');id(f.id,'resume53.field.id');text(f.label,'resume53.field.label');text(f.value,'resume53.field.value');if(f.hidden!==undefined)flag(f.hidden,'resume53.field.hidden');if(f.style)style(f.style);};
+ for(const [key,records]of Object.entries(r.addedRecords)){choice(key,['education','awards','experiences','practices','achievements','exams','learning','custom'],'resume53.addedRecords');list(records,'resume53.addedRecords',500);unique(records.map(x=>x.id),'resume53.addedRecords');for(const rec of records){id(rec.id,'resume53.record.id');object(rec,'resume53.record');bounded53(rec);}}
+ for(const [key,items]of Object.entries(r.addedFields)){path(key);list(items,'resume53.addedFields',100);unique(items.map(f=>f.id),'resume53.addedFields');items.forEach(customField);}
+ list(r.customModules,'resume53.customModules',100);unique(r.customModules.map(m=>m.id),'resume53.customModules');
+ for(const m of r.customModules){id(m.id,'resume53.module.id');text(m.title,'resume53.module.title');choice(m.layout,['list','text','timeline','image'],'resume53.module.layout');if(m.hidden!==undefined)flag(m.hidden,'resume53.module.hidden');if(m.style)style(m.style);list(m.entries,'resume53.entries',500);unique(m.entries.map(e=>e.id),'resume53.entries');for(const e of m.entries){id(e.id,'resume53.entry.id');text(e.title,'resume53.entry.title');if(e.hidden!==undefined)flag(e.hidden,'resume53.entry.hidden');list(e.fields,'resume53.fields',100);unique(e.fields.map(f=>f.id),'resume53.fields');e.fields.forEach(customField);if(e.photos)bounded53(e.photos);if(e.attachments)bounded53({attachments:e.attachments});}}
+ object(r.cover,'resume53.cover');flag(r.cover.enabled,'resume53.cover.enabled');text(r.cover.title,'resume53.cover.title');object(r.toc,'resume53.toc');flag(r.toc.enabled,'resume53.toc.enabled');stringList(r.toc.sections,'resume53.toc.sections',200);r.toc.sections.forEach(path);
+ choice(r.template,['original','classic','modern','academic'],'resume53.template');object(r.design,'resume53.design');choice(r.design.columns,[1,2],'resume53.design.columns');text(r.design.fontFamily,'resume53.design.fontFamily');if(r.design.sectionLines!==undefined)flag(r.design.sectionLines,'resume53.design.sectionLines');
+}
+function validateDraft (input, {trustedLocal = false} = {}) {
   assertJSON (input);
   object (input, 'current');
   if (input.format !== 'qicheng-resume' || input.version !== 6) throw new Error ('这不是当前 PWA 版本的启程数据。');
@@ -90,6 +110,7 @@ function validateDraft (input) {
   object (s.learning, 'learning');
   ['readingNotes', 'plan', 'notes'].forEach (k => text (s.learning [k], 'learning.' + k));
   choice (s.theme, ['pudding', 'obsidian', 'blue'], 'theme');
+  if(s.theme==='blue')s.theme='pudding';
   choice (s.uiLang, ['zh', 'en'], 'uiLang');
   flag (s.onboarded, 'onboarded');
   flag (s.sidebarHidden, 'sidebarHidden');
@@ -100,8 +121,8 @@ function validateDraft (input) {
   stringList (s.menuOpen, 'menuOpen', NAV3.length);
   s.menuOpen.forEach (k => choice (k, NAV3.map (g => g.id), 'menuOpen'));
   text (s.route, 'route');
-  const routes = [...NAV3.flatMap (g => g.items.map (i => i [0])), 'backup', 'settings', 'daily-quote', 'quiz', 'explore', ...CLASSICS.books.map (book => 'classic:' + book.id)];
-  if (! routes.includes (s.route) && !/^classic:[A-Za-z0-9][A-Za-z0-9._-]{0,119}$/.test(s.route)) {
+  const routes = ['studio','resumes','export-center','learning-review','question-bank','quiz-history','learning-stats',...NAV3.flatMap (g => g.items.map (i => i [0])), 'backup', 'settings', 'daily-quote', 'quiz', 'explore', ...CLASSICS.books.map (book => 'classic:' + book.id)];
+  if (! routes.includes (s.route) && !/^(?:resume-editor|resume-review):[A-Za-z0-9_-]{1,100}$/.test(s.route) && !/^question:[A-Za-z0-9][A-Za-z0-9._-]{0,119}\/[A-Za-z0-9][A-Za-z0-9._-]{0,119}$/.test(s.route) && !/^classic:[A-Za-z0-9][A-Za-z0-9._-]{0,119}$/.test(s.route)) {
     try {
       if (! s.route.startsWith ('school:') || ! SCHOOLS.some (x => x.name === decodeURIComponent (s.route.slice (7)))) fail ('route');
     }
@@ -119,6 +140,7 @@ function validateDraft (input) {
   unique (s.assets.map (a => a?.id), 'assets');
   const assets = new Map ();
   for (const a of s.assets) {
+    if (!trustedLocal && (a._assetBlobRef || a._assetPreview)) fail ('assets（外部备份不能含本机附件指针）');
     object (a, 'assets');
     id (a.id, 'assets.id');
     text (a.name, 'assets.name');
@@ -191,11 +213,13 @@ function validateDraft (input) {
   number (s.avatarCrop.x, 0, 100, 'avatarCrop.x');
   number (s.avatarCrop.y, 0, 100, 'avatarCrop.y');
   number (s.avatarCrop.zoom, 1, 3, 'avatarCrop.zoom');
-  list (s.versions, 'versions', 30);
-  if (! s.versions.length) fail ('versions（至少保留一份文档）');
+  list (s.versions, 'versions', 100);
   unique (s.versions.map (v => v?.id), 'versions');
   for (const v of s.versions) {
     object (v, 'versions');
+    if(v.resume53)validateResumeVersion53(v,assets);
+    if(v.targets53!==undefined)stringList(v.targets53,'versions.targets53',100);
+    for(const key of ['createdAt53','modifiedAt53'])if(v[key]!==undefined&&v[key]!==null&&(typeof v[key]!=='string'||!Number.isFinite(Date.parse(v[key]))))fail('versions.'+key);
     for(const [key,value] of Object.entries({paperColor:'#ffffff',lineColor:'#d6d6d6',titleColor:'#000000',paperImage:'',layoutPreset:'custom'})) if(!Object.hasOwn(v,key))v[key]=value;
     for(const key of ['paperColor','lineColor','titleColor'])if(!/^#[0-9a-f]{6}$/i.test(v[key]))fail('versions.'+key);
     if(typeof v.paperImage!=='string'||v.paperImage.length>6000000||(v.paperImage&&!/^data:image\/(?:png|jpeg);base64,[A-Za-z0-9+/]+={0,2}$/.test(v.paperImage)))fail('versions.paperImage');
@@ -235,7 +259,7 @@ function validateDraft (input) {
     20, 48], ['avatarRatioW', 1, 20], ['avatarRatioH', 1, 20]]) number (v [key], min, max, 'versions.' + key);
     for (const key of ['showAvatar', 'boldLabels', 'showToc', 'wordImages', 'wordBW']) flag (v [key], 'versions.' + key);
   }
-  if (! s.versions.some (v => v.id === s.activeVersion)) fail ('activeVersion');
+  if (s.versions.length?!s.versions.some (v => v.id === s.activeVersion):s.activeVersion!=='') fail ('activeVersion');
   list (s.exportHistory, 'exportHistory', 1500);
   unique (s.exportHistory.map (x => x?.id), 'exportHistory');
   for (const e of s.exportHistory) {

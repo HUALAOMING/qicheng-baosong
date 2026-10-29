@@ -1,0 +1,15 @@
+✔ 5000 rows import; direct create/update preserves stable IDs and writes only selected question (579.5052ms)
+✔ old JSON preserves manual new question and local explanation; conflicting upstream change is atomic (909.7881ms)
+✔ append retains all existing questions, duplicate import no duplication, bounded filtered query (2097.5803ms)
+✔ note and mark remain independent across answer edits and deletion; history snapshot remains exact (799.1003ms)
+✔ quota rollback and rapid stale writes do not partially change bank or provenance (678.8733ms)
+✔ backup restores effective questions, provenance, tombstone and notes; invalid metadata rejected (2462.0793ms)
+✔ source pack same qid never collides; manual pack maps to presentation bank (1350.4481ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9658.18

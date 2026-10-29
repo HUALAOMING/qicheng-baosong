@@ -1,6 +1,7 @@
 import { $, $$, clamp, esc, loadImage, toast, tr, moveIn } from '../utils/helpers.js';
 import { cleanCrop, currentVersion } from '../model.js';
 import { ctx } from '../state.js';
+import { storage } from '../storage.js';
 import { render, changed, confirmAction } from '../app.js';
 import { save, scheduleSave } from '../autosave.js';
 import { allPhotos } from './resume.js';
@@ -13,7 +14,7 @@ async function uploadPhotos (e) {
 }
 
 function photoTiles (photos, owner) {
-  return '<div class="media-grid">' + photos.map ((p, i) => '<article class="media-tile"><img src="' + esc (p.data) +
+  return '<div class="media-grid">' + photos.map ((p, i) => '<article class="media-tile"><img data-original-asset521="' + esc(p.assetId||'') + '" src="' + esc (p.data) +
   '" alt="' + esc (p.caption || p.name) + '"><input aria-label="' + tr ('照片说明', 'Photo caption') + '" placeholder="' +
   tr ('照片说明', 'Photo caption') + '" data-photo-caption="' + owner + ':' + i + '" value="' + esc (p.caption || '') +
   '"><div class="actions"><button data-crop-photo="' + owner + ':' + i + '">' + tr ('裁剪', 'Crop') + '</button><button data-photo-move="' +
@@ -54,6 +55,7 @@ async function cropCanvas (data, crop) {
 }
 
 async function exportPhotoData (photo) {
+  photo={...photo,data:await storage.photoData(photo,ctx.state)};
   const c = cleanCrop (photo.crop);
   if (c.ratio === 'original' && c.zoom === 1 && c.x === 50 && c.y === 50 && /^data:image\/(jpeg|png);/.test (photo.data)) return photo.data;
   const canvas = await cropCanvas (photo.data, c);
@@ -64,13 +66,14 @@ async function avatarData () {
   if (! ctx.state.avatar) return null;
   const v = currentVersion (), crop = {
     ...ctx.state.avatarCrop, ratio : v.avatarShape, w : v.avatarRatioW, h : v.avatarRatioH
-  }, canvas = await cropCanvas (ctx.state.avatar.data, crop);
+  }, canvas = await cropCanvas (await storage.photoData(ctx.state.avatar,ctx.state), crop);
   return canvas.toDataURL ('image/png')
 }
 
 async function openCropDialog (owner, index, queue = []) {
   const photo = owner === 'avatar' ? ctx.state.avatar : photoArray (owner)?.[index];
   if (! photo) return;
+  const originalData521=await storage.photoData(photo,ctx.state);
   const v = currentVersion (), working = owner === 'avatar' ? cleanCrop ( {
     ratio : v.avatarShape, w : v.avatarRatioW, h : v.avatarRatioH, ...ctx.state.avatarCrop
   }) : cleanCrop (photo.crop);
@@ -109,7 +112,7 @@ async function openCropDialog (owner, index, queue = []) {
   const draw = async () => {
     const token = ++ drawToken;
     try {
-      const canvas = await cropCanvas (photo.data, working);
+      const canvas = await cropCanvas (originalData521, working);
       if (token !== drawToken || ! dialog.open) return;
       const target = $ ('#cropCanvas');
       target.width = canvas.width;
@@ -170,10 +173,9 @@ async function openCropDialog (owner, index, queue = []) {
         x : working.x, y : working.y, zoom : working.zoom
       };
       v.avatarShape = working.ratio === 'original' ? 'custom' : working.ratio;
-      v.avatarRatioW = working.ratio === 'original' ? Math.max (1, (await loadImage (photo.data)).width / Math.max ((await loadImage (photo.data)).width,
-      (await loadImage (photo.data)).height) * 20) : working.w;
-      v.avatarRatioH = working.ratio === 'original' ? Math.max (1, (await loadImage (photo.data)).height / Math.max ((await loadImage (photo.data)).width,
-      (await loadImage (photo.data)).height) * 20) : working.h
+      const originalImage521=await loadImage(originalData521);
+      v.avatarRatioW = working.ratio === 'original' ? Math.max (1, originalImage521.width / Math.max (originalImage521.width,originalImage521.height) * 20) : working.w;
+      v.avatarRatioH = working.ratio === 'original' ? Math.max (1, originalImage521.height / Math.max (originalImage521.width,originalImage521.height) * 20) : working.h
     }
     else photo.crop = cleanCrop (working);
     await save ();
@@ -202,6 +204,12 @@ export { uploadPhotos, photoTiles, cropAspect, cropCanvas, exportPhotoData, avat
 
 // All controls for this feature, in their original override order.
 function bindImagesControls () {
+  for(const url of originalViewURLs521)URL.revokeObjectURL(url);originalViewURLs521.clear();
+  $$('[data-original-asset521]').forEach(async img=>{
+    const asset=ctx.state.assets.find(a=>a.id===img.dataset.originalAsset521);if(!asset?._assetBlobRef)return;
+    try{const blob=await storage.assetBlob(asset);if(!img.isConnected)return;const url=URL.createObjectURL(blob);originalViewURLs521.add(url);img.src=url;}catch(error){img.alt='原图读取失败：'+error.message;}
+  });
+
   if ($ ('#awardPhotos')) $ ('#awardPhotos').onchange = uploadPhotos;
   $$ ('[data-remove-photo]').forEach (b => b.onclick = async () => {
     ctx.state.awardDraft.photos.splice (Number (b.dataset.removePhoto), 1); await save (); render ();
@@ -238,3 +246,5 @@ function bindImagesControls () {
   });
 }
 export { bindImagesControls };
+
+const originalViewURLs521=new Set();

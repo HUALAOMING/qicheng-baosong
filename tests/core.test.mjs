@@ -36,21 +36,33 @@ function sample() {
   s.versions[0].showAvatar=false;s.versions[0].photoMode='none';s.versions[0].disabled=[];
   s.versions[0].titles.awards='我的荣誉';s.versions[0].summaries['awards:'+award.id]='补充简历表述';
   s.versions[0].moduleStyles.awards=model.cleanModuleStyle({titleAlign:'center',labelBold:false});
-  s.onboarded=true;return s;
+  s.onboarded=true;return validateDraft(s);
 }
 function reset(s=sample()) { ctx.state=s;ctx.busy=false;ctx.uploadBusy=false;autosave.cancelPendingSave();ctx.saveChain=Promise.resolve();autosave.initializeSaving301(); }
 
-test('49 universities, 34 provinces, font resources and all local seals load',()=>{
+test('49 universities, 34 provinces, font resources and all local seals load on demand',async()=>{
+  await data.loadRouteData('schools');await data.loadDocumentFonts();
   assert.equal(data.SCHOOL_DETAILS3.length,49);assert.equal(data.SCHOOLS.length,49);assert.equal(data.CHINA_VECTOR31.provinces.length,34);
   assert.ok(data.SCHOOL_DETAILS3.every(s=>s.logo.startsWith('assets/images/')));assert.ok(data.FONT_CJK.startsWith('data:font/ttf;base64,'));
+});
+test('all school profiles display sourced founding data and honest motto fallback',async()=>{
+  await data.loadRouteData('schools');
+  for(const s of data.SCHOOL_DETAILS3){
+    assert.ok(s.schoolFacts?.source?.startsWith('https://'),s.name);
+    assert.ok(s.schoolFacts.founding,s.name);
+    const html=universities.schoolDetail3(s.name);
+    assert.ok(html.includes(s.schoolFacts.founding),s.name);
+    assert.ok(html.includes(s.schoolFacts.motto || '资料待核实'),s.name);
+    assert.ok(html.includes(s.schoolFacts.mottoSource || s.schoolFacts.source),s.name);
+  }
 });
 test('strict current-state validation preserves every field and document setting',()=>{
   const s=sample();assert.deepEqual(validateDraft(s),s);const bad=structuredClone(s);delete bad.education;assert.throws(()=>validateDraft(bad),/必要字段/);
 });
-test('all original routes render with both interface languages and every current theme',()=>{
+test('all original routes render with both interface languages and every current theme',async()=>{
   const routes=constants.NAV3.flatMap(g=>g.items.map(i=>i[0]));
   for(const uiLang of ['zh','en'])for(const theme of ['pudding','obsidian','blue'])for(const route of [...routes,...data.SCHOOLS.map(s => 'school:'+encodeURIComponent(s.name))]) {
-    reset();ctx.state.uiLang=uiLang;ctx.state.theme=theme;ctx.state.route=route;app.render();assert.ok(workspaceHTML(env.document)?.length>100,route);assert.equal(env.document.body.dataset.theme,theme);
+    reset();ctx.state.uiLang=uiLang;ctx.state.theme=theme;ctx.state.route=route;await data.loadRouteData(route);app.render();assert.ok(workspaceHTML(env.document)?.length>100,route);assert.equal(env.document.body.dataset.theme,theme);
   }
 });
 test('IndexedDB get/set/update/remove/getAll/clear use committed transactions',async()=>{
@@ -67,8 +79,8 @@ test('save failure remains visible and the in-memory workspace can be backed up'
   reset();ctx.state.profile.name='unsaved';env.factory.failWrite=true;assert.equal(await autosave.save(),false);assert.equal(ctx.saveError,true);assert.equal(ctx.dirty301,true);const file=await backup.getCurrentBackup();assert.equal(file.data.current.profile.name,'unsaved');
 });
 test('complete JSON backup survives clearing and atomic recovery, including future user records',async()=>{
-  reset();await autosave.save();await storage.set('future-note',{text:'future user-generated content'});const original=model.snapshot3(),file=await backup.getCurrentBackup();await mkdir(path.join(root,'tests/generated'),{recursive:true});await writeFile(path.join(root,'tests/generated/sample-backup.json'),JSON.stringify(file,null,2));assert.equal(file.app,'Qicheng');assert.equal(file.backupVersion,1);assert.deepEqual(validateDraft(file.data.current),original);assert.ok(!JSON.stringify(file).includes('provinces'));assert.ok(file.data['future-note']);
-  await storage.clear();reset(model.fresh());await backup.commitBackup(await readFile(path.join(root,'tests/generated/sample-backup.json'),'utf8'));assert.deepEqual(model.snapshot3(),original);assert.deepEqual((await storage.getAll())['future-note'],{text:'future user-generated content'});
+  reset();await autosave.save();await storage.set('future-note',{text:'future user-generated content'});const original=model.snapshot3(),file=await backup.getCurrentBackup();await mkdir(path.join(root,'tests/generated'),{recursive:true});await writeFile(path.join(root,'tests/generated/sample-backup.json'),JSON.stringify(file,null,2));assert.equal(file.app,'Qicheng');assert.equal(file.backupVersion,backup.BACKUP_VERSION);assert.deepEqual(validateDraft(file.data.current),original);assert.ok(!JSON.stringify(file).includes('provinces'));assert.ok(file.data['future-note']);
+  await storage.clear();reset(model.fresh());await backup.commitBackup(await readFile(path.join(root,'tests/generated/sample-backup.json'),'utf8'));assert.deepEqual(await storage.materializeCurrent(model.snapshot3()),original);assert.deepEqual((await storage.getAll())['future-note'],{text:'future user-generated content'});
 });
 test('images, attachments, editable drafts and export history round-trip without duplication',async()=>{
   reset();const s=ctx.state;const png='data:image/png;base64,'+(await readFile(path.join(root,'assets/icons/apple-touch-icon.png'))).toString('base64');
@@ -76,7 +88,7 @@ test('images, attachments, editable drafts and export history round-trip without
     {id:'file-asset',name:'notes.txt',mime:'text/plain',kind:'file',data:'data:text/plain;base64,VGVzdA==',size:4,createdAt:new Date().toISOString(),source:'upload'},
     {id:'export-asset',name:'resume.md',mime:'text/markdown',kind:'export',data:'data:text/markdown;base64,VGVzdA==',size:4,createdAt:new Date().toISOString(),source:'generated'}];
   const photo={id:'photo-ref',assetId:'image-asset',name:'portrait.png',data:png,caption:'测试说明',crop:model.cleanCrop({ratio:'circle'})};s.awards[0].photos=[photo];s.awardDraft=structuredClone(s.awards[0]);s.awards[0].attachments=['file-asset'];s.media=[{...structuredClone(photo),id:'media-ref',link:'awards:'+s.awards[0].id}];s.avatar={...structuredClone(photo),id:'avatar-ref'};s.exportHistory=[{id:'export-record',assetId:'export-asset',name:'resume.md',type:'md',createdAt:new Date().toISOString(),versionId:s.activeVersion,purpose:'resume'}];
-  const file=await backup.getCurrentBackup();assert.equal(file.data.current.awards[0].photos[0].data,undefined);assert.equal(file.data.current.assets[0].data,png);await backup.commitBackup(file);assert.equal(ctx.state.awards[0].photos[0].data,png);assert.deepEqual(model.snapshot3(),backup.compactSnapshot(validateDraft(file.data.current)));
+  const file=await backup.getCurrentBackup();assert.equal(file.data.current.awards[0].photos[0].data,undefined);assert.equal(file.data.current.assets[0].data,png);await backup.commitBackup(file);assert.equal(await storage.photoData(ctx.state.awards[0].photos[0],ctx.state),png);assert.ok(ctx.state.assets[0]._assetBlobRef);assert.deepEqual(await storage.materializeCurrent(model.snapshot3()),backup.compactSnapshot(validateDraft(file.data.current)));
 });
 test('damaged/non-Qicheng/unsupported/incomplete/malformed/referentially broken JSON never mutates state',async()=>{
   reset();await autosave.save();const before=await storage.getAll(),state=structuredClone(ctx.state),valid=backup.createBackup(model.snapshot3());

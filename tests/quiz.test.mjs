@@ -21,7 +21,7 @@ async function quizHarness() {
   let nextId = 0;
   const modules = {
     '../storage.js':{storage:storageModule.namespace.storage},
-    '../resources.js':{listPracticeBanks:()=>banks},
+    '../resources.js':{listPracticeBankSummaries:()=>banks.map(b=>({...b,questionCount:b.questions.length,sourceBankIds:[b.bank.id]})),getPracticeBank:id=>banks.find(b=>b.bank.id===id),loadPracticeSample:async id=>banks.find(b=>b.bank.id===id),countPracticeMarks:(id,field,marks)=>marks.filter(mark=>mark.bankId===id&&mark[field]&&banks.find(b=>b.bank.id===id)?.questions.some(q=>q.id===mark.questionId)).length},
     '../state.js':{ctx},
     '../app.js':{render(){},confirmAction:async()=>true,go3:route=>{ctx.state.route=route;}},
     '../utils/helpers.js':{$:()=>null,$$:()=>[],esc:value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),tr:(zh,en)=>ctx.state.uiLang==='en'?en:zh,toast(){},uid:()=> 'test-'+(++nextId)}
@@ -96,7 +96,7 @@ test('atomic failure midway preserves every old mark and leaves the active group
   assert.equal(quiz.quizAnswer(0,'B'),true);
   const record=await quiz.quizSubmit();
   assert.equal(record.correct,9);
-  assert.equal(Object.keys(await storage.getAll()).length,2);
+  assert.equal(Object.keys(await storage.getAll()).length,3);assert.ok(await storage.get('settings:learning-overview53'));
   assert.equal(await storage.get(quiz.QUIZ_DRAFT_KEY),undefined);
 });
 
@@ -126,7 +126,7 @@ test('favorites survive initialization; composite IDs isolate banks and failed s
   assert.equal((await storage.get(quiz.quizMarkKey('en/grammar','Q0'))).favorite,false);
 });
 
-test('wrong practice clears a wrong mark only after a correctly submitted group and preserves favorites',async()=>{
+test('correct review records latest correctness while pending review requires explicit mastery and preserves favorites',async()=>{
   const {quiz,storage}=await quizHarness();
   const session=quiz.quizStart('en/grammar');quizFill(quiz,session,0);
   const wrongId=session.questions[0].id;
@@ -139,7 +139,7 @@ test('wrong practice clears a wrong mark only after a correctly submitted group 
   await quiz.quizSubmit();
   const mark=await storage.get(quiz.quizMarkKey('en/grammar',wrongId));
   assert.equal(mark.wrong,false);assert.equal(mark.favorite,true);
-  assert.throws(()=>quiz.quizStart('en/grammar','wrong'),/暂无待巩固/);
+  assert.equal(mark.reviewPending,true);assert.equal(quiz.quizStart('en/grammar','wrong').questions.length,1);
 });
 
 test('true-false false is a completed answer; sparse and empty banks behave explicitly',async()=>{
@@ -227,7 +227,8 @@ test('learning overview weights submitted questions, excludes drafts, and reads 
   const {quiz,storage,advance}=await quizHarness();
   assert.equal(quiz.getQuizDashboard().accuracy,null);
   let session=quiz.quizStart('en/grammar','random',7);const wrongIds=new Set(session.questions.slice(0,2).map(question=>question.id));quizFill(quiz,session);quiz.quizAnswer(0,'B');quiz.quizAnswer(1,'B');advance(65000);await quiz.quizSubmit();
-  session=quiz.quizStart('en/grammar','random',3);for(const question of session.questions)wrongIds.delete(question.id);quizFill(quiz,session);advance(35000);await quiz.quizSubmit();
+  // A correct answer updates recent correctness, but review remains pending until explicitly mastered.
+  session=quiz.quizStart('en/grammar','random',3);quizFill(quiz,session);advance(35000);await quiz.quizSubmit();
   await quiz.quizFavorite('en/grammar','Q0');quiz.quizStart('zh-usage');
   const before=JSON.stringify(await storage.getAll()),stats=quiz.getQuizDashboard();
   assert.equal(stats.total,10);assert.equal(stats.correct,8);assert.equal(stats.groups,2);assert.equal(stats.accuracy,80);assert.equal(stats.elapsedSeconds,100);assert.equal(stats.timedGroups,2);assert.equal(stats.favorites,1);assert.equal(stats.wrong,wrongIds.size);assert.equal(stats.recent.length,2);

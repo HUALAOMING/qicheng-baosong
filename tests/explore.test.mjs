@@ -10,7 +10,7 @@ const {validateDraft} = await import('../js/utils/validation.js');
 const {createBackup} = await import('../js/backup.js');
 const {routeName3,routeGroup3} = await import('../js/app.js');
 const explore = await import('../js/modules/explore.js');
-await data.loadBuiltinData();ctx.state = fresh();
+await data.loadBuiltinData();await data.loadRouteData('explore');ctx.state = fresh();
 
 test('four classic entrances and the complete supplied Guanzi source are preserved',()=>{
   assert.deepEqual(data.CLASSICS.books.map(book=>book.title),['论语','道德经','管子','庄子']);

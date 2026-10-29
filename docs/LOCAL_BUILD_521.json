@@ -1,0 +1,15 @@
+{
+  "appVersion": "5.2.1",
+  "cacheRevision": "22dacd845f6f",
+  "precacheResources": 135,
+  "databaseVersion": 2,
+  "backupVersion": 2,
+  "tests": {
+    "full": 261,
+    "packaged": 20,
+    "actualEdgeData": 12,
+    "actualEdgePWA": 6,
+    "actualEdgeStorage": 3
+  },
+  "published": false
+}

@@ -1,0 +1,38 @@
+✔ 5.1 snapshots gain only additive 5.2 fields and keep statements and document settings (4.7213ms)
+✔ Chinese character counts and English word counts exclude punctuation (3.0135ms)
+✔ duration conversion accepts overflow seconds and rejects negative or fractional input (0.2696ms)
+✔ countdown runs into overtime, preserves pause and resume, and resets (0.4043ms)
+✔ complete backups preserve introduction versions, drafts, and optional third-language statements (4.7624ms)
+✔ manual local-file save writes a restorable JSON and cancellation keeps user data (86.4449ms)
+✔ AI instruction example satisfies the actual importer and includes strict JSON guidance (1.9762ms)
+✔ default-bank dates and provided updatedAt metadata survive validation and storage (157.811ms)
+✔ 5000 rows import; direct create/update preserves stable IDs and writes only selected question (502.4811ms)
+✔ old JSON preserves manual new question and local explanation; conflicting upstream change is atomic (616.5982ms)
+✔ append retains all existing questions, duplicate import no duplication, bounded filtered query (1314.5244ms)
+✔ note and mark remain independent across answer edits and deletion; history snapshot remains exact (511.9405ms)
+✔ quota rollback and rapid stale writes do not partially change bank or provenance (375.8684ms)
+✔ backup restores effective questions, provenance, tombstone and notes; invalid metadata rejected (1272.0213ms)
+✔ source pack same qid never collides; manual pack maps to presentation bank (736.0663ms)
+✔ verified official online update cannot overwrite locally edited question (656.0353ms)
+✔ explicit reset resolves local provenance without deleting independent notes (279.0933ms)
+✔ 5.2 reading requires date, title, author, language and chapters; all optional values may be empty (13.8147ms)
+✔ legacy page records load unchanged and new chapter records round-trip through persistence (31.8793ms)
+✔ same book titles group into one timeline; latest input order is independent of reading date (0.5936ms)
+✔ integration combines every note of the selected book chronologically and remains independently editable (0.7143ms)
+✔ a failed reading write keeps the last committed record intact (10.5566ms)
+✔ weekly quotes require exactly seven unique selections and follow Monday-to-Sunday order for this week only (6.6422ms)
+✔ weekly quotes persist with the existing home backup record and malformed restored plans are rejected (187.0219ms)
+✔ reading text stays escaped and daily quote customization is reachable from home, daily quote and settings (18.4599ms)
+(node:1036024) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ startup module failure shows reload, emergency export and double-confirmed clear controls (8.8463ms)
+✔ startup emergency export failure has a visible message and never clears stored data (1.9497ms)
+✔ exported standalone HTML executes without any network imports/resources and restores its embedded workspace (607.3ms)
+ℹ tests 28
+ℹ suites 0
+ℹ pass 28
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7040.706

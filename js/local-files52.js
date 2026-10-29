@@ -1,3 +1,4 @@
+import {noteExternalBackup521,inspectStorage521} from './storage-status.js';
 import {ctx} from './state.js';
 import {$,download,toast,tr} from './utils/helpers.js';
 import {saveAllLocal,getCurrentBackup,restoreBackup} from './backup.js';
@@ -16,10 +17,11 @@ async function saveLocalFile52(){
     const backup=await getCurrentBackup(),content=JSON.stringify(backup,null,2);
     if(handle){
       const writer=await handle.createWritable();
-      try{await writer.write(content);await writer.close();}catch(error){try{await writer.abort();}catch{}throw error;}
+      try{await writer.write(content);await writer.close();await noteExternalBackup521('file',handle.name||'完整备份.json').catch(error=>toast('文件已写入，但无法记录备份时间：'+error.message));}catch(error){try{await writer.abort();}catch{}throw error;}
       toast(saved?tr('完整存档已写入本地文件','Complete archive saved to file'):tr('本机自动保存异常，已将可读取的当前资料写入存档','Automatic saving failed; readable current data saved to file'));
     }else{
       download(content,'application/json;charset=utf-8','启程-本地存档-'+new Date().toLocaleDateString('sv-SE')+'.json');
+      await noteExternalBackup521('download','完整备份.json').catch(error=>toast('备份已生成，但无法记录备份时间：'+error.message));
       toast(tr('完整存档已生成，请保存下载的 JSON 文件','Archive generated. Keep the downloaded JSON file'));
     }
     return true;
@@ -42,7 +44,7 @@ async function clearApplicationCache52(){
 function showStartupChoice52(){
   const dialog=$('#startupChoice52');if(!dialog)return;
   const input=$('#startupFile52');
-  $('#startupContinue52').onclick=()=>dialog.close();
+  $('#startupContinue52').onclick=()=>{dialog.close();inspectStorage521(true).catch(()=>{});};
   $('#startupLoad52').onclick=()=>input.click();
   input.onchange=async event=>{
     if(!event.target.files?.length)return;

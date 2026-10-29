@@ -1,0 +1,43 @@
+{
+  "browser": "156.0.4314.50",
+  "actualDevice": "Windows headless Edge; not Android or installed OS PWA shell",
+  "scope": "/qicheng-baosong/",
+  "checks": [
+    {
+      "name": "5.2.0 existing app boots and commits baseline user data",
+      "status": "PASS",
+      "milliseconds": 1206
+    },
+    {
+      "name": "5.2.0 saved single-window update migrates to 5.2.1 without losing database",
+      "status": "PASS",
+      "milliseconds": 1767
+    },
+    {
+      "name": "offline restart and lazy school/map, quiz and document route work under GitHub Pages subpath",
+      "status": "PASS",
+      "milliseconds": 767
+    },
+    {
+      "name": "editing peer blocks actual waiting-worker activation without refresh",
+      "status": "PASS",
+      "milliseconds": 2163,
+      "detail": {
+        "controllerState": "activated"
+      }
+    },
+    {
+      "name": "all clean windows acknowledge, save and reload together; new boot verifies expected revision",
+      "status": "PASS",
+      "milliseconds": 2385
+    },
+    {
+      "name": "interrupted/mismatched new resources fail installation; old offline program and data remain usable",
+      "status": "PASS",
+      "milliseconds": 807
+    }
+  ],
+  "errors": [],
+  "httpErrors": [],
+  "startedAt": "2026-10-29T04:40:41.100Z"
+}

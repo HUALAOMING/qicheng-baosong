@@ -283,9 +283,21 @@ const studioHelpContent52 = {
   }
 };
 
+Object.assign(pageHelpContent52,{
+ resumes:{title:['简历管理中心','Resume manager'],sections:[['版本隔离','Independent versions','最近修改区域是已有简历的快捷入口。新建、复制、重命名或设置院校；每份简历的内容与设计互不影响，删除需要两次确认。','Manage independent resume versions, targets and copies. Deletion requires two confirmations.']]},
+ 'export-center':{title:['统一导出中心','Export center'],sections:[['先核对再导出','Review before exporting','选择当前版本和文件格式，检查内容及分页后确认导出。文件名不修改版本名称；保存失败会停止导出。所有Word模板保持原生可编辑。','Select a version, filename and format, inspect preflight and preview, then export. All Word templates remain editable.']]},
+ 'learning-review':{title:['错题与收藏','Review and collections'],sections:[['待复习与已掌握','Review and mastery','错题按永久题目身份保留一条记录。收藏夹由你手动整理；掌握状态与收藏相互独立。筛选后可组卷，整组提交后再查看答案及笔记。','Mistakes are deduplicated by identity. Folders and mastery are independent. Submit a complete group before viewing answers and notes.']]},
+ 'question-bank':{title:['题库管理','Question bank management'],sections:[['逐题维护','Edit individual questions','浏览、搜索和分页读取题目，可直接新增或修改题目。旧JSON不会静默覆盖本地修改；导入冲突须明确选择，学习历史与个人笔记保留。','Browse, search and edit individual questions. Imports detect conflicts with local edits and preserve learning history.']]},
+ 'quiz-history':{title:['答题历史','Practice history'],sections:[['当时的评分依据','Historical grading','历史保留交卷时的题目、答案和分数快照。之后更改题库标准答案不会重算过去的成绩；正在作答的同题不显示旧解析或笔记。','Results retain question and grading snapshots from submission. Later bank changes do not recalculate scores.']]},
+ 'learning-stats':{title:['学习统计','Learning statistics'],sections:[['统计口径','Counting rules','可查看最近7天、30天及全部记录。作答题次与不同题目数分开计算，未提交练习不计入正式统计。','Choose seven days, thirty days or all time. Attempts and unique questions are counted separately; drafts are excluded.']]},
+ 'resume-editor':{title:['简历编辑工作区','Resume editor'],sections:[['继承、独立、隐藏','Inheritance, overrides and visibility','字段可继承底稿、使用当前版本独立内容，或单独隐藏。主动清空也是独立修改；同步底稿需要确认。撤销和重做在保存后仍可使用。','Inherit master values, override independently, or hide fields. Empty overrides are preserved and restores require confirmation.']]},
+ 'resume-review':{title:['简历只读审阅','Read-only resume review'],sections:[['安全审阅','Safe reading','精简版和空间不足时使用只读审阅。可以查看当前版本与进入导出；内容编辑和排版请在宽屏完整版进行。','Read and export the selected version. Use full mode in a wider viewport to edit its content and design.']]},
+ question:{title:['题目与个人笔记','Question and notes'],sections:[['同一份笔记','Shared personal notes','个人笔记独立保存并在各学习页面共享。题目处于未交卷练习中时，旧笔记和标准解析暂不显示，提交后恢复。','Personal notes are shared across learning views and stay separate from standard explanations. They are hidden while the question is in an unfinished group.']]}
+});
+
 function getPageHelp52(route = ctx.state?.route || 'home', studioTab = ctx.studioTab || 'content') {
   const currentRoute = String(route || 'home');
-  const pageKey = currentRoute.startsWith('classic:') ? 'classic' : currentRoute.startsWith('school:') ? 'school' : currentRoute === 'backup' ? 'settings' : currentRoute;
+  const pageKey = currentRoute.startsWith('resume-editor:')?'resume-editor':currentRoute.startsWith('resume-review:')?'resume-review':currentRoute.startsWith('question:')?'question':currentRoute.startsWith('classic:') ? 'classic' : currentRoute.startsWith('school:') ? 'school' : currentRoute === 'backup' ? 'settings' : currentRoute;
   const entry = pageKey === 'studio' ? studioHelpContent52[studioTab] || studioHelpContent52.content : pageHelpContent52[pageKey];
   const content = entry || {
     title: ['当前页面', 'Current page'],

@@ -1,0 +1,13 @@
+✔ category/tags roundtrip and atomic incoming conflict resolution preserve notes (100.9758ms)
+✔ unsubmitted group blocks question detail, search snippets and notes across shared identity (161.4865ms)
+✔ submission deduplicates wrongs, timestamps errors and keeps mastery independent of favorite (69.0375ms)
+✔ folders are many-to-many, rename without changing identity and backup validators reject corrupt membership (188.7916ms)
+✔ statistics distinguish repeated attempts, unique source identities and time range (0.6251ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 994.5544

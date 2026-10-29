@@ -1,3 +1,5 @@
+import {waitForTimerWrites53} from './timer53.js';
+import {flushLoadedFeatures53} from './features53.js';
 import { ctx } from './state.js';
 import { $, $$, toast, tr } from './utils/helpers.js';
 import { save } from './autosave.js';
@@ -7,9 +9,80 @@ import { waitForQuizWrites } from './modules/quiz.js';
 import { waitForResourceWrites } from './resources.js';
 import { waitForJournalWrites } from './modules/journal.js';
 import {waitForExamCalendarWrites} from './modules/exam-calendar.js';
+import { tasks } from './tasks.js';
+import { VERSION } from './constants.js';
 let installationPrompt = null, registration = null, status = 'loading', message = '', applyingUpdate = false;
 let checkingUpdate = false, updateNotice = '';
 let updateDownloadError = '';
+let resourceTask521 = null, switchTask521 = null, preparedUpdate521 = null, updateWatchdog521 = null;
+function updateStorageMarker521(value) {
+  try { if(value)sessionStorage.setItem('qicheng-pwa-transition',JSON.stringify(value));else sessionStorage.removeItem('qicheng-pwa-transition'); }catch{}
+}
+function releaseUpdateLock521() {
+  if(preparedUpdate521 && globalThis.document?.body)document.body.inert=preparedUpdate521.wasInert;
+  preparedUpdate521=null;applyingUpdate=false;clearTimeout(updateWatchdog521);
+}
+async function flushUpdateWrites521() {
+  await flushLoadedFeatures53();
+  if(!await save())throw new Error('本机保存失败，请先备份。');
+  await Promise.all([waitForHomeWrites(),waitForTimerWrites53(),waitForQuizWrites(),waitForResourceWrites(),waitForJournalWrites(),waitForExamCalendarWrites()]);
+}
+async function prepareUpdate521(event) {
+  const data=event.data, active=globalThis.document?.activeElement;
+  const editing=!!active?.matches?.('input:not([type=button]):not([type=submit]),textarea,select,[contenteditable=true]');
+  const reject=detail=>event.source.postMessage({type:'APP_UPDATE_READY',requestId:data.requestId,ready:false,detail});
+  if(ctx.busy||ctx.uploadBusy||(!data.initiator&&(ctx.dirty301||ctx.saveError||editing)))return reject('其他窗口正在编辑或未保存，请完成后重试。');
+  const revision=ctx.editRevision301;
+  const lock={id:data.requestId,revision:data.revision,wasInert:!!globalThis.document?.body?.inert};
+  preparedUpdate521=lock;
+  if(globalThis.document?.body)document.body.inert=true;
+  try {
+    await flushUpdateWrites521();
+    if(preparedUpdate521!==lock)return;
+    if(ctx.dirty301||ctx.saveError||ctx.busy||ctx.uploadBusy||revision!==ctx.editRevision301)throw new Error('窗口内容发生变化，请保存后重试。');
+    applyingUpdate=true;
+    switchTask521 ||= tasks.start('应用版本切换');switchTask521.stage('资料已保存，等待全部窗口确认');
+    clearTimeout(updateWatchdog521);
+    updateWatchdog521=setTimeout(()=>{
+      if(preparedUpdate521!==lock)return;
+      releaseUpdateLock521();updateNotice='版本切换未完成，当前资料已保留，请稍后重试。';
+      switchTask521?.fail(new Error(updateNotice));switchTask521=null;pwaBind();
+    },25000);
+    event.source.postMessage({type:'APP_UPDATE_READY',requestId:data.requestId,ready:true});
+  }catch(error){releaseUpdateLock521();reject(error.message);}
+}
+function handleWorkerMessage521(event) {
+  if(event.source?.scriptURL && new URL(event.source.scriptURL).href!==new URL('service-worker.js',APP_BASE).href)return;
+  const data=event.data||{};
+  if(data.type==='UPDATE_CACHE_PROGRESS') {
+    if(!resourceTask521||resourceTask521.state.status!=='running')resourceTask521=tasks.start('PWA 程序资源准备');
+    resourceTask521.stage('下载并校验必要程序资源',{done:data.done,total:data.total});
+    updateNotice='正在准备新版程序资源 · '+data.done+'/'+data.total;pwaBind();
+  } else if(data.type==='UPDATE_CACHE_READY') {
+    resourceTask521?.succeed('全部 '+data.total+' 个资源已校验，等待用户选择更新');
+    updateNotice='新版资源已准备完成，可稍后更新；编辑内容不会被强制打断。';pwaBind();
+  } else if(data.type==='UPDATE_CACHE_FAILED') {
+    updateDownloadError=String(data.detail||'UnknownError').slice(0,1200);
+    updateNotice=pwaUpdateError(new Error(updateDownloadError));resourceTask521?.fail(new Error(updateNotice));pwaBind();
+  } else if(data.type==='PREPARE_APP_UPDATE') {
+    return prepareUpdate521(event);
+  } else if(data.type==='UPDATE_ABORTED') {
+    if(preparedUpdate521&&data.requestId&&preparedUpdate521.id!==data.requestId)return;
+    releaseUpdateLock521();updateNotice=data.detail||'有窗口尚未准备好，当前版本继续可用。';
+    switchTask521?.fail(new Error(updateNotice));switchTask521=null;pwaBind();toast(updateNotice);
+  } else if(data.type==='UPDATE_ACTIVATING'&&preparedUpdate521?.id===data.requestId) {
+    switchTask521?.stage('全部窗口已保存，正在安全切换程序版本');
+    updateStorageMarker521({revision:data.revision});
+  } else if(data.type==='UPDATE_RELEASE_INFO') {
+    let pending;try{pending=JSON.parse(sessionStorage.getItem('qicheng-pwa-transition')||'null');}catch{}
+    if(pending) {
+      const task=tasks.start('应用版本切换');
+      if(data.revision===pending.revision&&data.appVersion===VERSION) {task.succeed('新版本已启动，本机数据库读取与程序版本验证完成');updateStorageMarker521(null);}
+      else task.fail(new Error('当前窗口与预期程序版本不一致，请保持资料并重新检查更新。'));
+    }
+  }
+}
+
 function pwaUpdateError(error) {
   const detail = [error?.name, error?.message].filter(Boolean).join(': ') || 'UnknownError';
   return tr('应用更新未完成，旧版和个人资料已保留。请确认网络能打开本站，并留出设备存储空间后重试；也可在安装启程时使用的浏览器中打开原地址检查。技术信息：','The update could not finish. Your current app and personal data are kept. Check this site is reachable and device storage is available, then retry in the browser used to install the app. Details: ')+(updateDownloadError || detail);
@@ -85,14 +158,20 @@ async function pwaInstall () {
 }
 async function pwaApplyUpdate () {
   if (ctx.busy || ctx.uploadBusy) return toast (tr ('请等待当前操作完成后更新。', 'Wait for the current operation before updating.'));
-  if (! registration?.waiting) return;
-  if (! await save ()) return toast (tr ('保存失败，请先备份，暂未更新。', 'Save failed. Back up before updating.'));
-  try {await Promise.all([waitForHomeWrites(),waitForQuizWrites(),waitForResourceWrites(),waitForJournalWrites(),waitForExamCalendarWrites()]);}
-  catch(error){toast(tr('数据仍未保存，请稍后再更新：','Pending data could not be saved: ')+error.message);return false;}
-  applyingUpdate = true;
-  registration.waiting.postMessage ( {
-    type : 'ACTIVATE_UPDATE'
-  });
+  if (!registration?.waiting || applyingUpdate) return false;
+  switchTask521=tasks.start('应用版本切换');switchTask521.stage('保存当前窗口资料');
+  try {await flushUpdateWrites521();}
+  catch(error){switchTask521.fail(error);toast(error.message);return false;}
+  applyingUpdate=true;
+  switchTask521.stage('检查其他启程窗口是否已保存');
+  updateWatchdog521=setTimeout(()=>{
+    if(!applyingUpdate||preparedUpdate521)return;
+    releaseUpdateLock521();updateNotice='新版程序暂未响应，请稍后重新检查更新。';
+    switchTask521?.fail(new Error(updateNotice));switchTask521=null;pwaBind();
+  },18000);
+  updateWatchdog521?.unref?.();
+  registration.waiting.postMessage({type:'ACTIVATE_UPDATE',protocol:2,requestId:Date.now().toString(36)+'-'+Math.random().toString(36).slice(2)});
+  return true;
 }
 async function pwaInit () {
   window.addEventListener ('beforeinstallprompt', event => {
@@ -116,20 +195,18 @@ async function pwaInit () {
     return;
   }
   navigator.serviceWorker.addEventListener ('controllerchange', () => {
-    if (applyingUpdate) location.reload ();
+    if (applyingUpdate && preparedUpdate521) location.reload ();
+    else {updateNotice='程序控制器已变化，请保存后重新打开启程以使用新版。';pwaBind();}
   });
-  navigator.serviceWorker.addEventListener('message',event=>{
-    if(event.source?.scriptURL && new URL(event.source.scriptURL).href!==new URL('service-worker.js',APP_BASE).href)return;
-    if(event.data?.type==='UPDATE_CACHE_FAILED'){
-      updateDownloadError=String(event.data.detail||'UnknownError').slice(0,1200);
-      updateNotice=pwaUpdateError(new Error(updateDownloadError));pwaBind();
-    }
-  });
+  navigator.serviceWorker.addEventListener('message',handleWorkerMessage521);
   try {
     registration = await navigator.serviceWorker.register (new URL ('service-worker.js', APP_BASE), {
       scope : APP_BASE.href, updateViaCache : 'none'
     });
+    if(!registration)throw new Error('当前浏览器未启用离线资源注册，请检查浏览器设置；本地资料仍可正常保存。');
     if (registration.waiting) pwaBind ();
+    registration.installing?.postMessage({type:'GET_UPDATE_PROGRESS'});
+    navigator.serviceWorker.controller?.postMessage({type:'GET_RELEASE_INFO'});
     registration.addEventListener ('updatefound', () => {
       const worker = registration.installing; worker?.addEventListener ('statechange', () => {
         if (worker.state === 'installed') {

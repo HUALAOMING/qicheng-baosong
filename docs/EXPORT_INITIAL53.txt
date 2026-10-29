@@ -1,0 +1,21 @@
+(node:1016172) ExperimentalWarning: vm.USE_MAIN_CONTEXT_DEFAULT_LOADER is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ independent paper, rule and section colors reach HTML, PDF, editable PPTX and Word (2836.1957ms)
+✔ appearance controls keep custom settings and additional statement can be independently excluded (1.4207ms)
+✔ 5.0 document settings keep old documents unchanged and validate optional additions (7.4061ms)
+✔ contents point to actual physical pages and all page numbers include contents (1216.9979ms)
+✔ long multi-page contents use the real offset and never overflow the printable area (51.9896ms)
+✔ page-number toggle and restrained decorations apply to every fixed-layout page (28.2998ms)
+(node:987596) ExperimentalWarning: vm.USE_MAIN_CONTEXT_DEFAULT_LOADER is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ DOCX carries a dynamic TOC, refresh flag, page/total fields and optional real page borders (71.9293ms)
+✔ PDF and editable PPTX preserve the same contents and total-page count (1511.9493ms)
+✔ all six original formats remain exposed with clear pagination guidance (1.4448ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3494.1908

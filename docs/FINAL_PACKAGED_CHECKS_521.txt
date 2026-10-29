@@ -1,0 +1,32 @@
+(node:547612) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ Android UnknownError retries the same service-worker URL without clearing registration or saving user state (17.1217ms)
+✔ an already downloaded update remains available even if another network check would fail (11.0082ms)
+✔ repeated unknown failures report useful recovery steps and technical details without deleting user data (3.9668ms)
+✔ offline checks do not request updates, re-register or save data (4.073ms)
+✔ app update waits for manual exam writes and keeps the old app when a write fails (6.9364ms)
+✔ precache paths exist and include lazy modules, workers, templates; exclude user data and tests (38.2711ms)
+✔ cold install verifies every resource; offline navigation, JS, fonts, map and templates work (321.5888ms)
+✔ worker does not intercept personal writes, external URLs or backup downloads (237.1476ms)
+✔ explicit no-store resource updates bypass worker; mutable manifests are not precached (181.3526ms)
+✔ new version retains preceding cache and unrelated apps; legacy single-window activation works (328.9295ms)
+✔ failed installation discards partial new cache and preserves complete old offline version (249.6154ms)
+✔ mobile installation bounds downloads to four and reports measured resource counts after verification (179.2467ms)
+✔ permanent failure reports error without emitting ready or false completion (80.0958ms)
+✔ hash mismatch rejects mixed-version resources instead of installing broken release (179.4951ms)
+✔ missing known resource never falls through to newer network code (197.6603ms)
+✔ multi-tab activation needs every client acknowledgement; dirty peer aborts safely (210.5701ms)
+✔ new peers and legacy multiple windows cannot be activated without acknowledgement (195.7992ms)
+(node:536556) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ startup module failure shows reload, emergency export and double-confirmed clear controls (10.9379ms)
+✔ startup emergency export failure has a visible message and never clears stored data (2.5722ms)
+✔ exported standalone HTML executes without any network imports/resources and restores its embedded workspace (571.6916ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2894.3476

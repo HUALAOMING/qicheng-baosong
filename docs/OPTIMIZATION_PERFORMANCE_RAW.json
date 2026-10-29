@@ -1,0 +1,200 @@
+[
+  {
+    "target": "../qicheng-5.2.1",
+    "round": 1,
+    "runs": [
+      {
+        "kind": "initial",
+        "preflightMs": 122.40000009536743,
+        "commitMs": 615,
+        "totalMs": 737.4000000953674,
+        "gets": 10008,
+        "puts": 10006
+      },
+      {
+        "kind": "identical",
+        "preflightMs": 677.4000000953674,
+        "commitMs": 16.799999952316284,
+        "totalMs": 694.2000000476837,
+        "gets": 5006,
+        "puts": 0
+      },
+      {
+        "kind": "patch",
+        "preflightMs": 659.2000000476837,
+        "commitMs": 20.09999990463257,
+        "totalMs": 679.2999999523163,
+        "gets": 5010,
+        "puts": 6
+      }
+    ],
+    "imageUploadMs": 64.5,
+    "thumbnailDecodes": 1,
+    "listImages": 1
+  },
+  {
+    "target": "../qicheng-5.2.1",
+    "round": 2,
+    "runs": [
+      {
+        "kind": "initial",
+        "preflightMs": 106.29999995231628,
+        "commitMs": 456.5,
+        "totalMs": 562.7999999523163,
+        "gets": 10008,
+        "puts": 10006
+      },
+      {
+        "kind": "identical",
+        "preflightMs": 676.5,
+        "commitMs": 18.100000143051147,
+        "totalMs": 694.6000001430511,
+        "gets": 5006,
+        "puts": 0
+      },
+      {
+        "kind": "patch",
+        "preflightMs": 673,
+        "commitMs": 18.299999952316284,
+        "totalMs": 691.2999999523163,
+        "gets": 5010,
+        "puts": 6
+      }
+    ],
+    "imageUploadMs": 34.700000047683716,
+    "thumbnailDecodes": 1,
+    "listImages": 1
+  },
+  {
+    "target": "../qicheng-5.2.1",
+    "round": 3,
+    "runs": [
+      {
+        "kind": "initial",
+        "preflightMs": 107.39999985694885,
+        "commitMs": 436.40000009536743,
+        "totalMs": 543.7999999523163,
+        "gets": 10008,
+        "puts": 10006
+      },
+      {
+        "kind": "identical",
+        "preflightMs": 685.4000000953674,
+        "commitMs": 17.799999952316284,
+        "totalMs": 703.2000000476837,
+        "gets": 5006,
+        "puts": 0
+      },
+      {
+        "kind": "patch",
+        "preflightMs": 668.0999999046326,
+        "commitMs": 18.5,
+        "totalMs": 686.5999999046326,
+        "gets": 5010,
+        "puts": 6
+      }
+    ],
+    "imageUploadMs": 33.59999990463257,
+    "thumbnailDecodes": 1,
+    "listImages": 1
+  },
+  {
+    "target": ".",
+    "round": 1,
+    "runs": [
+      {
+        "kind": "initial",
+        "preflightMs": 19.200000047683716,
+        "commitMs": 156.20000004768372,
+        "totalMs": 175.40000009536743,
+        "gets": 6,
+        "puts": 5006
+      },
+      {
+        "kind": "identical",
+        "preflightMs": 24.40000009536743,
+        "commitMs": 16.5,
+        "totalMs": 40.90000009536743,
+        "gets": 4,
+        "puts": 0
+      },
+      {
+        "kind": "patch",
+        "preflightMs": 30.200000047683716,
+        "commitMs": 18.09999990463257,
+        "totalMs": 48.299999952316284,
+        "gets": 5,
+        "puts": 5
+      }
+    ],
+    "imageUploadMs": 23.5,
+    "thumbnailDecodes": 0,
+    "listImages": 0
+  },
+  {
+    "target": ".",
+    "round": 2,
+    "runs": [
+      {
+        "kind": "initial",
+        "preflightMs": 18.800000190734863,
+        "commitMs": 154.79999995231628,
+        "totalMs": 173.60000014305115,
+        "gets": 6,
+        "puts": 5006
+      },
+      {
+        "kind": "identical",
+        "preflightMs": 22.5,
+        "commitMs": 18.59999990463257,
+        "totalMs": 41.09999990463257,
+        "gets": 4,
+        "puts": 0
+      },
+      {
+        "kind": "patch",
+        "preflightMs": 32.5,
+        "commitMs": 20,
+        "totalMs": 52.5,
+        "gets": 5,
+        "puts": 5
+      }
+    ],
+    "imageUploadMs": 16.800000190734863,
+    "thumbnailDecodes": 0,
+    "listImages": 0
+  },
+  {
+    "target": ".",
+    "round": 3,
+    "runs": [
+      {
+        "kind": "initial",
+        "preflightMs": 17.600000143051147,
+        "commitMs": 165.19999980926514,
+        "totalMs": 182.79999995231628,
+        "gets": 6,
+        "puts": 5006
+      },
+      {
+        "kind": "identical",
+        "preflightMs": 21.100000143051147,
+        "commitMs": 16.5,
+        "totalMs": 37.60000014305115,
+        "gets": 4,
+        "puts": 0
+      },
+      {
+        "kind": "patch",
+        "preflightMs": 29.5,
+        "commitMs": 20.299999952316284,
+        "totalMs": 49.799999952316284,
+        "gets": 5,
+        "puts": 5
+      }
+    ],
+    "imageUploadMs": 21.200000047683716,
+    "thumbnailDecodes": 0,
+    "listImages": 0
+  }
+]

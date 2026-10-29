@@ -1,0 +1,45 @@
+✔ no-op save avoids writes; rapid queued saves retain latest edit and actual commit state (43.3679ms)
+✔ storage snapshots omit immutable binary projections and photos before cloning (0.9391ms)
+✔ autosave pins UI revision even after incidental database reads; conflicts preserve local unsaved edits (48.9367ms)
+✔ backup v2 materializes exact original bytes from lazy Blob workspace without local pointers (46.8099ms)
+✔ preflight can precede atomic restore without invalidating integrity; restored original is lossless (180.608ms)
+✔ damaged complete backup is rejected before replacing existing database (32.5022ms)
+✔ external backups cannot supply local Blob pointers even with matching recalculated digest (29.19ms)
+✔ old imported packs join the default four without migration writes and preserve old learning keys (352.8882ms)
+✔ multiple JSON packs with the same question ID merge safely into one chosen bank (142.3065ms)
+✔ users create named banks; empty banks, assignments and imported packs survive a complete backup restore (291.7747ms)
+✔ a local JSON with an official ID imports as a personal pack without overwriting official content (132.983ms)
+✔ reimport updates a pack and can move it without duplicating practice entries or losing favorites (142.0404ms)
+✔ deleting packs and custom banks preserves other packs, default banks and learning history (213.6934ms)
+✔ database failures preserve both the old directory and all packs in memory and on disk (225.9755ms)
+✔ offline reload retains the directory and imported content without requests or extra user-state saves (193.7897ms)
+✔ valid IDs that match object property names keep their own assignments and learning identities (279.3021ms)
+✔ 5.2 reading requires date, title, author, language and chapters; all optional values may be empty (18.411ms)
+✔ legacy page records load unchanged and new chapter records round-trip through persistence (36.1101ms)
+✔ same book titles group into one timeline; latest input order is independent of reading date (0.8463ms)
+✔ integration combines every note of the selected book chronologically and remains independently editable (0.8143ms)
+✔ a failed reading write keeps the last committed record intact (15.8856ms)
+✔ weekly quotes require exactly seven unique selections and follow Monday-to-Sunday order for this week only (7.7292ms)
+✔ weekly quotes persist with the existing home backup record and malformed restored plans are rejected (156.7518ms)
+✔ reading text stays escaped and daily quote customization is reachable from home, daily quote and settings (14.2372ms)
+✔ navigation, menu and temporary filters produce zero current writes; an edit survives immediate navigation (754.759ms)
+✔ all three downloadable examples import offline, show dynamic entries and round-trip through backup (234.0297ms)
+✔ failed imports preserve every record, reject ambiguous formats, duplicate IDs, illegal answers and dangerous text remains inert (94.074ms)
+✔ Guanzi 100 quotes are exact originals with valid passage links and fixed daily selection (3.0034ms)
+✔ manual online classic update verifies checksum and commits atomically, with custom content still preferred (32.612ms)
+✔ empty old official quotes are filled locally while custom quotes and real installed resources remain untouched (117.0031ms)
+✔ workspace normalization separates originals as Blob, reconstructs lossless public view, lazy view contains no original (21.358ms)
+✔ editing one field commits only changed row and preserves immutable original Blob identity (3.5649ms)
+✔ two windows reject stale workspace and generic writes without overwriting committed data (13.7722ms)
+✔ failed normalized transaction rolls back all fields and preserves quota failure reason (7.1283ms)
+✔ failed full restore after clear is atomic, updater errors retain exact reason (7.0368ms)
+✔ restore invalidates a peer observed revision and bank projection retains origin and exact questions (8.2165ms)
+✔ removing the last asset reference garbage collects original and thumbnail atomically (5.7446ms)
+ℹ tests 37
+ℹ suites 0
+ℹ pass 37
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2758.8869

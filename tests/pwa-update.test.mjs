@@ -5,7 +5,9 @@ import {readFile} from 'node:fs/promises';
 async function harness(registration,waitForCalendar=async()=>{}){
   const notice={textContent:''};let registrations=0,saves=0;const nav={onLine:true,serviceWorker:{getRegistration:async()=>registration,register:async()=>{registrations++;return registration;}}};
   const values={
+    './features53.js':{flushLoadedFeatures53:async()=>{}},'./timer53.js':{waitForTimerWrites53:async()=>{}},
     './state.js':{ctx:{state:{}}},'./utils/helpers.js':{$:()=>null,$$:selector=>selector==='[data-pwa-update-status]'?[notice]:[],tr:zh=>zh,toast(){}},
+    './tasks.js':{tasks:{start:()=>({state:{status:'running'},stage(){},succeed(){},fail(){}})}},'./constants.js':{VERSION:'5.2.1'},
     './autosave.js':{save:async()=>{saves++;return true;}},'./data.js':{APP_BASE:new URL('https://qicheng.test/app/')},
     './modules/home.js':{waitForHomeWrites:async()=>{}},'./modules/quiz.js':{waitForQuizWrites:async()=>{}},'./resources.js':{waitForResourceWrites:async()=>{}},'./modules/journal.js':{waitForJournalWrites:async()=>{}},'./modules/exam-calendar.js':{waitForExamCalendarWrites:waitForCalendar}
   };

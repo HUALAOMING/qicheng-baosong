@@ -1,0 +1,12 @@
+{
+  "appVersion": "5.2.1",
+  "cacheRevision": "c4722e8b9b29",
+  "databaseVersion": 2,
+  "backupVersion": 2,
+  "fullTests": 271,
+  "specializedTests": 9,
+  "edgeRuntime": 12,
+  "edgePWA": 6,
+  "offlineDirectModificationRounds": 3,
+  "published": false
+}

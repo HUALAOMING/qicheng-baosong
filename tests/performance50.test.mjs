@@ -15,7 +15,7 @@ async function harness() {
   const storage=storeModule.namespace.storage;
   for(const method of ['set','setMany','update','remove']){const original=storage[method];storage[method]=(...args)=>{writes.push({method,key:args[0]});return original(...args);};}
   const dependencies={
-    '../storage.js':{storage},'../resources.js':{listPracticeBanks:()=>banks},'../state.js':{ctx},
+    '../storage.js':{storage},'../resources.js':{listPracticeBankSummaries:()=>banks.map(b=>({...b,questionCount:b.questions.length,sourceBankIds:[b.bank.id]})),getPracticeBank:id=>banks.find(b=>b.bank.id===id),loadPracticeSample:async id=>banks.find(b=>b.bank.id===id),countPracticeMarks:(id,field,marks)=>marks.filter(mark=>mark.bankId===id&&mark[field]&&banks.find(b=>b.bank.id===id)?.questions.some(q=>q.id===mark.questionId)).length},'../state.js':{ctx},
     '../app.js':{render(){},confirmAction:async()=>true,go3:route=>{ctx.state.route=route;}},
     '../utils/helpers.js':{$:()=>null,$$:selector=>controls.get(selector)||[],esc:value=>String(value??''),tr:zh=>zh,toast:message=>messages.push(message),uid:()=> 'draft-'+(++nextId)}
   };
@@ -28,12 +28,12 @@ async function harness() {
 test('rapid real answer edits debounce into one independent draft write; repeat selections and timer do not save',async()=>{
   const {quiz,storage,writes,advance}=await harness();
   const session=quiz.quizStart('bank','random',10,()=>0.25);await quiz.waitForQuizWrites();
-  assert.equal(writes.length,1);assert.equal(writes[0].method,'update');
+  assert.equal(writes.length,1);assert.equal(writes[0].method,'setMany');assert.deepEqual(Object.keys(writes[0].key).sort(),['@521:quiz:overview',quiz.QUIZ_DRAFT_KEY].sort());
   const original=await storage.get(quiz.QUIZ_DRAFT_KEY);writes.length=0;
   for(let index=0;index<session.questions.length;index++)quiz.quizAnswer(index,session.questions[index].answer);
   assert.equal(writes.length,0);assert.equal(quiz.getRecentQuiz(),null);
   await new Promise(resolve=>setTimeout(resolve,650));await quiz.waitForQuizWrites();
-  assert.equal(writes.length,1);assert.equal(writes[0].key,quiz.QUIZ_DRAFT_KEY);
+  assert.equal(writes.length,1);assert.deepEqual(Object.keys(writes[0].key).sort(),['@521:quiz:overview',quiz.QUIZ_DRAFT_KEY].sort());
   const draft=await storage.get(quiz.QUIZ_DRAFT_KEY);assert.deepEqual(draft.questions,original.questions);
   assert.equal(draft.answers.filter(answer=>answer!==null).length,10);
   assert.equal('index' in draft,false);assert.equal('correct' in draft,false);assert.equal(await storage.get('current'),undefined);
@@ -113,7 +113,7 @@ test('old history loads question snapshots on demand and reviewing never replace
   const session=quiz.quizStart('bank','random',7);quiz.quizAnswer(0,session.questions[0].answer);await quiz.waitForQuizWrites();
   let reads=0;const originalGet=storage.get;storage.get=key=>{if(key==='quiz:record:'+first.id)reads++;return originalGet(key);};
   const button={dataset:{quizReview:first.id},disabled:false};controls.set('[data-quiz-review]',[button]);quiz.bindQuizControls();
-  const beforeWrites=writes.length;await button.onclick();assert.equal(reads,1);assert.match(quiz.quizPage(),/PRIVATE_EXPLANATION/);
+  const beforeWrites=writes.length;await button.onclick();assert.equal(reads,1);assert.doesNotMatch(quiz.quizPage(),/PRIVATE_EXPLANATION/);assert.match(quiz.quizPage(),/先完成正在进行的练习/);
   assert.equal(quiz.getUnfinishedQuiz().id,session.id);assert.equal(quiz.getUnfinishedQuiz().answered,1);
   quiz.quizResume();assert.ok(!quiz.quizPage().includes('PRIVATE_EXPLANATION'));assert.equal(writes.length,beforeWrites);
   assert.equal((await storage.get('quiz:record:'+first.id)).questions.length,7);

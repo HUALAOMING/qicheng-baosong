@@ -1,0 +1,301 @@
+✖ independent paper, rule and section colors reach HTML, PDF, editable PPTX and Word (4.2549ms)
+✔ appearance controls keep custom settings and additional statement can be independently excluded (4.502ms)
+✔ 5.0 document settings keep old documents unchanged and validate optional additions (11.1529ms)
+✖ contents point to actual physical pages and all page numbers include contents (4.3679ms)
+✖ long multi-page contents use the real offset and never overflow the printable area (2.2306ms)
+✖ page-number toggle and restrained decorations apply to every fixed-layout page (1.1246ms)
+✖ DOCX carries a dynamic TOC, refresh flag, page/total fields and optional real page borders (10.9466ms)
+✖ PDF and editable PPTX preserve the same contents and total-page count (1.2306ms)
+✔ all six original formats remain exposed with clear pagination guidance (5.8744ms)
+✔ 5.1 snapshots gain only additive 5.2 fields and keep statements and document settings (5.1427ms)
+✔ Chinese character counts and English word counts exclude punctuation (2.5733ms)
+✔ duration conversion accepts overflow seconds and rejects negative or fractional input (0.3021ms)
+✔ countdown runs into overtime, preserves pause and resume, and resets (2.2448ms)
+✔ complete backups preserve introduction versions, drafts, and optional third-language statements (10.5551ms)
+✖ manual local-file save writes a restorable JSON and cancellation keeps user data (51.5283ms)
+✔ AI instruction example satisfies the actual importer and includes strict JSON guidance (1.4719ms)
+✔ default-bank dates and provided updatedAt metadata survive validation and storage (146.9549ms)
+✔ 5.2 reading requires date, title, author, language and chapters; all optional values may be empty (16.4978ms)
+✔ legacy page records load unchanged and new chapter records round-trip through persistence (21.5094ms)
+✔ same book titles group into one timeline; latest input order is independent of reading date (18.2507ms)
+✔ integration combines every note of the selected book chronologically and remains independently editable (0.9137ms)
+✔ a failed reading write keeps the last committed record intact (11.7523ms)
+✔ weekly quotes require exactly seven unique selections and follow Monday-to-Sunday order for this week only (7.1653ms)
+✖ weekly quotes persist with the existing home backup record and malformed restored plans are rejected (8.7758ms)
+✔ reading text stays escaped and daily quote customization is reachable from home, daily quote and settings (21.4235ms)
+✔ schema validation rejects broken answers, duplicate stable IDs, mismatched sections and invalid versions (36.9089ms)
+✔ semantic versions compare numerically including prerelease precedence (25.5461ms)
+✖ initialization fetches only bundled local resources and never requests a manifest (248.9434ms)
+✔ installed resources take priority over newer application seeds without a startup update (23.6699ms)
+✖ custom resources persist through an offline restart and cannot replace an official bank (33.1385ms)
+✖ reimport replaces the same custom bank while retaining stable learning keys, with rollback on failure (27.4304ms)
+✔ backup resource validation checks origin, key consistency and official/custom collisions (12.2368ms)
+✔ one corrupt checksum prevents the entire update, preserving disk, memory and learning history (42.2678ms)
+✖ a correctly hashed but invalid schema or inconsistent version cannot update (20.3833ms)
+✔ database failure after the first put rolls all resources back without publishing memory (30.9191ms)
+✔ manual update commits all verified resources and retains them after offline restart (28.8679ms)
+✖ unsafe manifests and custom ID collisions fail before resource downloads (16.8785ms)
+✖ simultaneous imports are serialized and failed queued work does not poison future writes (18.8037ms)
+ℹ Error: Test "custom resources persist through an offline restart and cannot replace an official bank" at tests\resources.test.mjs:74:1 generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" and would have caused the test to fail, but instead triggered an uncaughtException event.
+ℹ Error: Test "custom resources persist through an offline restart and cannot replace an official bank" at tests\resources.test.mjs:74:1 generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" and would have caused the test to fail, but instead triggered an uncaughtException event.
+ℹ Error: Test "custom resources persist through an offline restart and cannot replace an official bank" at tests\resources.test.mjs:74:1 generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" and would have caused the test to fail, but instead triggered an uncaughtException event.
+ℹ Error: Test "custom resources persist through an offline restart and cannot replace an official bank" at tests\resources.test.mjs:74:1 generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" and would have caused the test to fail, but instead triggered an uncaughtException event.
+ℹ Error: A resource generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" which triggered an uncaughtException event, caught by the test runner.
+ℹ Error: A resource generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" which triggered an uncaughtException event, caught by the test runner.
+ℹ Error: Test "custom resources persist through an offline restart and cannot replace an official bank" at tests\resources.test.mjs:74:1 generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" and would have caused the test to fail, but instead triggered an uncaughtException event.
+ℹ Error: A resource generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" which triggered an uncaughtException event, caught by the test runner.
+ℹ Error: Test "reimport replaces the same custom bank while retaining stable learning keys, with rollback on failure" at tests\resources.test.mjs:83:1 generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" and would have caused the test to fail, but instead triggered an uncaughtException event.
+ℹ Error: Test "reimport replaces the same custom bank while retaining stable learning keys, with rollback on failure" at tests\resources.test.mjs:83:1 generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" and would have caused the test to fail, but instead triggered an uncaughtException event.
+ℹ Error: Test "reimport replaces the same custom bank while retaining stable learning keys, with rollback on failure" at tests\resources.test.mjs:83:1 generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" and would have caused the test to fail, but instead triggered an uncaughtException event.
+ℹ Error: A resource generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" which triggered an uncaughtException event, caught by the test runner.
+ℹ Error: A resource generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" which triggered an uncaughtException event, caught by the test runner.
+ℹ Error: A resource generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" which triggered an uncaughtException event, caught by the test runner.
+ℹ Error: A resource generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" which triggered an uncaughtException event, caught by the test runner.
+ℹ Error: A resource generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" which triggered an uncaughtException event, caught by the test runner.
+ℹ Error: A resource generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" which triggered an uncaughtException event, caught by the test runner.
+ℹ Error: A resource generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" which triggered an uncaughtException event, caught by the test runner.
+ℹ Error: A resource generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" which triggered an uncaughtException event, caught by the test runner.
+ℹ Error: A resource generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" which triggered an uncaughtException event, caught by the test runner.
+ℹ Error: A resource generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" which triggered an uncaughtException event, caught by the test runner.
+ℹ Error: A resource generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" which triggered an uncaughtException event, caught by the test runner.
+ℹ Error: A resource generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" which triggered an uncaughtException event, caught by the test runner.
+ℹ Error: A resource generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" which triggered an uncaughtException event, caught by the test runner.
+ℹ Error: A resource generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" which triggered an uncaughtException event, caught by the test runner.
+ℹ Error: A resource generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" which triggered an uncaughtException event, caught by the test runner.
+ℹ Error: A resource generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" which triggered an uncaughtException event, caught by the test runner.
+ℹ Error: A resource generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" which triggered an uncaughtException event, caught by the test runner.
+ℹ Error: A resource generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" which triggered an uncaughtException event, caught by the test runner.
+ℹ Error: Test "unsafe manifests and custom ID collisions fail before resource downloads" at tests\resources.test.mjs:141:1 generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" and would have caused the test to fail, but instead triggered an uncaughtException event.
+ℹ Error: A resource generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" which triggered an uncaughtException event, caught by the test runner.
+ℹ Error: A resource generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" which triggered an uncaughtException event, caught by the test runner.
+ℹ Error: Test "simultaneous imports are serialized and failed queued work does not poison future writes" at tests\resources.test.mjs:148:1 generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" and would have caused the test to fail, but instead triggered an uncaughtException event.
+ℹ Error: Test "simultaneous imports are serialized and failed queued work does not poison future writes" at tests\resources.test.mjs:148:1 generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" and would have caused the test to fail, but instead triggered an uncaughtException event.
+ℹ Error: Test "simultaneous imports are serialized and failed queued work does not poison future writes" at tests\resources.test.mjs:148:1 generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" and would have caused the test to fail, but instead triggered an uncaughtException event.
+ℹ Error: Test "simultaneous imports are serialized and failed queued work does not poison future writes" at tests\resources.test.mjs:148:1 generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" and would have caused the test to fail, but instead triggered an uncaughtException event.
+ℹ Error: A resource generated asynchronous activity after the test ended. This activity created the error "TypeError: host.replaceChildren is not a function" which triggered an uncaughtException event, caught by the test runner.
+✔ New introduction clears an existing edit ID while retaining an unfinished new draft (15.3424ms)
+✖ restore clears rehearsal clocks so an imported version cannot inherit previous overtime (13.0191ms)
+✔ cache clearing asks for confirmation and removes only this installation assets, keeping all database records (14.7304ms)
+✖ manual JSON save preserves unsaved current data even when database writing fails (41.855ms)
+✔ total and subject metrics use corresponding full marks and corresponding ranks (123.175ms)
+✔ score rates preserve numeric zero and reject absent, impossible or zero full marks (63.8027ms)
+✔ chart offers exactly total/subject and score/rate/rank selectors, with no missing-value NaN (63.7752ms)
+✔ weighted scores and ranks normalize relative weights without requiring 100 percent (54.1882ms)
+✔ invalid weights block calculations and missing scores/ranks are never silently counted as zero (49.6139ms)
+✔ manual calendar arrangements save, reload, edit, group by university and delete independently (100.2246ms)
+✔ manual event validation and storage failures preserve the previous complete event (71.5419ms)
+✔ manual events survive independent-record round trips and text remains inert in the calendar (67.8675ms)
+✖ complete backup restores manual calendar events and rejects damaged events before any mutation (65.5058ms)
+(node:323364) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ startup module failure shows reload, emergency export and double-confirmed clear controls (18.1969ms)
+✔ startup emergency export failure has a visible message and never clears stored data (3.2215ms)
+✔ exported standalone HTML executes without any network imports/resources and restores its embedded workspace (458.0905ms)
+ℹ tests 54
+ℹ suites 0
+ℹ pass 37
+ℹ fail 17
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1801.9351
+
+✖ failing tests:
+
+test at tests\design52.test.mjs:15:1
+✖ independent paper, rule and section colors reach HTML, PDF, editable PPTX and Word (4.2549ms)
+  TypeError: storage.hydrateAssets is not a function
+      at documentPlan (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/js/modules/export.js:144:17)
+      at TestContext.<anonymous> (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/tests/design52.test.mjs:17:20)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.start (node:internal/test_runner/test:1257:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17)
+
+test at tests\export50.test.mjs:42:1
+✖ contents point to actual physical pages and all page numbers include contents (4.3679ms)
+  TypeError: storage.hydrateAssets is not a function
+      at documentPlan (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/js/modules/export.js:144:17)
+      at TestContext.<anonymous> (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/tests/export50.test.mjs:44:22)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:969:18)
+      at Test.postRun (node:internal/test_runner/test:1537:19)
+      at Test.run (node:internal/test_runner/test:1462:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at tests\export50.test.mjs:60:1
+✖ long multi-page contents use the real offset and never overflow the printable area (2.2306ms)
+  TypeError: storage.hydrateAssets is not a function
+      at documentPlan (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/js/modules/export.js:144:17)
+      at TestContext.<anonymous> (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/tests/export50.test.mjs:61:18)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:969:18)
+      at Test.postRun (node:internal/test_runner/test:1537:19)
+      at Test.run (node:internal/test_runner/test:1462:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7)
+
+test at tests\export50.test.mjs:76:1
+✖ page-number toggle and restrained decorations apply to every fixed-layout page (1.1246ms)
+  TypeError: storage.hydrateAssets is not a function
+      at documentPlan (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/js/modules/export.js:144:17)
+      at TestContext.<anonymous> (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/tests/export50.test.mjs:80:24)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:969:18)
+      at Test.postRun (node:internal/test_runner/test:1537:19)
+      at Test.run (node:internal/test_runner/test:1462:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7)
+
+test at tests\export50.test.mjs:95:1
+✖ DOCX carries a dynamic TOC, refresh flag, page/total fields and optional real page borders (10.9466ms)
+  TypeError: storage.hydrateAssets is not a function
+      at wordBlob (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/js/modules/export.js:446:17)
+      at async TestContext.<anonymous> (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/tests/export50.test.mjs:97:16)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7)
+
+test at tests\export50.test.mjs:116:1
+✖ PDF and editable PPTX preserve the same contents and total-page count (1.2306ms)
+  TypeError: storage.hydrateAssets is not a function
+      at documentPlan (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/js/modules/export.js:144:17)
+      at TestContext.<anonymous> (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/tests/export50.test.mjs:118:22)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:969:18)
+      at Test.postRun (node:internal/test_runner/test:1537:19)
+      at Test.run (node:internal/test_runner/test:1462:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7)
+
+test at tests\introductions52.test.mjs:45:1
+✖ manual local-file save writes a restorable JSON and cancellation keeps user data (51.5283ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/tests/introductions52.test.mjs:48:73)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\reading52.test.mjs:86:1
+✖ weekly quotes persist with the existing home backup record and malformed restored plans are rejected (8.7758ms)
+  TypeError: host.replaceChildren is not a function
+      at paintTasks521 (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/js/tasks.js:13:8)
+      at requestAnimationFrame (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/tests/support.mjs:111:65)
+      at scheduleTaskPaint521 (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/js/tasks.js:33:63)
+      at Object.start (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/js/tasks.js:40:42)
+      at Module.getCurrentBackup (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/js/backup.js:102:20)
+      at TestContext.<anonymous> (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/tests/reading52.test.mjs:93:29)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7)
+
+test at tests\resources.test.mjs:55:1
+✖ initialization fetches only bundled local resources and never requests a manifest (248.9434ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  234 !== 6
+  
+      at TestContext.<anonymous> (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/tests/resources.test.mjs:62:10)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 234,
+    expected: 6,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\resources.test.mjs:74:1
+✖ custom resources persist through an offline restart and cannot replace an official bank (33.1385ms)
+  TypeError: host.replaceChildren is not a function
+      at Timeout.paintTasks521 [as _onTimeout] (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/js/tasks.js:13:8)
+      at listOnTimeout (node:internal/timers:685:17)
+      at process.processTimers (node:internal/timers:618:7)
+
+test at tests\resources.test.mjs:83:1
+✖ reimport replaces the same custom bank while retaining stable learning keys, with rollback on failure (27.4304ms)
+  TypeError: host.replaceChildren is not a function
+      at Timeout.paintTasks521 [as _onTimeout] (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/js/tasks.js:13:8)
+      at listOnTimeout (node:internal/timers:685:17)
+      at process.processTimers (node:internal/timers:618:7)
+
+test at tests\resources.test.mjs:116:1
+✖ a correctly hashed but invalid schema or inconsistent version cannot update (20.3833ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  10 !== 6
+  
+      at TestContext.<anonymous> (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/tests/resources.test.mjs:121:75)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 10,
+    expected: 6,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\resources.test.mjs:141:1
+✖ unsafe manifests and custom ID collisions fail before resource downloads (16.8785ms)
+  TypeError: host.replaceChildren is not a function
+      at Timeout.paintTasks521 [as _onTimeout] (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/js/tasks.js:13:8)
+      at listOnTimeout (node:internal/timers:685:17)
+      at process.processTimers (node:internal/timers:618:7)
+
+test at tests\resources.test.mjs:148:1
+✖ simultaneous imports are serialized and failed queued work does not poison future writes (18.8037ms)
+  TypeError: host.replaceChildren is not a function
+      at Timeout.paintTasks521 [as _onTimeout] (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/js/tasks.js:13:8)
+      at listOnTimeout (node:internal/timers:685:17)
+      at process.processTimers (node:internal/timers:618:7)
+
+test at tests\review52.test.mjs:18:1
+✖ restore clears rehearsal clocks so an imported version cannot inherit previous overtime (13.0191ms)
+  TypeError: host.replaceChildren is not a function
+      at paintTasks521 (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/js/tasks.js:13:8)
+      at requestAnimationFrame (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/tests/support.mjs:111:65)
+      at scheduleTaskPaint521 (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/js/tasks.js:33:63)
+      at Object.start (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/js/tasks.js:40:42)
+      at Module.commitBackup (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/js/backup.js:154:20)
+      at async TestContext.<anonymous> (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/tests/review52.test.mjs:22:3)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7)
+
+test at tests\review52.test.mjs:36:1
+✖ manual JSON save preserves unsaved current data even when database writing fails (41.855ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/tests/review52.test.mjs:39:14)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\scores52.test.mjs:82:1
+✖ complete backup restores manual calendar events and rejects damaged events before any mutation (65.5058ms)
+  TypeError: host.replaceChildren is not a function
+      at paintTasks521 (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/js/tasks.js:13:8)
+      at requestAnimationFrame (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/tests/support.mjs:111:65)
+      at scheduleTaskPaint521 (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/js/tasks.js:33:63)
+      at Object.start (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/js/tasks.js:40:42)
+      at Module.getCurrentBackup (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/js/backup.js:102:20)
+      at TestContext.<anonymous> (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/tests/scores52.test.mjs:85:30)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7)

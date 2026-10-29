@@ -1,0 +1,274 @@
+{
+  "scope": "Local application-generated exports; OOXML structural verification. No desktop Word or LibreOffice manual editing check.",
+  "browser": {
+    "browser": "156.0.4314.50",
+    "platform": "Windows headless Edge; tablet is viewport simulation only",
+    "checks": [
+      {
+        "name": "independent version content reaches full editor and design modes without changing master",
+        "status": "PASS"
+      },
+      {
+        "name": "advanced legacy settings remain editable and template switching preserves saved appearance",
+        "status": "PASS",
+        "details": {
+          "restoredAvatarSize": 40,
+          "backgroundPreserved": true
+        }
+      },
+      {
+        "name": "all four DOCX templates contain editable independent text, selective TOC and native columns",
+        "status": "PASS",
+        "details": [
+          {
+            "template": "original",
+            "hasName": true,
+            "hasBody": true,
+            "hasMaster": false,
+            "protected": false,
+            "drawing": false,
+            "heading1": 1,
+            "columns": false
+          },
+          {
+            "template": "classic",
+            "hasName": true,
+            "hasBody": true,
+            "hasMaster": false,
+            "protected": false,
+            "drawing": false,
+            "heading1": 1,
+            "columns": false
+          },
+          {
+            "template": "modern",
+            "hasName": true,
+            "hasBody": true,
+            "hasMaster": false,
+            "protected": false,
+            "drawing": false,
+            "heading1": 1,
+            "columns": false
+          },
+          {
+            "template": "academic",
+            "hasName": true,
+            "hasBody": true,
+            "hasMaster": false,
+            "protected": false,
+            "drawing": false,
+            "heading1": 1,
+            "columns": true
+          }
+        ]
+      },
+      {
+        "name": "native portrait images stay separate from editable body paragraphs in all templates",
+        "status": "PASS",
+        "details": [
+          {
+            "template": "original",
+            "drawingCount": 1,
+            "hasBody": true,
+            "nativeMedia": 1,
+            "protected": false
+          },
+          {
+            "template": "classic",
+            "drawingCount": 1,
+            "hasBody": true,
+            "nativeMedia": 1,
+            "protected": false
+          },
+          {
+            "template": "modern",
+            "drawingCount": 1,
+            "hasBody": true,
+            "nativeMedia": 1,
+            "protected": false
+          },
+          {
+            "template": "academic",
+            "drawingCount": 1,
+            "hasBody": true,
+            "nativeMedia": 1,
+            "protected": false
+          }
+        ]
+      },
+      {
+        "name": "unified export button navigates before generation; filename does not rename version and files persist",
+        "status": "PASS",
+        "details": {
+          "description": "File_custom.docx · 16 KB"
+        }
+      },
+      {
+        "name": "PDF/PPTX/HTML/Markdown and PNG share resolved content, cover and finite page geometry",
+        "status": "PASS",
+        "details": {
+          "pages": 3,
+          "pptBytes": 85210,
+          "htmlHas": true,
+          "htmlMaster": false,
+          "mdHas": true,
+          "pngPages": 3
+        }
+      },
+      {
+        "name": "landscape tablet layout keeps design controls usable and avoids document horizontal overflow",
+        "status": "PASS"
+      }
+    ],
+    "errors": []
+  },
+  "docx": [
+    {
+      "file": "docs/evidence53/export53/academic-with-photo.docx",
+      "bytes": 16085,
+      "sha256": "15cc53379a3d6798e7577744ab9eacce27be8ca19059d7fb9baeec3760409dca",
+      "nativeParagraphs": 20,
+      "nativeTextRuns": 21,
+      "drawings": 1,
+      "mediaFiles": [
+        "word/media/86c4c36186349af63abfcf4b4345a86eda7fe885.png"
+      ],
+      "columnCounts": [
+        "2"
+      ],
+      "hasIndependentName": true,
+      "hasIndependentStatement": true,
+      "hasMasterText": false,
+      "hasDocumentProtection": false,
+      "hasAltChunk": false
+    },
+    {
+      "file": "docs/evidence53/export53/academic.docx",
+      "bytes": 11132,
+      "sha256": "24b2a05b2a984cff39236ea43726a7e6e4dcc252540675c5a865426a9faf339f",
+      "nativeParagraphs": 19,
+      "nativeTextRuns": 21,
+      "drawings": 0,
+      "mediaFiles": [],
+      "columnCounts": [
+        "2"
+      ],
+      "hasIndependentName": true,
+      "hasIndependentStatement": true,
+      "hasMasterText": false,
+      "hasDocumentProtection": false,
+      "hasAltChunk": false
+    },
+    {
+      "file": "docs/evidence53/export53/classic-with-photo.docx",
+      "bytes": 24882,
+      "sha256": "5a0926ced7df074ef11e1eede57e7bfc0da48bc4953bb158e01a2a3dfa4a4a3b",
+      "nativeParagraphs": 20,
+      "nativeTextRuns": 21,
+      "drawings": 1,
+      "mediaFiles": [
+        "word/media/4537e825396afd37171c649a97af238390ddc924.png"
+      ],
+      "columnCounts": [
+        "2"
+      ],
+      "hasIndependentName": true,
+      "hasIndependentStatement": true,
+      "hasMasterText": false,
+      "hasDocumentProtection": false,
+      "hasAltChunk": false
+    },
+    {
+      "file": "docs/evidence53/export53/classic.docx",
+      "bytes": 11096,
+      "sha256": "6d7a0a78ba3b3a4423c127748b9260c0d320dd4dc4760ac27c3622e15f392b03",
+      "nativeParagraphs": 19,
+      "nativeTextRuns": 21,
+      "drawings": 0,
+      "mediaFiles": [],
+      "columnCounts": [],
+      "hasIndependentName": true,
+      "hasIndependentStatement": true,
+      "hasMasterText": false,
+      "hasDocumentProtection": false,
+      "hasAltChunk": false
+    },
+    {
+      "file": "docs/evidence53/export53/modern-with-photo.docx",
+      "bytes": 16081,
+      "sha256": "773572c2e0ad8fe85a45644eb656e592bb8ba1bd37b2a9078e80748bdedd19a2",
+      "nativeParagraphs": 20,
+      "nativeTextRuns": 21,
+      "drawings": 1,
+      "mediaFiles": [
+        "word/media/86c4c36186349af63abfcf4b4345a86eda7fe885.png"
+      ],
+      "columnCounts": [
+        "2"
+      ],
+      "hasIndependentName": true,
+      "hasIndependentStatement": true,
+      "hasMasterText": false,
+      "hasDocumentProtection": false,
+      "hasAltChunk": false
+    },
+    {
+      "file": "docs/evidence53/export53/modern.docx",
+      "bytes": 11103,
+      "sha256": "8f7689c683e1b3de3fbeb63ec1cc776cb37b5537849e81eef38018f5f9d391c2",
+      "nativeParagraphs": 19,
+      "nativeTextRuns": 21,
+      "drawings": 0,
+      "mediaFiles": [],
+      "columnCounts": [],
+      "hasIndependentName": true,
+      "hasIndependentStatement": true,
+      "hasMasterText": false,
+      "hasDocumentProtection": false,
+      "hasAltChunk": false
+    },
+    {
+      "file": "docs/evidence53/export53/original-with-photo.docx",
+      "bytes": 15971,
+      "sha256": "037110a0a78fe8c262c4e3ddb8e1501a13966be00624013d26ed14c92d3da145",
+      "nativeParagraphs": 20,
+      "nativeTextRuns": 21,
+      "drawings": 1,
+      "mediaFiles": [
+        "word/media/86c4c36186349af63abfcf4b4345a86eda7fe885.png"
+      ],
+      "columnCounts": [
+        "2"
+      ],
+      "hasIndependentName": true,
+      "hasIndependentStatement": true,
+      "hasMasterText": false,
+      "hasDocumentProtection": false,
+      "hasAltChunk": false
+    },
+    {
+      "file": "docs/evidence53/export53/original.docx",
+      "bytes": 10991,
+      "sha256": "01637d1c56f69b127d75bb9a0594c864c45f85b2fe57e0476518e7cd9a7ed19b",
+      "nativeParagraphs": 19,
+      "nativeTextRuns": 21,
+      "drawings": 0,
+      "mediaFiles": [],
+      "columnCounts": [],
+      "hasIndependentName": true,
+      "hasIndependentStatement": true,
+      "hasMasterText": false,
+      "hasDocumentProtection": false,
+      "hasAltChunk": false
+    }
+  ],
+  "unitCommand": "node --experimental-vm-modules --test tests/export53.test.mjs tests/design52.test.mjs tests/export50.test.mjs",
+  "unitResult": {
+    "pass": 14,
+    "fail": 0
+  },
+  "visualInspection": [
+    "docs/evidence53/export53/tablet-design.png",
+    "docs/evidence53/export53/page-3.png"
+  ]
+}

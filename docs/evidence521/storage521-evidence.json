@@ -1,0 +1,35 @@
+{
+  "date": "2026-10-28",
+  "platform": "Windows Edge headless",
+  "checks": [
+    {
+      "name": "real IDB Blob original/thumbnail/lazy attachment/incremental single-field commit",
+      "status": "PASS",
+      "fullImageExact": true,
+      "fullAttachmentExact": true,
+      "originalSize": [
+        768,
+        1024
+      ],
+      "thumbnailSize": [
+        240,
+        320
+      ],
+      "lazyAttachmentBytes": 37,
+      "saveMs": 1.7000000476837158,
+      "changedKeys": [
+        "@521:ws:profile"
+      ],
+      "revision": 2
+    },
+    {
+      "name": "separate Edge tabs reject stale whole-workspace overwrite",
+      "status": "PASS"
+    },
+    {
+      "name": "winner",
+      "status": "PASS",
+      "size": 4194304
+    }
+  ]
+}

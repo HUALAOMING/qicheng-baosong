@@ -1,4 +1,7 @@
+import {ensureVendors} from '../lazy-runtime.js';
 import { getCurrentBackup } from '../backup.js';
+import { storage } from '../storage.js';
+import { tasks } from '../tasks.js';
 import { ctx } from '../state.js';
 import { $, $$, checkbox, dataBytes, download, esc, formatSize3, heading3, icon3, loadImage, readFile, safeFilename3, toast, tr, uid, moveIn } from '../utils/helpers.js';
 import { cleanCrop, normalizeAssets3, snapshot3 } from '../model.js';
@@ -23,6 +26,9 @@ function ownerObject3 (owner) {
 function assetBy3 (id) {
   return ctx.state.assets.find (a => a.id === id)
 }
+async function downloadAsset521(asset){
+  try{download(await storage.assetBlob(asset),asset.mime,asset.name);}catch(error){toast('无法读取原始附件：'+error.message);}
+}
 
 function attachmentPanel3 (owner) {
   const x = ownerObject3 (owner);
@@ -32,7 +38,7 @@ function attachmentPanel3 (owner) {
   (photos.length + files.length) + '</span></div><div class="actions"><label class="file-button">' + icon3 ('folder') +
   tr ('从本地上传', 'Upload from device') + '<input type="file" data-import3="' + esc (owner) + '" multiple hidden></label><button type="button" data-picker3="' +
   esc (owner) + '">' + tr ('从资料中心选择', 'Choose from Materials') + '</button></div>' + (photos.length ? '<div class="attachment-photos">' +
-  photos.map ((p, i) => '<article><img src="' + esc (p.data) + '" alt="' + esc (p.name) + '"><input data-caption3="' +
+  photos.map ((p, i) => '<article><img data-original-asset521="' + esc(p.assetId||'') + '" src="' + esc (p.data) + '" alt="' + esc (p.name) + '"><input data-caption3="' +
   esc (owner) + '" data-index="' + i + '" value="' + esc (p.caption || '') + '" placeholder="' + tr ('照片说明', 'Caption') +
   '"><div class="actions"><button type="button" data-crop-photo="' + esc (owner) + ':' + i + '">' + tr ('裁剪', 'Crop') +
   '</button><button type="button" data-photo-move3="' + esc (owner) + '" data-index="' + i + '" data-dir="-1" aria-label="' +
@@ -49,7 +55,7 @@ async function addAsset3 (file, kind) {
   if (file.size > 50 * 1048576) throw Error (tr ('单个文件应小于50MB', 'Each file must be under 50 MB'));
   if (ctx.state.assets.length >= 1500) throw Error (tr ('最多支持1500项资料', 'Up to 1500 materials'));
   const data = await readFile (file);
-  if (kind === 'image') await loadImage (data);
+  // Decode only when the user opens or crops an image. Upload preserves exact bytes.
   let a = ctx.state.assets.find (a => a.kind !== 'export' && a.data === data);
   if (! a) {
     a = {
@@ -99,9 +105,12 @@ async function importAssets3 (files, owner = 'center') {
   if (list.length > 50) return toast (tr ('一次最多选择50个文件', 'Select up to 50 files at a time'));
   ctx.uploadBusy = true;
   ctx.busy = true;
+  const task521=tasks.start('批量图片与附件处理');
+  let processed521=0;
   const queue = [], errors = [];
   try {
     for (const f of owner === 'avatar' ? list.slice (0, 1) : list) {
+      task521.stage('读取并校验文件',{done:processed521,total:owner==='avatar'?1:list.length});
       try {
         if (owner === 'avatar' && ! /^image\/(jpeg|png|webp|gif)$/.test (f.type)) throw Error (tr ('请选择 JPG、PNG、WebP 或 GIF 照片',
         'Choose JPG, PNG, WebP or GIF'));
@@ -111,12 +120,17 @@ async function importAssets3 (files, owner = 'center') {
       catch (e) {
         errors.push (f.name + ': ' + e.message)
       }
+      processed521++;
+      task521.stage('已校验文件',{done:processed521,total:owner==='avatar'?1:list.length});
     }
     normalizeAssets3 ();
-    await save ();
+    task521.stage('写入附件与关联记录，等待数据库提交');
+    if(!await save())throw new Error('附件尚未成功提交，请保留当前页面并重试或备份。');
     render ();
+    if(errors.length)task521.fail(new Error('部分文件未能导入：'+errors.join('; ')));else task521.succeed('已提交 '+(owner==='avatar'?1:list.length)+' 个文件');
     toast (tr ('资料已添加', 'Materials added') + (errors.length ? ' · ' + errors.join ('; ') : ''))
   }
+  catch(error){task521.fail(error);toast(error.message);return;}
   finally {
     ctx.busy = false;
     ctx.uploadBusy = false
@@ -151,11 +165,9 @@ function materialsPage3 (kind) {
   (kind === 'image' ? 'accept="image/jpeg,image/png,image/webp,image/gif"' : '') + ' multiple hidden></label><span class="badge">' +
   list.length + ' ' + tr ('项', 'items') + '</span></section><div class="asset-grid3 ' + (kind === 'file' ? 'asset-files3' : '') +
   '">' + (list.length ? list.map (a => {
-    const use = assetUsage3 (a.id); return '<article class="asset-card3">' + (kind === 'image' ? '<div class="asset-image"><img src="' +
-    esc (a.data) + '" alt="' + esc (a.name) + '"></div>' : '<div class="file-mark3">' + icon3 ('folder') + '<span>' +
-    esc (a.name.split ('.').pop ().toUpperCase ().slice (0, 8)) + '</span></div>') + '<div class="asset-info"><h3 title="' +
+    const use = assetUsage3 (a.id); return '<article class="asset-card3">' + '<button class="file-mark3" data-open-asset521="'+esc(a.id)+'" aria-label="打开 '+esc(a.name)+'">'+icon3('folder')+'<span>'+esc(a.name.split('.').pop().toUpperCase().slice(0,8))+'</span></button>' + '<div class="asset-info"><h3 title="' +
     esc (a.name) + '">' + esc (a.name) + '</h3><p>' + formatSize3 (a.size) + ' · ' + new Date (a.createdAt).toLocaleDateString () +
-    '</p><small>' + tr ('关联 ', 'Linked to ') + use.length + tr (' 处', ' records') + '</small><div class="actions"><button data-download-asset3="' +
+    '</p><small>' + tr ('关联 ', 'Linked to ') + use.length + tr (' 处', ' records') + '</small><div class="actions"><button data-open-asset521="'+esc(a.id)+'">打开</button><button data-download-asset3="' +
     a.id + '">' + tr ('下载', 'Download') + '</button><button data-attach-asset3="' + a.id + '">' + tr ('关联', 'Attach') +
     '</button><button data-delete-asset3="' + a.id + '">' + tr ('删除', 'Delete') + '</button></div></div></article>'
   }).join ('') : '<div class="panel empty3">' + icon3 ('folder') + '<p>' + tr ('还没有资料。上传后会自动保存到这里。', 'No materials yet. Uploads are saved here automatically.') +
@@ -189,7 +201,7 @@ function showPicker3 (owner) {
   d.innerHTML = '<div class="dialog-head3"><h2>' + tr ('从资料中心选择', 'Choose from Materials') + '</h2><button data-close-dialog3="assetPicker3">×</button></div><p class="hint">' +
   tr ('选择已有图片或文件；保留原文件，并添加到当前记录。', 'Select existing files or photos to attach to this record.') + '</p><div class="picker-grid3">' +
   (list.length ? list.map (a => '<label>' + checkbox (false, 'data-picker-asset3="' + a.id + '"', a.kind === 'image' ?
-  '<img src="' + esc (a.data) + '" alt="">' : '<span class="file-mark3">' + icon3 ('folder') + '</span>') + '<strong>' +
+  '<span class="file-mark3">'+icon3('folder')+'</span>' : '<span class="file-mark3">' + icon3 ('folder') + '</span>') + '<strong>' +
   esc (a.name) + '</strong><small>' + formatSize3 (a.size) + '</small></label>').join ('') : '<div class="empty">' +
   tr ('资料中心暂无可选文件。请先上传。', 'Upload some materials first.') + '</div>') + '</div><div class="dialog-actions3"><button data-close-dialog3="assetPicker3">' +
   tr ('取消', 'Cancel') + '</button><button class="primary" id="applyAssetPicker3">' + tr ('添加所选', 'Attach selected') +
@@ -215,6 +227,8 @@ function showPicker3 (owner) {
 async function deleteAsset3 (id) {
   const a = assetBy3 (id);
   if (! a) return;
+  const references53=(value)=>{if(!value||typeof value!=='object')return false;if(value.assetId===id)return true;if(Array.isArray(value.attachments)&&value.attachments.includes(id))return true;return Object.values(value).some(child=>typeof child==='object'&&references53(child));};
+  if(ctx.state.versions.some(v=>references53(v.resume53))){toast('此原始附件仍被简历版本引用，请先在相应版本中移除关联，再删除文件。');return;}
   const use = assetUsage3 (id);
   if (! await confirmAction (tr ('删除这份资料？', 'Delete this material?'), a.name + tr ('。将删除原始资料，并解除所有记录中的关联。当前关联数量：', '. This removes the source and all links. Linked records: ') +
   use.length, tr ('确认删除', 'Delete'))) return;
@@ -249,6 +263,7 @@ function archivePage3 () {
 }
 
 async function exportArchive3 () {
+  await ensureVendors(['jszip']);
   if (ctx.busy) return;
   ctx.busy = true;
   toast (tr ('正在打包个人资料…', 'Preparing archive…'));
@@ -264,7 +279,7 @@ async function exportArchive3 () {
         n ++
       }
       used.add (path);
-      zip.file (path, dataBytes (a.data), {
+      zip.file (path, await (await storage.assetBlob(a)).arrayBuffer(), {
         binary : true
       });
       index.push ( {
@@ -289,10 +304,9 @@ async function exportArchive3 () {
 }
 
 function bindAssetCards3 () {
+  $$('[data-open-asset521]').forEach(b=>b.onclick=()=>openAsset521(b.dataset.openAsset521));
   $$ ('.asset-grid3 [data-download-asset3]').forEach (b => b.onclick = () => {
-    const a = assetBy3 (b.dataset.downloadAsset3); download (new Blob ([dataBytes (a.data)], {
-      type : a.mime
-    }), a.mime, a.name)
+    const a = assetBy3 (b.dataset.downloadAsset3); downloadAsset521(a)
   });
   $$ ('.asset-grid3 [data-delete-asset3]').forEach (b => b.onclick = () => deleteAsset3 (b.dataset.deleteAsset3));
   $$ ('.asset-grid3 [data-attach-asset3]').forEach (b => b.onclick = () => showAttach3 (b.dataset.attachAsset3))
@@ -331,6 +345,7 @@ export { ownerObject3, assetBy3, attachmentPanel3, addAsset3, linkAsset3, import
 
 // All controls for this feature, in their original override order.
 function bindMaterialsControls () {
+  $$('[data-open-asset521]').forEach(b=>b.onclick=()=>openAsset521(b.dataset.openAsset521));
   $$ ('[data-import3]').forEach (e => e.onchange = () => importAssets3 (e.files, e.dataset.import3));
   $$ ('[data-picker3]').forEach (b => b.onclick = e => {
     e.preventDefault (); showPicker3 (b.dataset.picker3)
@@ -348,10 +363,7 @@ function bindMaterialsControls () {
     const o = ownerObject3 (b.dataset.unlinkFile3); o.attachments = o.attachments.filter (x => x !== b.dataset.id); changed ()
   });
   $$ ('[data-download-asset3]').forEach (b => b.onclick = e => {
-    e.preventDefault (); const a = assetBy3 (b.dataset.downloadAsset3); if (a) download (new Blob ([dataBytes (a.data)],
-    {
-      type : a.mime
-    }), a.mime, a.name)
+    e.preventDefault (); const a = assetBy3 (b.dataset.downloadAsset3); if (a) downloadAsset521(a)
   });
   $$ ('[data-delete-asset3]').forEach (b => b.onclick = () => deleteAsset3 (b.dataset.deleteAsset3));
   $$ ('[data-attach-asset3]').forEach (b => b.onclick = () => showAttach3 (b.dataset.attachAsset3));
@@ -369,3 +381,18 @@ function bindMaterialsControls () {
   };
 }
 export { bindMaterialsControls };
+
+let openedAssetURL521=null,assetOpenSequence521=0;
+async function openAsset521(id){
+ const asset=assetBy3(id);if(!asset)return;
+ const token=++assetOpenSequence521;
+ let dialog=$('#assetViewer521');if(!dialog){dialog=document.createElement('dialog');dialog.id='assetViewer521';document.body.append(dialog);}
+ const cleanup=()=>{if(openedAssetURL521)URL.revokeObjectURL(openedAssetURL521);openedAssetURL521=null;};cleanup();
+ dialog.replaceChildren();const title=document.createElement('h2'),status=document.createElement('p'),close=document.createElement('button');title.textContent=asset.name;status.textContent='正在读取原始文件…';close.textContent='关闭';close.onclick=()=>dialog.close();dialog.append(title,status,close);dialog.onclose=()=>{assetOpenSequence521++;cleanup();dialog.replaceChildren();};if(!dialog.open)dialog.showModal();
+ try{const blob=await storage.assetBlob(asset);if(token!==assetOpenSequence521||!dialog.open)return;
+  if(blob.type.startsWith('image/')){openedAssetURL521=URL.createObjectURL(blob);const img=document.createElement('img');img.alt=asset.name;img.style.cssText='max-width:100%;max-height:70vh;object-fit:contain';img.src=openedAssetURL521;dialog.insertBefore(img,close);await img.decode();status.textContent='原图 · '+formatSize3(blob.size);}
+  else if((blob.type.startsWith('text/')||/\.(json|md|csv)$/i.test(asset.name))&&blob.size<=2*1024*1024){const pre=document.createElement('pre');pre.style.cssText='white-space:pre-wrap;max-height:65vh;overflow:auto';pre.textContent=await blob.text();if(token!==assetOpenSequence521)return;dialog.insertBefore(pre,close);status.textContent='原始文件 · '+formatSize3(blob.size);}
+  else{openedAssetURL521=URL.createObjectURL(blob);const link=document.createElement('a');link.href=openedAssetURL521;link.download=asset.name;link.textContent='保存原文件后使用设备应用打开';dialog.insertBefore(link,close);status.textContent='此类型请使用设备应用打开 · '+formatSize3(blob.size);}
+ }catch(error){if(token===assetOpenSequence521)status.textContent='无法打开文件：'+error.message;}
+}
+export {openAsset521};

@@ -1,0 +1,52 @@
+✔ category/tags roundtrip and atomic incoming conflict resolution preserve notes (222.367ms)
+✔ unsubmitted group blocks question detail, search snippets and notes across shared identity (461.6742ms)
+✔ submission deduplicates wrongs, timestamps errors and keeps mastery independent of favorite (158.6497ms)
+✔ folders are many-to-many, rename without changing identity and backup validators reject corrupt membership (475.6842ms)
+✔ statistics distinguish repeated attempts, unique source identities and time range (0.9697ms)
+(node:1628728) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ rapid real answer edits debounce into one independent draft write; repeat selections and timer do not save (751.2469ms)
+✔ a killed process restores partial answers and elapsed time without entering a page or revealing grading (69.0393ms)
+✔ malformed draft backups reject invalid schema, IDs, questions, answers and timing before changing memory (26.2987ms)
+✔ failed draft save preserves the previous committed answer and exposes a pure emergency backup snapshot (26.7215ms)
+✔ submission atomically removes the saved draft; failure keeps it retryable and never shows formal statistics (39.5613ms)
+✔ replacing an in-flight draft is serialized; pausing persistence blocks new draft writes (37.2306ms)
+✔ old history loads question snapshots on demand and reviewing never replaces an unfinished draft (26.6373ms)
+(node:1631260) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ random groups contain 10/20 distinct snapshots; drafts never write records or reveal answers (51.2396ms)
+✔ answers can be revised, incomplete groups cannot submit, result uses final choices (46.8084ms)
+✔ atomic failure midway preserves every old mark and leaves the active group retryable (16.1512ms)
+✔ rapid double submission creates exactly one formal result (98.8476ms)
+✔ favorites survive initialization; composite IDs isolate banks and failed saves do not toggle memory (13.2348ms)
+✔ correct review records latest correctness while pending review requires explicit mastery and preserves favorites (41.4893ms)
+✔ true-false false is a completed answer; sparse and empty banks behave explicitly (11.3736ms)
+✔ missing live questions retain saved marks and snapshot history but are excluded from practice (13.5923ms)
+✔ restoration resets active drafts and validates results against snapshot answers (173.0758ms)
+✔ rich text allows only exact italic/underline tags, inertly escapes scripts and attributes (49.1413ms)
+✔ backup write barrier waits for favorite and group commits; paused persistence blocks new mutations (88.285ms)
+✔ beta manual question sizes accept integers and never duplicate scarce questions (11.0464ms)
+✔ beta timer uses absolute elapsed time, expires without grading, and freezes only on submission (13.4806ms)
+✔ beta untimed sessions count elapsed time and old records stay valid (26.9686ms)
+✔ learning overview weights submitted questions, excludes drafts, and reads without writes (36.9823ms)
+✔ schema validation rejects broken answers, duplicate stable IDs, mismatched sections and invalid versions (71.6523ms)
+✔ semantic versions compare numerically including prerelease precedence (20.5997ms)
+✔ initialization fetches only bundled local resources and never requests a manifest (583.3441ms)
+✔ installed resources take priority over newer application seeds without a startup update (19.4701ms)
+✔ custom resources persist through an offline restart and cannot replace an official bank (48.4037ms)
+✔ reimport replaces the same custom bank while retaining stable learning keys, with rollback on failure (26.1176ms)
+✔ backup resource validation checks origin, key consistency and official/custom collisions (11.7353ms)
+✔ one corrupt checksum prevents the entire update, preserving disk, memory and learning history (14.2052ms)
+✔ a correctly hashed but invalid schema or inconsistent version cannot update (9.1762ms)
+✔ database failure after the first put rolls all resources back without publishing memory (14.2707ms)
+✔ manual update commits all verified resources and retains them after offline restart (38.3686ms)
+✔ unsafe manifests and custom ID collisions fail before resource downloads (11.0253ms)
+✔ simultaneous imports are serialized and failed queued work does not poison future writes (12.8766ms)
+ℹ tests 40
+ℹ suites 0
+ℹ pass 40
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2751.8592

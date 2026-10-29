@@ -18,8 +18,9 @@ function newVersion (name = '我的第一份简历') {
   };
 }
 
+let emptyVersion53=null;
 function currentVersion () {
-  return ctx.state.versions.find (v => v.id === ctx.state.activeVersion) || ctx.state.versions [0];
+  return ctx.state.versions.find (v => v.id === ctx.state.activeVersion) || ctx.state.versions [0] || (emptyVersion53 ||= {...newVersion('尚无简历'),id:'empty-resume53'});
 }
 
 function cleanCrop (c) {
@@ -82,9 +83,20 @@ function normalizeAssets3 (s = ctx.state) {
   }
 }
 
-function snapshot3 () {
+function snapshot3 ({forStorage = false} = {}) {
   normalizeAssets3 ();
-  const s = clone (ctx.state);
+  // Originals are immutable Blob references after first commit. Exclude their Base64
+  // projection before cloning so a text edit never clones large attachments.
+  const storedAssetIDs=new Set(ctx.state.assets.filter(a=>a._assetBlobRef).map(a=>a.id));
+  const metadataCopy=value=>{
+    if(!value||typeof value!=='object')return value;
+    if(Array.isArray(value))return value.map(metadataCopy);
+    const omitBinary=value._assetBlobRef||storedAssetIDs.has(value.assetId);
+    return Object.fromEntries(Object.entries(value).filter(([key])=>!(key==='data'&&omitBinary)).map(([key,v])=>[key,metadataCopy(v)]));
+  };
+  const source = forStorage ? metadataCopy(ctx.state) : ctx.state;
+  // Photo data is also a display projection, not an authoritative copy.
+  const s = clone (source);
   for (const p of photoRefs3 (s)) if (p.assetId && s.assets.some (a => a.id === p.assetId)) delete p.data;
   return s
 }

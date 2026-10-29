@@ -1,0 +1,42 @@
+✔ home initialization does not read bank or question prefixes; metadata loading defers question rows (215.5659ms)
+✔ same bank reimport writes nothing; single-field patch writes only its question and bank revision (91.8226ms)
+✔ preflight detects answer changes, removed IDs and duplicate content without touching learning data (105.9468ms)
+✔ malformed patch, wrong base version and unknown fields leave every original record intact (118.2132ms)
+✔ a transaction failure never publishes patched memory or success (104.5418ms)
+✔ large imports report measured validated counts and export all original bank questions (1615.7243ms)
+✔ a prepared plan cannot silently overwrite a newer bank revision (148.5643ms)
+✔ a ten-question UI sample reads exactly ten question rows from a 5000-question bank (1102.6059ms)
+✔ old imported packs join the default four without migration writes and preserve old learning keys (262.6321ms)
+✔ multiple JSON packs with the same question ID merge safely into one chosen bank (102.6701ms)
+✔ users create named banks; empty banks, assignments and imported packs survive a complete backup restore (289.089ms)
+✔ a local JSON with an official ID imports as a personal pack without overwriting official content (99.016ms)
+✔ reimport updates a pack and can move it without duplicating practice entries or losing favorites (111.4721ms)
+✔ deleting packs and custom banks preserves other packs, default banks and learning history (113.8053ms)
+✔ database failures preserve both the old directory and all packs in memory and on disk (170.8203ms)
+✔ offline reload retains the directory and imported content without requests or extra user-state saves (221.5268ms)
+✔ valid IDs that match object property names keep their own assignments and learning identities (173.177ms)
+(node:765764) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ random groups contain 10/20 distinct snapshots; drafts never write records or reveal answers (20.4001ms)
+✔ answers can be revised, incomplete groups cannot submit, result uses final choices (11.1716ms)
+✔ atomic failure midway preserves every old mark and leaves the active group retryable (10.4642ms)
+✔ rapid double submission creates exactly one formal result (8.2397ms)
+✔ favorites survive initialization; composite IDs isolate banks and failed saves do not toggle memory (9.916ms)
+✔ wrong practice clears a wrong mark only after a correctly submitted group and preserves favorites (13.0845ms)
+✔ true-false false is a completed answer; sparse and empty banks behave explicitly (10.5748ms)
+✔ missing live questions retain saved marks and snapshot history but are excluded from practice (15.6126ms)
+✔ restoration resets active drafts and validates results against snapshot answers (30.4188ms)
+✔ rich text allows only exact italic/underline tags, inertly escapes scripts and attributes (6.8685ms)
+✔ backup write barrier waits for favorite and group commits; paused persistence blocks new mutations (10.0448ms)
+✔ beta manual question sizes accept integers and never duplicate scarce questions (7.524ms)
+✔ beta timer uses absolute elapsed time, expires without grading, and freezes only on submission (9.9893ms)
+✔ beta untimed sessions count elapsed time and old records stay valid (10.1786ms)
+✔ learning overview weights submitted questions, excludes drafts, and reads without writes (11.8762ms)
+ℹ tests 32
+ℹ suites 0
+ℹ pass 32
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3857.1112

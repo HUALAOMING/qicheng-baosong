@@ -1,168 +1,108 @@
-// One IndexedDB object store, no ORM and no historical data migrations.
-const DATABASE_NAME = 'qicheng-v4' + (globalThis.QICHENG_EMBEDDED?.id ? '-copy-' + globalThis.QICHENG_EMBEDDED.id : '');
-const STORE = 'records';
-let connection = null;
-let opening = null;
-let activityTracking = false;
-const DEVICE_ACTIVITY_KEY = 'meta:device';
-function trackStorageActivity(store, keys) {
-  if(!activityTracking || !keys.some(key=>key!=='__seedCleared'&&!key.startsWith('meta:')&&!key.startsWith('session:')&&!key.startsWith('resource:official:')))return;
-  const request=store.get(DEVICE_ACTIVITY_KEY);
-  request.onsuccess=()=>store.put({...request.result,lastSavedAt:new Date().toISOString()},DEVICE_ACTIVITY_KEY);
+// Database structure v2. Public API projects the stable v1 workspace; @521 keys are private.
+const DATABASE_NAME='qicheng-v4'+(globalThis.QICHENG_EMBEDDED?.id?'-copy-'+globalThis.QICHENG_EMBEDDED.id:'');
+const DATABASE_VERSION=2, STORE='records', STORAGE_INTERNAL521='@521:';
+let connection=null, opening=null, activityTracking=false, storageLastCommit521=null;
+const storageObserved521=new Map();
+class StorageConflictError extends Error {constructor(key){super('另一窗口已修改此项资料，请先备份当前编辑，再重新载入。未覆盖另一窗口的数据。');this.name='StorageConflictError';this.key=key;}}
+function storageOpen(){
+ if(connection)return Promise.resolve(connection);if(opening)return opening;
+ opening=new Promise((resolve,reject)=>{
+  if(!globalThis.indexedDB){reject(new Error('此浏览器无法使用本地数据库，请使用系统浏览器。'));return;}
+  let settled=false;const timer=setTimeout(()=>finish(new Error('本地数据库无法打开。请关闭其他启程窗口后重新加载。')),10000);
+  function finish(error,db){if(settled){db?.close();return;}settled=true;clearTimeout(timer);error?reject(error):resolve(db);}
+  let request;try{request=indexedDB.open(DATABASE_NAME,DATABASE_VERSION);}catch(e){finish(e);return;}
+  request.onupgradeneeded=()=>{if(!request.result.objectStoreNames.contains(STORE))request.result.createObjectStore(STORE);};
+  request.onerror=()=>finish(request.error||new Error('无法打开本地数据库。'));
+  request.onblocked=()=>finish(new Error('数据库升级等待其他窗口关闭，请关闭其他启程窗口后重试。'));
+  request.onsuccess=()=>{const db=request.result;db.onversionchange=()=>{db.close();if(connection===db)connection=null;};db.onclose=()=>{if(connection===db)connection=null;};finish(null,db);};
+ }).then(db=>connection=db).finally(()=>opening=null);return opening;
 }
+async function storageTransaction(mode,operate){const db=await storageOpen();return new Promise((resolve,reject)=>{let tx,result,failure;try{
+ try{tx=db.transaction(STORE,mode,mode==='readwrite'?{durability:'strict'}:undefined);}catch(e){if(e.name!=='TypeError')throw e;tx=db.transaction(STORE,mode);}
+ const abort=error=>{failure=error;try{tx.abort();}catch{}};
+ tx.oncomplete=()=>{resolve(result);if(mode==='readwrite'&&activityTracking&&globalThis.dispatchEvent&&globalThis.Event)globalThis.dispatchEvent(new Event('qicheng-local-write'));};
+ tx.onabort=()=>reject(failure||tx.error||new Error('本地数据操作未完成，原数据已保留。'));tx.onerror=()=>{};operate(tx.objectStore(STORE),v=>result=v,tx,abort);
+ }catch(e){try{tx?.abort();}catch{}reject(e);}});}
+function storageRange521(prefix){return globalThis.IDBKeyRange?.bound(prefix,prefix+'\uffff');}
+function storageRevisionKey521(key){return STORAGE_INTERNAL521+'rev:'+key;}
+function storageObserve521(key,revision){storageObserved521.set(key,revision||0);}
+function storageRawPrefix521(prefix){return storageTransaction('readonly',(store,done)=>{const values=Object.create(null),request=store.openCursor(prefix?storageRange521(prefix):undefined);request.onsuccess=()=>{const cursor=request.result;if(!cursor){done(values);return;}if(String(cursor.key).startsWith(prefix))values[cursor.key]=cursor.value;cursor.continue();};});}
+function storageRead521(key){return storageTransaction('readonly',(store,done)=>{let value,revision=0,pending=2;const finish=()=>{if(--pending===0){storageObserve521(key,revision);done(value);}};const a=store.get(key);a.onsuccess=()=>{value=a.result;finish();};const b=store.get(storageRevisionKey521(key));b.onsuccess=()=>{revision=b.result||0;finish();};});}
+function storagePhotoRefs521(s){return [s.avatar,...(s.media||[]),...['awardDraft','experienceDraft','practiceDraft','achievementDraft','bookDraft'].flatMap(k=>s[k]?.photos||[]),...['awards','experiences','practices','achievements','customBlocks'].flatMap(k=>(s[k]||[]).flatMap(x=>x.photos||[])),...(s.learning?.books||[]).flatMap(x=>x.photos||[])].filter(Boolean);}
+function storageIsWorkspace521(v){return v?.__workspace521===1;}
+function storageWorkspaceRows521(snapshot){const manifest={__workspace521:1,modelVersion:1,fields:{}},rows={};const add=(field,value)=>{
+ if(Array.isArray(value)&&value.length&&value.every(x=>x&&typeof x==='object'&&typeof x.id==='string')&&new Set(value.map(x=>x.id)).size===value.length){manifest.fields[field]={ids:value.map(x=>x.id)};for(const item of value)rows[STORAGE_INTERNAL521+'ws:'+field+':'+item.id]=item;}
+ else{manifest.fields[field]={single:true};rows[STORAGE_INTERNAL521+'ws:'+field]=value;}};
+ for(const[key,value]of Object.entries(snapshot)){if(key==='learning'){const {books=[],...text}=value;add('learning',text);add('learning.books',books);}else add(key,value);}rows.current=manifest;return rows;}
+function storageAssemble521(manifest,rows){if(!storageIsWorkspace521(manifest))return manifest;const result={};for(const[field,layout]of Object.entries(manifest.fields)){const value=layout.ids?layout.ids.map(id=>rows[STORAGE_INTERNAL521+'ws:'+field+':'+id]):rows[STORAGE_INTERNAL521+'ws:'+field];if(layout.ids&&value.some(x=>x===undefined))throw new Error('本地数据关联不完整：'+field+'。请使用外部备份恢复。');if(field==='learning.books'){result.learning||={};result.learning.books=value;}else result[field]=value;}return result;}
+function storageDataBlob521(data){if(typeof data!=='string'||!/^data:.*;base64,/.test(data))throw new Error('附件原始数据格式不正确。');const comma=data.indexOf(','),mime=data.slice(5,data.indexOf(';'))||'application/octet-stream',binary=atob(data.slice(comma+1)),bytes=new Uint8Array(binary.length);for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);return new Blob([bytes],{type:mime});}
+async function storageBlobData521(blob){const bytes=new Uint8Array(await blob.arrayBuffer());let binary='';for(let i=0;i<bytes.length;i+=32768)binary+=String.fromCharCode(...bytes.subarray(i,i+32768));return 'data:'+(blob.type||'application/octet-stream')+';base64,'+btoa(binary);}
+function storagePlaceholder521(asset){return asset.kind==='image'?'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScLbtAAAAABJRU5ErkJggg==':'data:'+(asset.mime||'application/octet-stream')+';base64,';}
+function storageMetadataCopy521(value,assetIDs){if(!value||typeof value!=='object')return value;if(Array.isArray(value))return value.map(v=>storageMetadataCopy521(v,assetIDs));return Object.fromEntries(Object.entries(value).filter(([key])=>!(key==='data'&&assetIDs.has(value.assetId))).map(([key,v])=>[key,storageMetadataCopy521(v,assetIDs)]));}
+async function storagePrepareCurrent521(snapshot){const assetIDs=new Set((snapshot.assets||[]).map(a=>a.id)),clean=storageMetadataCopy521({...snapshot,assets:[]},assetIDs),blobs={};for(const asset of snapshot.assets||[]){const {data,...meta}=asset;if(!meta._assetBlobRef){const blob=storageDataBlob521(data),ref=asset.id+'-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10);meta._assetBlobRef=ref;meta._assetPreview=storagePlaceholder521(asset);blobs[STORAGE_INTERNAL521+'blob:'+ref]=blob;}else meta._assetPreview=storagePlaceholder521(asset);clean.assets.push(meta);}return {rows:storageWorkspaceRows521(clean),blobs,clean};}
+function storageEqual521(a,b){return JSON.stringify(a)===JSON.stringify(b);}
+async function storageMutate521(records,removeKeys=[],options={}){const keys=[...new Set([...Object.keys(records),...removeKeys])];if(!keys.length)return;const outcome=await storageTransaction('readwrite',(store,done,tx,abort)=>{const existing={},revisions={};let pending=keys.length*2+1,clock=0;const finish=()=>{if(--pending)return;try{
+ for(const key of keys){const expected=Object.hasOwn(options.expected||{},key)?options.expected[key]:storageObserved521.get(key);if(expected!==undefined&&expected!==(revisions[key]||0))throw new StorageConflictError(key);}
+ const changed=keys.filter(key=>removeKeys.includes(key)?existing[key]!==undefined:!storageEqual521(existing[key],records[key]));
+ if(!changed.length){done({revisions,changed:[]});return;}const next=clock+1;for(const key of changed){if(removeKeys.includes(key))store.delete(key);else store.put(records[key],key);store.put(next,storageRevisionKey521(key));revisions[key]=next;}
+ // A workspace manifest revision changes on ANY workspace row change, not only reordering.
+ if(keys.includes('current')&&!changed.includes('current')){store.put(next,storageRevisionKey521('current'));revisions.current=next;}
+ store.put(next,STORAGE_INTERNAL521+'clock');const savedAt=new Date().toISOString();
+ if(activityTracking&&changed.some(key=>!key.startsWith('meta:')&&!key.startsWith('session:')&&!key.startsWith('resource:official:')&&key!=='__seedCleared'&&(!key.startsWith(STORAGE_INTERNAL521)||key.startsWith(STORAGE_INTERNAL521+'bank:')||key.startsWith(STORAGE_INTERNAL521+'ws:')))){const a=store.get('meta:device');a.onsuccess=()=>store.put({...a.result,lastSavedAt:savedAt},'meta:device');}
+ done({revisions,changed,savedAt});}catch(e){abort(e);}};
+ for(const key of keys){const a=store.get(key);a.onsuccess=()=>{existing[key]=a.result;finish();};const b=store.get(storageRevisionKey521(key));b.onsuccess=()=>{revisions[key]=b.result||0;finish();};}const c=store.get(STORAGE_INTERNAL521+'clock');c.onsuccess=()=>{clock=c.result||0;finish();};});
+ for(const[key,rev]of Object.entries(outcome.revisions))storageObserve521(key,rev);if(outcome.changed.length)storageLastCommit521={at:outcome.savedAt,keys:outcome.changed};return outcome;}
+// A bank delta is already compared by the repository. Guard the aggregate revision,
+// then write its rows directly in ONE strict transaction, without per-question rereads.
+async function storageBankDelta521(records,removeKeys,options){
+ const keys=[...new Set([...Object.keys(records),...removeKeys])];
+ const headers=[...new Set([...keys,...Object.keys(options.expected||{})].filter(k=>k.startsWith('@521:bank:meta:')))];
+ const isQuestion=k=>k.startsWith('@521:bank:q:')||k.startsWith('question:edit:');
+ const headerFor=k=>{const suffix=k.slice(k.startsWith('question:edit:')?'question:edit:'.length:'@521:bank:q:'.length);return '@521:bank:meta:'+suffix.slice(0,suffix.indexOf('/'));};
+ if(!headers.length||keys.some(k=>isQuestion(k)?!headers.includes(headerFor(k)):!headers.includes(k)&&k!=='settings:quiz-library'))throw new TypeError('题库增量必须包含对应题库修订标记。');
+ const guards=[...headers,...(keys.includes('settings:quiz-library')?['settings:quiz-library']:[])];
+ const expected=Object.fromEntries(guards.map(k=>[k,Object.hasOwn(options.expected||{},k)?options.expected[k]:storageObserved521.get(k)??0]));
+ const outcome=await storageTransaction('readwrite',(store,done,tx,abort)=>{
+  let pending=guards.length+1,clock=0;
+  const finish=()=>{if(--pending)return;try{
+   const revision=clock+1;
+   for(const key of removeKeys){store.delete(key);store.delete(storageRevisionKey521(key));}
+   for(const [key,value]of Object.entries(records))store.put(value,key);
+   for(const key of guards)store.put(revision,storageRevisionKey521(key));
+   store.put(revision,STORAGE_INTERNAL521+'clock');
+   const at=new Date().toISOString();if(activityTracking){const req=store.get('meta:device');req.onsuccess=()=>store.put({...req.result,lastSavedAt:at},'meta:device');}
+   done({revision,at});
+  }catch(error){abort(error);}};
+  for(const key of guards){const req=store.get(storageRevisionKey521(key));req.onsuccess=()=>{if((req.result||0)!==expected[key]){abort(new StorageConflictError(key));return;}finish();};}
+  const clockRequest=store.get(STORAGE_INTERNAL521+'clock');clockRequest.onsuccess=()=>{clock=clockRequest.result||0;finish();};
+ });
+ for(const key of guards)storageObserve521(key,outcome.revision);
+ storageLastCommit521={at:outcome.at,keys};return {changed:keys};
+}
+async function storageGetCurrent521({lazyAssets=false}={}){const raw=await storageTransaction('readonly',(store,done)=>{const rows={};let manifest,revision=0,pending=3;const finish=()=>{if(--pending===0){storageObserve521('current',revision);done({manifest,rows});}};const a=store.get('current');a.onsuccess=()=>{manifest=a.result;finish();};const b=store.get(storageRevisionKey521('current'));b.onsuccess=()=>{revision=b.result||0;finish();};const c=store.openCursor(storageRange521(STORAGE_INTERNAL521+'ws:'));c.onsuccess=()=>{const cur=c.result;if(!cur){finish();return;}if(String(cur.key).startsWith(STORAGE_INTERNAL521+'ws:'))rows[cur.key]=cur.value;cur.continue();};});const current=storageAssemble521(raw.manifest,raw.rows);if(!current||!storageIsWorkspace521(raw.manifest))return current;
+ if(lazyAssets){for(const a of current.assets||[])a.data=storagePlaceholder521(a);const byID=new Map((current.assets||[]).map(a=>[a.id,a]));for(const p of storagePhotoRefs521(current))if(byID.has(p.assetId))p.data=byID.get(p.assetId).data;return current;}return storageMaterializeCurrent521(current);}
+async function storageAssetBlob521(asset){if(asset?._assetBlobRef){const blob=await storageRead521(STORAGE_INTERNAL521+'blob:'+asset._assetBlobRef);if(!(blob instanceof Blob))throw new Error('原始附件丢失：'+(asset.name||asset.id));return blob;}return storageDataBlob521(asset.data);}
+async function storageAssetData521(asset){return asset?._assetBlobRef?storageBlobData521(await storageAssetBlob521(asset)):asset.data;}
+async function storageMaterializeCurrent521(snapshot){const result=structuredClone(snapshot);for(const a of result.assets||[]){if(a._assetBlobRef)a.data=await storageAssetData521(a);delete a._assetBlobRef;delete a._assetPreview;}const byID=new Map((result.assets||[]).map(a=>[a.id,a]));for(const p of storagePhotoRefs521(result))if(byID.has(p.assetId))delete p.data;return result;}
+async function storageHydrateAssets521(snapshot){for(const a of snapshot.assets||[])if(a._assetBlobRef)a.data=await storageAssetData521(a);const byID=new Map((snapshot.assets||[]).map(a=>[a.id,a]));for(const p of storagePhotoRefs521(snapshot))if(byID.has(p.assetId))p.data=byID.get(p.assetId).data;return snapshot;}
+function storageOrphanKeys521(oldRows,nextAssets){const keep=new Set((nextAssets||[]).map(a=>a._assetBlobRef).filter(Boolean)),refs=new Set();for(const[key,value]of Object.entries(oldRows))if(key==='@521:ws:assets'||key.startsWith('@521:ws:assets:'))for(const a of Array.isArray(value)?value:[value])if(a?._assetBlobRef&&!keep.has(a._assetBlobRef))refs.add(a._assetBlobRef);return [...refs].flatMap(ref=>['@521:blob:'+ref,'@521:thumb:'+ref]);}
+async function storageCommitCurrent521(snapshot,options={}){const prepared=await storagePrepareCurrent521(snapshot),old=await storageRawPrefix521(STORAGE_INTERNAL521+'ws:'),removeKeys=[...Object.keys(old).filter(key=>!Object.hasOwn(prepared.rows,key)),...storageOrphanKeys521(old,prepared.clean.assets),...(prepared.clean.assets||[]).filter(a=>a._assetBlobRef).map(a=>'@521:thumb:'+a._assetBlobRef)];const expected={...(options.expected||{})};if(!Object.hasOwn(expected,'current')&&storageObserved521.has('current'))expected.current=storageObserved521.get('current');const result=await storageMutate521({...prepared.rows,...prepared.blobs},removeKeys,{...options,expected});return {revision:storageObserved521.get('current')||0,assets:prepared.clean.assets,result};}
+async function storageGet(key){if(key==='current')return storageGetCurrent521();const value=await storageRead521(key);if(value!==undefined||!key.startsWith('resource:'))return value;const match=/^resource:(official|custom):(.+)$/.exec(key);if(!match)return value;const meta=await storageRead521('@521:bank:meta:'+match[1]+':'+match[2]);if(!meta)return value;const questions=await storageRawPrefix521('@521:bank:q:'+match[1]+':'+match[2]+'/');return {schemaVersion:meta.schemaVersion,bank:meta.bank,origin:meta.origin,questions:meta.questionIds.map(id=>questions['@521:bank:q:'+match[1]+':'+match[2]+'/'+id])};}
+async function storageSet(key,value,options){return key==='current'?storageCommitCurrent521(value,options):storageMutate521({[key]:value},[],options);}
+async function storageRemove(key){return storageMutate521({},[key]);}
+async function storageGetAll(){const raw=await storageRawPrefix521(''),result=Object.create(null);for(const[key,value]of Object.entries(raw))if(!key.startsWith(STORAGE_INTERNAL521)){result[key]=value;}if(storageIsWorkspace521(result.current)){result.current=storageAssemble521(result.current,raw);for(const a of result.current.assets||[])if(a._assetBlobRef){const blob=raw[STORAGE_INTERNAL521+'blob:'+a._assetBlobRef];if(!(blob instanceof Blob))throw new Error('原始附件丢失：'+a.name);a.data=await storageBlobData521(blob);delete a._assetBlobRef;delete a._assetPreview;}}
+ for(const[key,meta]of Object.entries(raw))if(key.startsWith('@521:bank:meta:')){const suffix=key.slice('@521:bank:meta:'.length);result['resource:'+suffix]={schemaVersion:meta.schemaVersion,bank:meta.bank,origin:meta.origin,questions:meta.questionIds.map(id=>raw['@521:bank:q:'+suffix+'/'+id])};}return result;}
+async function storageGetPrefix(prefix){if(typeof prefix!=='string'||!prefix)throw new TypeError('数据键前缀不能为空。');if(prefix.startsWith('@521:bank:q:'))return storageRawPrefix521(prefix);return storageTransaction('readonly',(store,done)=>{const result=Object.create(null),request=store.openCursor(storageRange521(prefix));let pending=1,ended=false;const finish=()=>{if(ended&&pending===0)done(result);};request.onsuccess=()=>{const cursor=request.result;if(!cursor){ended=true;pending--;finish();return;}const key=String(cursor.key);if(key.startsWith(prefix)&&!key.startsWith(STORAGE_INTERNAL521+'rev:')){result[key]=cursor.value;pending++;const rev=store.get(storageRevisionKey521(key));rev.onsuccess=()=>{storageObserve521(key,rev.result||0);pending--;finish();};}cursor.continue();};});}
+async function storageGetPrefixPage521(prefix,{limit=100,direction='next'}={}){if(!prefix||!Number.isInteger(limit)||limit<1||limit>10000)throw new TypeError('无效的分页参数。');return storageTransaction('readonly',(store,done)=>{const rows={},request=store.openCursor(storageRange521(prefix),direction);let count=0;request.onsuccess=()=>{const cur=request.result;if(!cur||count>=limit){done(rows);return;}if(String(cur.key).startsWith(prefix)){rows[cur.key]=cur.value;count++;}if(count<limit)cur.continue();else done(rows);};});}
+async function storageUpdate(key,updater){if(key==='current'){const previous=await storageGet(key),value=updater(previous);if(value?.then)throw new TypeError('update() 回调必须同步完成。');await storageSet(key,value);return value;}const outcome=await storageTransaction('readwrite',(store,done,tx,abort)=>{let previous,revision=0,clock=0,pending=3;const finish=()=>{if(--pending)return;try{const observed=storageObserved521.get(key);if(observed!==undefined&&observed!==revision)throw new StorageConflictError(key);const value=updater(previous);if(value?.then)throw new TypeError('update() 回调必须同步完成。');const next=clock+1;store.put(value,key);store.put(next,storageRevisionKey521(key));store.put(next,STORAGE_INTERNAL521+'clock');if(activityTracking&&!key.startsWith('meta:')){const a=store.get('meta:device');a.onsuccess=()=>store.put({...a.result,lastSavedAt:new Date().toISOString()},'meta:device');}done({value,revision:next});}catch(e){abort(e);}};const a=store.get(key);a.onsuccess=()=>{previous=a.result;finish();};const b=store.get(storageRevisionKey521(key));b.onsuccess=()=>{revision=b.result||0;finish();};const c=store.get(STORAGE_INTERNAL521+'clock');c.onsuccess=()=>{clock=c.result||0;finish();};});storageObserve521(key,outcome.revision);storageLastCommit521={at:new Date().toISOString(),keys:[key]};return outcome.value;}
+async function storageReplaceAll(records){const prepared=records.current?await storagePrepareCurrent521(records.current):null,replacement={...records,...(prepared?.rows||{}),...(prepared?.blobs||{})};const revision=await storageTransaction('readwrite',(store,done)=>{const clock=store.get(STORAGE_INTERNAL521+'clock');clock.onsuccess=()=>{const next=(clock.result||0)+1;store.clear();for(const[key,value]of Object.entries(replacement)){store.put(value,key);store.put(next,storageRevisionKey521(key));}store.put(next,STORAGE_INTERNAL521+'clock');done(next);};});storageObserved521.clear();for(const key of Object.keys(replacement))storageObserve521(key,revision);storageLastCommit521={at:new Date().toISOString(),keys:['*']};}
+async function storageSetMany(records,removeKeys=[],options={}){if(options.bankDelta)return storageBankDelta521(records,removeKeys,options);if(Object.hasOwn(records,'current')){const prepared=await storagePrepareCurrent521(records.current),old=await storageRawPrefix521(STORAGE_INTERNAL521+'ws:');return storageMutate521({...records,...prepared.rows,...prepared.blobs},[...removeKeys,...Object.keys(old).filter(key=>!Object.hasOwn(prepared.rows,key)),...storageOrphanKeys521(old,prepared.clean.assets),...(prepared.clean.assets||[]).filter(a=>a._assetBlobRef).map(a=>'@521:thumb:'+a._assetBlobRef)],options);}return storageMutate521(records,removeKeys,options);}
+function storageReadMany521(keys){if(!Array.isArray(keys)||keys.length>1000)throw new TypeError('批量读取最多1000个键。');return storageTransaction('readonly',(store,done)=>{const values=new Array(keys.length);let pending=keys.length;if(!pending){done(values);return;}keys.forEach((key,index)=>{const req=store.get(key);req.onsuccess=()=>{values[index]=req.result;if(!--pending)done(values);};});});}
+function storageClose(){connection?.close();connection=null;}
+const storage={readMany:storageReadMany521,enableActivityTracking:enabled=>{activityTracking=enabled!==false;},open:storageOpen,close:storageClose,get:storageGet,set:storageSet,update:storageUpdate,remove:storageRemove,getAll:storageGetAll,getPrefix:storageGetPrefix,getPrefixPage:storageGetPrefixPage521,clear:()=>storageReplaceAll({}),replaceAll:storageReplaceAll,setMany:storageSetMany,getCurrent:storageGetCurrent521,commitCurrent:storageCommitCurrent521,materializeCurrent:storageMaterializeCurrent521,hydrateAssets:storageHydrateAssets521,assetBlob:storageAssetBlob521,assetData:storageAssetData521,photoData:async(photo,workspace)=>{const a=(workspace?.assets||[]).find(a=>a.id===photo.assetId);return a?storageAssetData521(a):photo.data;},revision:key=>storageObserved521.get(key)||0,lastCommit:()=>storageLastCommit521};
+export { storage, DATABASE_NAME, DATABASE_VERSION, StorageConflictError };
 
-function storageOpen () {
-  if (connection) return Promise.resolve (connection);
-  if (opening) return opening;
-  opening = new Promise ((resolve, reject) => {
-    if (! globalThis.indexedDB) {
-      reject (new Error ('此浏览器无法使用本地数据库，请使用系统浏览器。')); return;
-    }
-    let settled = false; const timeout = setTimeout (() => finish (new Error ('本地数据库无法打开。请关闭其他启程窗口后重新加载。')), 10000); function finish (error,
-    db) {
-      if (settled) {
-        db?.close (); return;
-      }
-      settled = true; clearTimeout (timeout); if (error) reject (error); else resolve (db);
-    }
-    let request; try {
-      request = indexedDB.open (DATABASE_NAME, 1);
-    }
-    catch (error) {
-      finish (error); return;
-    }
-    request.onupgradeneeded = () => {
-      if (! request.result.objectStoreNames.contains (STORE)) request.result.createObjectStore (STORE);
-    }; request.onerror = () => finish (request.error || new Error ('无法打开本地数据库。')); request.onblocked = () => finish (new Error ('数据库被其他窗口占用，请关闭其他启程窗口后重试。')); request.onsuccess = () =>
-    {
-      const db = request.result; db.onversionchange = () => {
-        db.close (); if (connection === db) connection = null;
-      }; db.onclose = () => {
-        if (connection === db) connection = null;
-      }; finish (null, db);
-    };
-  }).then (db => {
-    connection = db; return db;
-  }).finally (() => {
-    opening = null;
-  });
-  return opening;
-}
 
-async function storageTransaction (mode, operate) {
-  const db = await storageOpen ();
-  return new Promise ((resolve, reject) => {
-    let tx; try {
-      try {
-        tx = db.transaction (STORE, mode, mode === 'readwrite' ? {
-          durability : 'strict'
-        } : undefined);
-      }
-      catch (e) {
-        if (e.name !== 'TypeError') throw e; tx = db.transaction (STORE, mode);
-      }
-      let result; tx.oncomplete = () => {
-        resolve(result);
-        if(mode==='readwrite'&&activityTracking&&globalThis.dispatchEvent&&globalThis.Event)globalThis.dispatchEvent(new Event('qicheng-local-write'));
-      }; tx.onabort = () => reject (tx.error || new Error ('本地数据操作未完成，原数据已保留。')); tx.onerror = () =>
-      {
-      }; operate (tx.objectStore (STORE), value => {
-        result = value;
-      }, tx);
-    }
-    catch (error) {
-      try {
-        tx?.abort ();
-      }
-      catch {
-      }
-      reject (error);
-    }
-  });
-}
 
-function storageGet (key) {
-  return storageTransaction ('readonly', (store, done) => {
-    const request = store.get (key); request.onsuccess = () => done (request.result);
-  });
-}
-function storageSet (key, value) {
-  return storageTransaction ('readwrite', store => {
-    store.put (value, key);
-    trackStorageActivity(store,[key]);
-  });
-}
-function storageRemove (key) {
-  return storageTransaction ('readwrite', store => {
-    store.delete (key);
-    trackStorageActivity(store,[key]);
-  });
-}
-function storageClear () {
-  return storageTransaction ('readwrite', store => {
-    store.clear ();
-  });
-}
-function storageGetAll () {
-  return storageTransaction ('readonly', (store, done) => {
-    const result = Object.create (null); const request = store.openCursor (); request.onsuccess = () => {
-      const cursor = request.result; if (! cursor) {
-        done (result); return;
-      }
-      result [cursor.key] = cursor.value; cursor.continue ();
-    };
-  });
-}
-function storageGetPrefix (prefix) {
-  if (typeof prefix !== 'string' || !prefix) return Promise.reject(new TypeError('数据键前缀不能为空。'));
-  return storageTransaction('readonly',(store,done) => {
-    const result = Object.create(null);
-    // A bounded cursor avoids deserializing uploaded files stored under `current`.
-    const range = globalThis.IDBKeyRange?.bound(prefix,prefix+'\uffff');
-    const request = store.openCursor(range);
-    request.onsuccess = () => {
-      const cursor = request.result;
-      if (!cursor) { done(result); return; }
-      // The filter also supports the tiny IndexedDB doubles used by the test suite.
-      if (typeof cursor.key === 'string' && cursor.key.startsWith(prefix)) result[cursor.key] = cursor.value;
-      cursor.continue();
-    };
-  });
-}
-function storageUpdate (key, updater) {
-  return storageTransaction ('readwrite', (store, done, tx) => {
-    const request = store.get (key); request.onsuccess = () => {
-      try {
-        const value = updater (request.result); if (value && typeof value.then === 'function') throw new TypeError ('update() 回调必须同步完成。'); store.put (value,
-        key); done (value);
-        trackStorageActivity(store,[key]);
-      }
-      catch (error) {
-        tx.abort ();
-      }
-    };
-  });
-}
-function storageReplaceAll (records) {
-  return storageTransaction ('readwrite', store => {
-    store.clear (); for (const [key, value] of Object.entries (records)) store.put (value, key);
-  });
-}
-// Merge related records in one transaction; failed writes leave every old value intact.
-function storageSetMany (records, removeKeys = []) {
-  return storageTransaction ('readwrite', store => {
-    for (const [key, value] of Object.entries (records)) store.put (value, key);
-    for(const key of removeKeys)store.delete(key);
-    trackStorageActivity(store,[...Object.keys(records),...removeKeys]);
-  });
-}
-function storageClose () {
-  connection?.close ();
-  connection = null;
-}
-const storage = {
-  enableActivityTracking : enabled => {activityTracking=enabled!==false;},
-  open : storageOpen, close : storageClose, get : storageGet, set : storageSet, update : storageUpdate, remove : storageRemove,
-  getAll : storageGetAll, getPrefix:storageGetPrefix, clear : storageClear, replaceAll : storageReplaceAll, setMany : storageSetMany
-};
-export { storage, DATABASE_NAME };
+
+

@@ -13,10 +13,10 @@ const resources=await import('../js/resources.js');
 const explore=await import('../js/modules/explore.js');
 const home=await import('../js/modules/home.js');
 const backup=await import('../js/backup.js');
-await data.loadBuiltinData();ctx.state=fresh();await resources.initializeResources();
+await data.loadBuiltinData();await data.loadRouteData('reading');ctx.state=fresh();await resources.initializeResources();
 test('navigation, menu and temporary filters produce zero current writes; an edit survives immediate navigation',async()=>{
-  saving.initializeSaving301();let writes=0;const original=storage.set;
-  storage.set=async(...args)=>{if(args[0]==='current')writes++;return original(...args);};
+  saving.initializeSaving301();let writes=0;const original=storage.commitCurrent;
+  storage.commitCurrent=async(...args)=>{writes++;return original(...args);};
   try{
     for(const route of ['profile','settings','quiz','home'])await app.go3(route);
     app.toggleNav3();app.toggleNav3();ctx.state.menuOpen.push('info');ctx.state.chartMetric='subject';
@@ -25,7 +25,7 @@ test('navigation, menu and temporary filters produce zero current writes; an edi
     await new Promise(resolve=>setTimeout(resolve,650));await ctx.saveChain;
     assert.equal(writes,1);assert.equal((await storage.get('current')).profile.name,'编辑后立刻切页');assert.equal((await storage.get('current')).route,'home');
     for(const route of ['settings','profile','home'])await app.go3(route);await saving.save();assert.equal(writes,1);
-  }finally{storage.set=original;saving.cancelPendingSave();}
+  }finally{storage.commitCurrent=original;saving.cancelPendingSave();}
 });
 test('all three downloadable examples import offline, show dynamic entries and round-trip through backup',async()=>{
   const original=globalThis.fetch;globalThis.fetch=()=>{throw Error('Network disabled');};

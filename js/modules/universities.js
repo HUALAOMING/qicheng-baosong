@@ -15,14 +15,14 @@ function bindDreams () {
     const name=button.dataset.featureSchool;
     if(ctx.busy||!ctx.state.dreamSchools.includes(name))return;
     button.disabled=true;
-    try{await saveHomePreferences({featuredSchool:name});render();toast(tr('已设为首页展示院校','University featured on Home'));}
+    try{await saveHomePreferences({featuredSchool:name});render();toast(tr('已设为主要展示院校','University featured on Home'));}
     catch(error){toast(error.message);button.disabled=false;}
   });
 }
 function schoolFeatureButton(name){
   if(!ctx.state.dreamSchools.includes(name))return '';
   const active=homeFeaturedSchool().name===name;
-  return '<button class="school-feature-button" data-feature-school="'+esc(name)+'" aria-pressed="'+active+'"'+(active?' disabled':'')+'>'+icon3('home')+tr(active?'首页展示中':'设为首页展示院校',active?'Shown on Home':'Feature on Home')+'</button>';
+  return '<button class="school-feature-button" data-feature-school="'+esc(name)+'" aria-pressed="'+active+'"'+(active?' disabled':'')+'>'+icon3('home')+tr(active?'主要展示院校':'设为主要展示院校',active?'Shown on Home':'Feature on Home')+'</button>';
 }
 
 async function toggleDream (name) {
@@ -107,6 +107,8 @@ function schoolDetail3 (name) {
   if (! s) return heading3 ('UNIVERSITY', tr ('没有找到这所学校', 'University not found')) + '<button data-go3="schools">' +
   tr ('返回院校列表', 'Back to universities') + '</button>';
   const dream = ctx.state.dreamSchools.includes (s.name);
+  const facts = s.schoolFacts || {};
+  const factsPanel = '<section class="panel school-facts53"><div class="eyebrow">UNIVERSITY / HERITAGE</div><h2>' + tr('校训与办学历史', 'Motto and history') + '</h2><dl class="exam-facts302"><div><dt>' + tr('校训', 'Motto') + '</dt><dd>' + esc(facts.motto || tr('资料待核实', 'To be verified')) + '</dd></div><div><dt>' + tr('建校时间', 'Founding') + '</dt><dd>' + esc(facts.founding || tr('资料待核实', 'To be verified')) + '</dd></div></dl><p class="source-note">' + tr('院校历史可能涉及前身、合并或更名，年份按所标注口径展示。', 'Founding dates may refer to a predecessor, merger or change of name as noted.') + ' ' + (facts.source ? '<a href="' + esc(facts.source) + '" target="_blank" rel="noopener noreferrer">' + tr('查看资料来源', 'View source') + '</a>' : '') + (facts.mottoSource ? ' · <a href="' + esc(facts.mottoSource) + '" target="_blank" rel="noopener noreferrer">' + tr('查看校训来源', 'Motto source') + '</a>' : '') + '</p></section>';
   return '<button class="back-link3" data-go3="schools">← ' + tr ('返回院校与地图', 'Back to universities & map') + '</button><section class="school-hero3"><div class="school-hero-text3"><div class="eyebrow">' +
   esc (s.abbreviation) + ' / ' + tr ('院校档案', 'UNIVERSITY PROFILE') + '</div><h1>' + esc (s.name) + '</h1><p class="university-english3">' +
   esc (s.english) + '</p><div class="school-location3">' + icon3 ('globe') + esc (s.region + ' · ' + s.city) + '</div><button class="' +
@@ -120,7 +122,7 @@ function schoolDetail3 (name) {
   tr ('维基百科', 'Wikipedia') + '</strong><small>' + esc (s.english) + '</small></span>' + icon3 ('export') + '</a>' +
   (s.official ? '<a href="' + esc (s.official) + '" target="_blank" rel="noopener noreferrer"><span><strong>' + tr ('学校官网',
   'Official website') + '</strong><small>' + esc (s.official) + '</small></span>' + icon3 ('export') + '</a>' : '') +
-  '</section>' + schoolExamPanel302 (s) + '</div>'
+  '</section>' + factsPanel + schoolExamPanel302 (s) + '</div>'
 }
 
 function bindSchoolCards3 () {

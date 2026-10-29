@@ -1,0 +1,443 @@
+✔ no-op save avoids writes; rapid queued saves retain latest edit and actual commit state (45.973ms)
+✔ storage snapshots omit immutable binary projections and photos before cloning (0.8852ms)
+✔ autosave pins UI revision even after incidental database reads; conflicts preserve local unsaved edits (42.1163ms)
+✔ backup v2 materializes exact original bytes from lazy Blob workspace without local pointers (78.9312ms)
+✔ preflight can precede atomic restore without invalidating integrity; restored original is lossless (315.1953ms)
+✔ damaged complete backup is rejected before replacing existing database (40.9386ms)
+✔ external backups cannot supply local Blob pointers even with matching recalculated digest (55.6061ms)
+✔ home initialization does not read bank or question prefixes; metadata loading defers question rows (562.0705ms)
+✔ same bank reimport writes nothing; single-field patch writes only its question and bank revision (217.2794ms)
+✔ preflight detects answer changes, removed IDs and duplicate content without touching learning data (233.8599ms)
+✔ malformed patch, wrong base version and unknown fields leave every original record intact (453.0902ms)
+✔ a transaction failure never publishes patched memory or success (228.2464ms)
+✔ large imports report measured validated counts and export all original bank questions (3186.034ms)
+✔ a prepared plan cannot silently overwrite a newer bank revision (366.8558ms)
+✔ a ten-question UI sample reads exactly ten question rows from a 5000-question bank (2537.4887ms)
+✔ beta homepage settings are serialized independently; navigation does not write current or prefs (117.397ms)
+✔ featured school is a reference to existing targets with a non-destructive fallback (2.5527ms)
+✔ classic JSON is shared by daily reading, reimports update both views, and backups retain the binding (377.7805ms)
+✔ home settings validate before mutation; missing old settings keep defaults; text stays inert (12.3509ms)
+✔ backup waits for accepted home writes and a failed write preserves old preferences (44.5977ms)
+✔ explicit app update check finds waiting versions, handles offline/failure, and never saves content (240.7489ms)
+✔ 49 universities, 34 provinces, font resources and all local seals load on demand (404.1112ms)
+✔ strict current-state validation preserves every field and document setting (9.7631ms)
+✔ all original routes render with both interface languages and every current theme (1341.0437ms)
+✔ IndexedDB get/set/update/remove/getAll/clear use committed transactions (7.2951ms)
+✔ debounced autosave saves latest edits and queued writes preserve order (678.0567ms)
+✔ closing/reopening database retains user data (storage-layer restart) (2.9613ms)
+✔ save failure remains visible and the in-memory workspace can be backed up (20.9059ms)
+✔ complete JSON backup survives clearing and atomic recovery, including future user records (244.878ms)
+✔ images, attachments, editable drafts and export history round-trip without duplication (346.6529ms)
+✔ damaged/non-Qicheng/unsupported/incomplete/malformed/referentially broken JSON never mutates state (175.4646ms)
+✔ a restore write failure AFTER clear rolls back all records and keeps unsaved edits (74.4759ms)
+✔ opening IndexedDB failure is surfaced and can be retried (0.9944ms)
+✔ Markdown sample/import and bilingual export keep every recognized module (11.5043ms)
+✔ vector map contains each province, inset and counts; filters/favorites retain semantics (4.4389ms)
+(node:1567680) ExperimentalWarning: vm.USE_MAIN_CONTEXT_DEFAULT_LOADER is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ real paginated SVG, embedded-font searchable PDF, DOCX and editable PPTX exports (5014.4816ms)
+✔ editable HTML preserves full runtime/data/assets and embeds the current workspace (356.6568ms)
+✔ background save cannot overwrite a restore transaction in progress (261.3704ms)
+✔ all export palettes and both orientations generate finite, paginated layouts (369.1345ms)
+✔ province popup opens with matching universities and closes cleanly (DOM API double) (12.8229ms)
+✔ service worker registration failure keeps the workspace visible and reports an error (4.4067ms)
+✔ normal clear requires two confirmations and persists an empty workspace (291.2213ms)
+✔ Markdown file import commits before changing workspace; a failed write keeps original materials (522.9376ms)
+(node:1580980) ExperimentalWarning: vm.USE_MAIN_CONTEXT_DEFAULT_LOADER is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ independent paper, rule and section colors reach HTML, PDF, editable PPTX and Word (4848.7959ms)
+✔ appearance controls keep custom settings and additional statement can be independently excluded (2.1588ms)
+✔ four classic entrances and the complete supplied Guanzi source are preserved (7.564ms)
+✔ Guanzi has all 100 original numbered passages, 26 chapters, source notes and study advice (11.511ms)
+✔ reviewed editorial wordings remain exactly as supplied, including the corrected punctuation (0.339ms)
+✔ passage search and chapter selection combine without changing source content (1.1076ms)
+✔ Markdown displays emphasis and lists while treating HTML and executable links as inert text (0.6856ms)
+✔ old quiz routes remain valid while new center and all four classic pages validate (7.9502ms)
+✔ uninstalled classics show an honest empty state; static texts do not enter personal backups (4.2978ms)
+✔ 5.0 document settings keep old documents unchanged and validate optional additions (7.682ms)
+✔ contents point to actual physical pages and all page numbers include contents (2116.985ms)
+✔ long multi-page contents use the real offset and never overflow the printable area (125.1842ms)
+✔ page-number toggle and restrained decorations apply to every fixed-layout page (48.9087ms)
+(node:1571684) ExperimentalWarning: vm.USE_MAIN_CONTEXT_DEFAULT_LOADER is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ DOCX carries a dynamic TOC, refresh flag, page/total fields and optional real page borders (147.0652ms)
+✔ PDF and editable PPTX preserve the same contents and total-page count (2740.3265ms)
+✔ all six original formats remain exposed with clear pagination guidance (2.1323ms)
+✔ resolved export rows and all four editable DOCX templates use isolated content and selected TOC headings (190.9737ms)
+✔ PDF pagination, cover, TOC and two-column bounds are finite for long version-only fields (7552.0376ms)
+✔ original template is a non-destructive view of saved styles and exports explicit empty overrides (28.5066ms)
+✔ search groups master/version/settings and highlights untrusted text safely (211.9894ms)
+✔ global search never reveals active unsubmitted question text, explanations or stored note (210.75ms)
+✔ device preference stays in meta namespace and safe space logic is independent of mode preference (21.2446ms)
+✔ all saved destinations appear once, the featured university retains its name, abbreviation and seal (15.6544ms)
+✔ arbitrary school names remain escaped, and an empty list keeps the normal invitation (0.9164ms)
+✔ weekly drag moves an item directly to its target while retaining all seven unique snapshots (1.2618ms)
+✔ a name alone creates a peer bank outside the four defaults; old category-based banks also display as peers (224.8673ms)
+✔ a new bank and a question resource pack import atomically, with arbitrary subject metadata (595.8724ms)
+✔ moving a pack keeps IDs, wrong/favorite marks and historical results; several packs may share a bank (283.3992ms)
+✔ a failed create-from-pack leaves no empty bank and no imported pack; failed moves preserve the original assignment (326.7508ms)
+✔ custom bank names are escaped in per-bank dashboard filters and results (222.3717ms)
+✔ manual save commits edited materials and independent quiz/home/reading writes before reporting success (293.4312ms)
+✔ repeated manual saves and navigation never write unchanged data; settings does not open Information (403.5011ms)
+✔ manual saving retries an answer draft failure and never reports success while storage fails (264.0306ms)
+✔ manual save observes a pending resource failure even while current is being saved (172.7668ms)
+✔ settings has one set of JSON controls and keeps independent HTML copies under Advanced tools (242.4461ms)
+✔ materials/results and practice data have separate pages and independent filters (170.8712ms)
+✔ empty examination framework ships no dates and month rows are Monday-first, including leap years (202.4295ms)
+✔ school counts deduplicate same-day written/interview stages and preserve both arrangements (184.1252ms)
+✔ schedule imports validate real dates, stable IDs, stages, times and ambiguous resource formats (253.9406ms)
+✔ offline imported schedules survive backup and do not collide with old banks named exam-schedule (524.4676ms)
+✔ online schedule updates use the existing atomic resource update and custom schedules keep priority (246.2469ms)
+✔ schedule text is rendered inertly instead of interpreting injected HTML (256.1288ms)
+✔ 5.1 snapshots gain only additive 5.2 fields and keep statements and document settings (5.9092ms)
+✔ Chinese character counts and English word counts exclude punctuation (2.8412ms)
+✔ duration conversion accepts overflow seconds and rejects negative or fractional input (0.2832ms)
+✔ countdown runs into overtime, preserves pause and resume, and resets (0.4244ms)
+✔ complete backups preserve introduction versions, drafts, and optional third-language statements (5.3443ms)
+✔ manual local-file save writes a restorable JSON and cancellation keeps user data (62.4764ms)
+✔ AI instruction example satisfies the actual importer and includes strict JSON guidance (1.3863ms)
+✔ default-bank dates and provided updatedAt metadata survive validation and storage (168.2292ms)
+(node:1581912) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ journal is read only until an explicit content action, including calendar and week/month generation (97.1311ms)
+✔ save, edit, delete and initialize reading progress retain stable IDs without duplicating rows (16.7672ms)
+✔ latest legacy reading follows recording time independently of reading date and returned objects cannot mutate saved data (16.2325ms)
+✔ reading validation rejects current required fields and malformed legacy page ranges before storage writes (18.8465ms)
+✔ failed reading writes and deletes retain committed memory and database, and remain retryable (16.8956ms)
+✔ writes are serialized, pending edits survive navigation, and paused restore operations cannot interleave (12.5613ms)
+✔ four daily states persist individually, repeated unchanged selection does not save, clearing is isolated (13.6375ms)
+✔ failed status write never replaces a previously committed day; invalid options do not write (16.8195ms)
+✔ restoration validates every journal entry before replacing any memory and accepts unrelated backup records (34.4375ms)
+✔ malformed and mismatched journal backups are rejected, including unknown record types (11.582ms)
+✔ date calculations use local calendar dates, support year boundaries and keep Monday-first 7-day rows (14.0865ms)
+✔ calendar encouragement saves independently and only after successful commit (33.5762ms)
+✔ home five-day board distinguishes unrecorded days and safely escapes user text in all views (52.9939ms)
+✔ calendar reuses the existing countdown date and renders accessible date and reflection controls (27.4987ms)
+✔ large reading history is paginated for mobile rendering; backups retain all records and enforce limits (574.4679ms)
+✔ category/tags roundtrip and atomic incoming conflict resolution preserve notes (263.9214ms)
+✔ unsubmitted group blocks question detail, search snippets and notes across shared identity (360.3541ms)
+✔ submission deduplicates wrongs, timestamps errors and keeps mastery independent of favorite (193.8846ms)
+✔ folders are many-to-many, rename without changing identity and backup validators reject corrupt membership (417.6061ms)
+✔ statistics distinguish repeated attempts, unique source identities and time range (1.8316ms)
+✖ old imported packs join the default four without migration writes and preserve old learning keys (590.4245ms)
+✔ multiple JSON packs with the same question ID merge safely into one chosen bank (245.7396ms)
+✔ users create named banks; empty banks, assignments and imported packs survive a complete backup restore (675.836ms)
+✔ a local JSON with an official ID imports as a personal pack without overwriting official content (319.8767ms)
+✔ reimport updates a pack and can move it without duplicating practice entries or losing favorites (355.4765ms)
+✔ deleting packs and custom banks preserves other packs, default banks and learning history (290.4864ms)
+✔ database failures preserve both the old directory and all packs in memory and on disk (312.0375ms)
+✔ offline reload retains the directory and imported content without requests or extra user-state saves (371.5139ms)
+✔ valid IDs that match object property names keep their own assignments and learning identities (364.5402ms)
+✔ saving image originals never decodes/resizes; old derived thumbnails removed atomically (16.9013ms)
+✖ every current page has its own help, including detail routes outside navigation (4.3142ms)
+✔ all six composer tabs describe their own controls (6.7532ms)
+✔ help refresh keys track the route, current composer tab and language (0.7835ms)
+✔ English help is available for every page and composer tab (2.3479ms)
+✔ dashboard help explains normalization and equivalent ratios with correct examples (3.93ms)
+✔ help never echoes an unknown route as executable content (0.5811ms)
+✔ v3.1 feature/field parity: zh:profile (15.1333ms)
+✔ v3.1 feature/field parity: zh:education (2.5686ms)
+✔ v3.1 feature/field parity: zh:statement (2.7982ms)
+✔ v3.1 feature/field parity: zh:academics (3.4037ms)
+✔ v3.1 feature/field parity: zh:awards (3.0354ms)
+✔ v3.1 feature/field parity: zh:experiences (2.0558ms)
+✔ v3.1 feature/field parity: zh:practices (1.8097ms)
+✔ v3.1 feature/field parity: zh:sort-awards (2.0629ms)
+✔ v3.1 feature/field parity: zh:sort-experiences (2.5616ms)
+✔ v3.1 feature/field parity: zh:sort-practices (1.8168ms)
+✔ v3.1 feature/field parity: zh:learning (6.6715ms)
+✔ v3.1 feature/field parity: zh:achievements (1.4724ms)
+✔ v3.1 feature/field parity: zh:custom (1.9229ms)
+✔ v3.1 feature/field parity: zh:dashboard (5.2577ms)
+✔ v3.1 feature/field parity: zh:images (1.8023ms)
+✔ v3.1 feature/field parity: zh:files (2.6741ms)
+✔ v3.1 feature/field parity: zh:outputs (1.509ms)
+✔ v3.1 feature/field parity: zh:studio (4.6769ms)
+✔ v3.1 feature/field parity: zh:archive (1.9466ms)
+✔ v3.1 feature/field parity: zh:schools (58.5817ms)
+✔ v3.1 feature/field parity: zh:school:%E5%93%88%E5%B0%94%E6%BB%A8%E5%B7%A5%E4%B8%9A%E5%A4%A7%E5%AD%A6 (2.8108ms)
+✔ v3.1 feature/field parity: en:profile (1.3955ms)
+✔ v3.1 feature/field parity: en:education (5.7492ms)
+✔ v3.1 feature/field parity: en:statement (3.7374ms)
+✔ v3.1 feature/field parity: en:academics (2.4308ms)
+✔ v3.1 feature/field parity: en:awards (5.4873ms)
+✔ v3.1 feature/field parity: en:experiences (1.367ms)
+✔ v3.1 feature/field parity: en:practices (1.5005ms)
+✔ v3.1 feature/field parity: en:sort-awards (1.4656ms)
+✔ v3.1 feature/field parity: en:sort-experiences (1.3354ms)
+✔ v3.1 feature/field parity: en:sort-practices (1.3727ms)
+✔ v3.1 feature/field parity: en:learning (2.1152ms)
+✔ v3.1 feature/field parity: en:achievements (2.5862ms)
+✔ v3.1 feature/field parity: en:custom (1.7228ms)
+✔ v3.1 feature/field parity: en:dashboard (2.1373ms)
+✔ v3.1 feature/field parity: en:images (2.1084ms)
+✔ v3.1 feature/field parity: en:files (1.2897ms)
+✔ v3.1 feature/field parity: en:outputs (1.2914ms)
+✔ v3.1 feature/field parity: en:studio (2.8387ms)
+✔ v3.1 feature/field parity: en:archive (1.6326ms)
+✔ v3.1 feature/field parity: en:schools (19.0403ms)
+✔ v3.1 feature/field parity: en:school:%E5%93%88%E5%B0%94%E6%BB%A8%E5%B7%A5%E4%B8%9A%E5%A4%A7%E5%AD%A6 (1.7761ms)
+(node:1570052) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ rapid real answer edits debounce into one independent draft write; repeat selections and timer do not save (741.7598ms)
+✔ a killed process restores partial answers and elapsed time without entering a page or revealing grading (23.9088ms)
+✔ malformed draft backups reject invalid schema, IDs, questions, answers and timing before changing memory (23.6165ms)
+✔ failed draft save preserves the previous committed answer and exposes a pure emergency backup snapshot (24.7282ms)
+✔ submission atomically removes the saved draft; failure keeps it retryable and never shows formal statistics (14.9793ms)
+✔ replacing an in-flight draft is serialized; pausing persistence blocks new draft writes (11.5672ms)
+✔ old history loads question snapshots on demand and reviewing never replaces an unfinished draft (33.1315ms)
+(node:1520100) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✖ Android UnknownError retries the same service-worker URL without clearing registration or saving user state (11.7485ms)
+✖ an already downloaded update remains available even if another network check would fail (24.6657ms)
+✖ repeated unknown failures report useful recovery steps and technical details without deleting user data (23.0703ms)
+✖ offline checks do not request updates, re-register or save data (9.9242ms)
+✖ app update waits for manual exam writes and keeps the old app when a write fails (6.0684ms)
+✔ 5000 rows import; direct create/update preserves stable IDs and writes only selected question (752.3281ms)
+✔ old JSON preserves manual new question and local explanation; conflicting upstream change is atomic (1122.5598ms)
+✔ append retains all existing questions, duplicate import no duplication, bounded filtered query (2321.0142ms)
+✔ note and mark remain independent across answer edits and deletion; history snapshot remains exact (548.8863ms)
+✔ quota rollback and rapid stale writes do not partially change bank or provenance (301.0604ms)
+✔ backup restores effective questions, provenance, tombstone and notes; invalid metadata rejected (1156.3872ms)
+✔ source pack same qid never collides; manual pack maps to presentation bank (716.0448ms)
+✔ verified official online update cannot overwrite locally edited question (644.5491ms)
+✔ explicit reset resolves local provenance without deleting independent notes (258.3086ms)
+✔ random groups contain 10/20 distinct snapshots; drafts never write records or reveal answers (53.1593ms)
+✔ answers can be revised, incomplete groups cannot submit, result uses final choices (19.3177ms)
+(node:1582952) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ atomic failure midway preserves every old mark and leaves the active group retryable (44.7714ms)
+✔ rapid double submission creates exactly one formal result (12.5048ms)
+✔ favorites survive initialization; composite IDs isolate banks and failed saves do not toggle memory (11.8647ms)
+✔ correct review records latest correctness while pending review requires explicit mastery and preserves favorites (14.2439ms)
+✔ true-false false is a completed answer; sparse and empty banks behave explicitly (26.4814ms)
+✔ missing live questions retain saved marks and snapshot history but are excluded from practice (51.0157ms)
+✔ restoration resets active drafts and validates results against snapshot answers (64.7861ms)
+✔ rich text allows only exact italic/underline tags, inertly escapes scripts and attributes (22.0347ms)
+✔ backup write barrier waits for favorite and group commits; paused persistence blocks new mutations (28.7978ms)
+✔ beta manual question sizes accept integers and never duplicate scarce questions (30.744ms)
+✔ beta timer uses absolute elapsed time, expires without grading, and freezes only on submission (19.3428ms)
+✔ beta untimed sessions count elapsed time and old records stay valid (45.2899ms)
+✔ learning overview weights submitted questions, excludes drafts, and reads without writes (89.3917ms)
+✔ 5.2 reading requires date, title, author, language and chapters; all optional values may be empty (19.1179ms)
+✔ legacy page records load unchanged and new chapter records round-trip through persistence (58.9338ms)
+✔ same book titles group into one timeline; latest input order is independent of reading date (1.1612ms)
+✔ integration combines every note of the selected book chronologically and remains independently editable (0.9979ms)
+✔ a failed reading write keeps the last committed record intact (28.0572ms)
+✔ weekly quotes require exactly seven unique selections and follow Monday-to-Sunday order for this week only (11.5464ms)
+✔ weekly quotes persist with the existing home backup record and malformed restored plans are rejected (338.2846ms)
+✔ reading text stays escaped and daily quote customization is reachable from home, daily quote and settings (25.6671ms)
+✔ navigation, menu and temporary filters produce zero current writes; an edit survives immediate navigation (865.196ms)
+✔ all three downloadable examples import offline, show dynamic entries and round-trip through backup (440.5941ms)
+✔ failed imports preserve every record, reject ambiguous formats, duplicate IDs, illegal answers and dangerous text remains inert (54.8014ms)
+✔ Guanzi 100 quotes are exact originals with valid passage links and fixed daily selection (20.2835ms)
+✔ manual online classic update verifies checksum and commits atomically, with custom content still preferred (53.5967ms)
+✔ empty old official quotes are filled locally while custom quotes and real installed resources remain untouched (331.5891ms)
+✔ schema validation rejects broken answers, duplicate stable IDs, mismatched sections and invalid versions (27.5712ms)
+✔ semantic versions compare numerically including prerelease precedence (9.9746ms)
+✔ initialization fetches only bundled local resources and never requests a manifest (415.4201ms)
+✔ installed resources take priority over newer application seeds without a startup update (14.953ms)
+✔ custom resources persist through an offline restart and cannot replace an official bank (32.0198ms)
+✔ reimport replaces the same custom bank while retaining stable learning keys, with rollback on failure (20.9177ms)
+✔ backup resource validation checks origin, key consistency and official/custom collisions (10.2831ms)
+✔ one corrupt checksum prevents the entire update, preserving disk, memory and learning history (15.5652ms)
+✔ a correctly hashed but invalid schema or inconsistent version cannot update (14.3742ms)
+✔ database failure after the first put rolls all resources back without publishing memory (9.7412ms)
+✔ manual update commits all verified resources and retains them after offline restart (19.1818ms)
+✔ unsafe manifests and custom ID collisions fail before resource downloads (12.9757ms)
+✔ simultaneous imports are serialized and failed queued work does not poison future writes (9.0624ms)
+✔ old documents migrate once without pretending opening was an edit; multi-version overrides preserve explicit empty (13.4571ms)
+✔ master changes flow only into inherited fields; deleted source records survive by stable-ID fallback (4.2153ms)
+✔ content restores keep selections/order/style, undo survives successful database save and redo restores it (29.9227ms)
+✔ custom modules/fields/record order/labels are version-only and validator preserves them (7.7625ms)
+✔ blank resumes stay blank, copies are isolated, no-op saves never change modified time (1.9594ms)
+✔ backup rejects embedded raw files and dangling resume references; valid edits persist after reload (16.6356ms)
+✔ New introduction clears an existing edit ID while retaining an unfinished new draft (8.5612ms)
+✔ restore clears rehearsal clocks so an imported version cannot inherit previous overtime (252.3372ms)
+✔ cache clearing asks for confirmation and removes only this installation assets, keeping all database records (20.5729ms)
+✔ manual JSON save preserves unsaved current data even when database writing fails (50.3146ms)
+✔ total and subject metrics use corresponding full marks and corresponding ranks (224.6811ms)
+✔ score rates preserve numeric zero and reject absent, impossible or zero full marks (198.8237ms)
+✔ chart offers exactly total/subject and score/rate/rank selectors, with no missing-value NaN (193.3452ms)
+✔ weighted scores and ranks normalize relative weights without requiring 100 percent (244.259ms)
+✔ invalid weights block calculations and missing scores/ranks are never silently counted as zero (194.3375ms)
+✔ manual calendar arrangements save, reload, edit, group by university and delete independently (220.0624ms)
+✔ manual event validation and storage failures preserve the previous complete event (198.2006ms)
+✔ manual events survive independent-record round trips and text remains inert in the calendar (172.7469ms)
+✔ complete backup restores manual calendar events and rejects damaged events before any mutation (437.4091ms)
+✔ precache paths exist and include lazy modules, workers, templates; exclude user data and tests (46.0524ms)
+✔ cold install verifies every resource; offline navigation, JS, fonts, map and templates work (443.0038ms)
+✔ worker does not intercept personal writes, external URLs or backup downloads (379.7368ms)
+✔ explicit no-store resource updates bypass worker; mutable manifests are not precached (358.4236ms)
+✔ new version retains preceding cache and unrelated apps; legacy single-window activation works (519.7506ms)
+✔ failed installation discards partial new cache and preserves complete old offline version (364.3304ms)
+✔ mobile installation bounds downloads to four and reports measured resource counts after verification (214.4673ms)
+✔ permanent failure reports error without emitting ready or false completion (86.2965ms)
+✔ hash mismatch rejects mixed-version resources instead of installing broken release (162.8744ms)
+✔ missing known resource never falls through to newer network code (162.8783ms)
+✔ multi-tab activation needs every client acknowledgement; dirty peer aborts safely (171.2952ms)
+✔ new peers and legacy multiple windows cannot be activated without acknowledgement (159.1675ms)
+(node:1519552) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ startup module failure shows reload, emergency export and double-confirmed clear controls (15.123ms)
+✔ startup emergency export failure has a visible message and never clears stored data (3.0785ms)
+✔ exported standalone HTML executes without any network imports/resources and restores its embedded workspace (773.0437ms)
+✔ persistent storage reflects granted/denied/unsupported and never invents authorization (3.9958ms)
+✔ storage permission and estimate failures are reported separately (0.6934ms)
+✔ processed counts cannot complete tasks before commit; failures remain terminal (1.101ms)
+✔ workspace normalization separates originals as Blob, reconstructs lossless public view, lazy view contains no original (23.8519ms)
+✔ editing one field commits only changed row and preserves immutable original Blob identity (15.3079ms)
+✔ two windows reject stale workspace and generic writes without overwriting committed data (22.4849ms)
+✔ failed normalized transaction rolls back all fields and preserves quota failure reason (13.4706ms)
+✔ failed full restore after clear is atomic, updater errors retain exact reason (4.4868ms)
+✔ restore invalidates a peer observed revision and bank projection retains origin and exact questions (13.21ms)
+✔ removing the last asset reference garbage collects original and thumbnail atomically (6.5298ms)
+✔ device save timestamps are committed atomically with real user changes; reads and official downloads do not change them (118.8202ms)
+✔ complete transfer keeps journal and custom user records, omits local receipts and stamps import only on success (388.2417ms)
+✔ an unsaved answer draft is included in an emergency JSON even if its database write fails (48.6238ms)
+✔ formal English banks keep 118 grammar and 110 vocabulary stable IDs, Chinese remains empty and Guanzi daily quotes are installed (6.4367ms)
+✔ beta1 schema and every original user field remain readable; transient fields may be omitted (10.844ms)
+✔ countdown calendar days handle leap days, today, past targets and invalid dates (1.2699ms)
+✔ daily quote is fixed for local calendar date, changes next day, and accepts empty resources (0.5407ms)
+✖ v2 full backup covers independent user keys and official resources, omits navigation, and restores the backed-up resource version atomically (82.4445ms)
+✔ invalid countdown, quiz and custom-bank records are rejected before restoring any user data (86.5033ms)
+✔ Home reads existing target data and export history without creating duplicate fields (31.9657ms)
+ℹ tests 288
+ℹ suites 0
+ℹ pass 280
+ℹ fail 8
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 17251.9051
+
+✖ failing tests:
+
+test at tests\library.test.mjs:18:1
+✖ old imported packs join the default four without migration writes and preserve old learning keys (590.4245ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    {
+      bankId: 'legacy',
+      favorite: true,
+  +   mastered: false,
+      questionId: 'Q1',
+  +   reviewPending: true,
+      wrong: false
+    }
+  
+      at TestContext.<anonymous> (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.3/tests/library.test.mjs:25:10)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { bankId: 'legacy', questionId: 'Q1', wrong: false, favorite: true, reviewPending: true, mastered: false },
+    expected: { bankId: 'legacy', questionId: 'Q1', wrong: false, favorite: true },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests\page-help52.test.mjs:14:1
+✖ every current page has its own help, including detail routes outside navigation (4.3142ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  33 !== 38
+  
+      at TestContext.<anonymous> (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.3/tests/page-help52.test.mjs:18:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 33,
+    expected: 38,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\pwa-update.test.mjs:17:1
+✖ Android UnknownError retries the same service-worker URL without clearing registration or saving user state (11.7485ms)
+  TypeError: Cannot convert undefined or null to object
+      at Object.keys (<anonymous>)
+      at file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.3/tests/pwa-update.test.mjs:14:89
+      at [kLink] (node:internal/vm/module:345:28)
+      at SourceTextModule.link (node:internal/vm/module:208:22)
+      at harness (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.3/tests/pwa-update.test.mjs:14:16)
+      at async TestContext.<anonymous> (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.3/tests/pwa-update.test.mjs:19:11)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at tests\pwa-update.test.mjs:21:1
+✖ an already downloaded update remains available even if another network check would fail (24.6657ms)
+  TypeError: Cannot convert undefined or null to object
+      at Object.keys (<anonymous>)
+      at file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.3/tests/pwa-update.test.mjs:14:89
+      at [kLink] (node:internal/vm/module:345:28)
+      at SourceTextModule.link (node:internal/vm/module:208:22)
+      at harness (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.3/tests/pwa-update.test.mjs:14:16)
+      at async TestContext.<anonymous> (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.3/tests/pwa-update.test.mjs:22:26)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7)
+
+test at tests\pwa-update.test.mjs:25:1
+✖ repeated unknown failures report useful recovery steps and technical details without deleting user data (23.0703ms)
+  TypeError: Cannot convert undefined or null to object
+      at Object.keys (<anonymous>)
+      at file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.3/tests/pwa-update.test.mjs:14:89
+      at [kLink] (node:internal/vm/module:345:28)
+      at SourceTextModule.link (node:internal/vm/module:208:22)
+      at harness (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.3/tests/pwa-update.test.mjs:14:16)
+      at async TestContext.<anonymous> (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.3/tests/pwa-update.test.mjs:26:11)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7)
+
+test at tests\pwa-update.test.mjs:29:1
+✖ offline checks do not request updates, re-register or save data (9.9242ms)
+  TypeError: Cannot convert undefined or null to object
+      at Object.keys (<anonymous>)
+      at file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.3/tests/pwa-update.test.mjs:14:89
+      at [kLink] (node:internal/vm/module:345:28)
+      at SourceTextModule.link (node:internal/vm/module:208:22)
+      at harness (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.3/tests/pwa-update.test.mjs:14:16)
+      at async TestContext.<anonymous> (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.3/tests/pwa-update.test.mjs:30:11)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7)
+
+test at tests\pwa-update.test.mjs:33:1
+✖ app update waits for manual exam writes and keeps the old app when a write fails (6.0684ms)
+  TypeError: Cannot convert undefined or null to object
+      at Object.keys (<anonymous>)
+      at file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.3/tests/pwa-update.test.mjs:14:89
+      at [kLink] (node:internal/vm/module:345:28)
+      at SourceTextModule.link (node:internal/vm/module:208:22)
+      at harness (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.3/tests/pwa-update.test.mjs:14:16)
+      at async TestContext.<anonymous> (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.3/tests/pwa-update.test.mjs:35:11)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7)
+
+test at tests\upgrade.test.mjs:53:1
+✖ v2 full backup covers independent user keys and official resources, omits navigation, and restores the backed-up resource version atomically (82.4445ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    {
+      bankId: 'upgrade-custom',
+      favorite: true,
+  +   lastWrongAt: '2026-10-29T10:17:38.973Z',
+  +   mastered: false,
+      questionId: 'TF1',
+  +   reviewPending: true,
+      wrong: true
+    }
+  
+      at TestContext.<anonymous> (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.3/tests/upgrade.test.mjs:68:10)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { bankId: 'upgrade-custom', questionId: 'TF1', wrong: true, favorite: true, lastWrongAt: '2026-10-29T10:17:38.973Z', mastered: false, reviewPending: true },
+    expected: { bankId: 'upgrade-custom', questionId: 'TF1', wrong: true, favorite: true },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }

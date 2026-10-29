@@ -1,0 +1,97 @@
+(node:1047328) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ rapid real answer edits debounce into one independent draft write; repeat selections and timer do not save (681.7265ms)
+✔ a killed process restores partial answers and elapsed time without entering a page or revealing grading (10.4136ms)
+✔ malformed draft backups reject invalid schema, IDs, questions, answers and timing before changing memory (8.7384ms)
+✔ failed draft save preserves the previous committed answer and exposes a pure emergency backup snapshot (11.2137ms)
+✔ submission atomically removes the saved draft; failure keeps it retryable and never shows formal statistics (11.8798ms)
+✔ replacing an in-flight draft is serialized; pausing persistence blocks new draft writes (8.5213ms)
+✖ old history loads question snapshots on demand and reviewing never replaces an unfinished draft (11.6559ms)
+(node:1044644) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ random groups contain 10/20 distinct snapshots; drafts never write records or reveal answers (16.8962ms)
+✔ answers can be revised, incomplete groups cannot submit, result uses final choices (10.832ms)
+✖ atomic failure midway preserves every old mark and leaves the active group retryable (10.2579ms)
+✔ rapid double submission creates exactly one formal result (9.6092ms)
+✔ favorites survive initialization; composite IDs isolate banks and failed saves do not toggle memory (7.7076ms)
+✖ wrong practice clears a wrong mark only after a correctly submitted group and preserves favorites (13.6972ms)
+✔ true-false false is a completed answer; sparse and empty banks behave explicitly (9.1655ms)
+✔ missing live questions retain saved marks and snapshot history but are excluded from practice (8.1376ms)
+✔ restoration resets active drafts and validates results against snapshot answers (29.1513ms)
+✔ rich text allows only exact italic/underline tags, inertly escapes scripts and attributes (6.2617ms)
+✔ backup write barrier waits for favorite and group commits; paused persistence blocks new mutations (9.499ms)
+✔ beta manual question sizes accept integers and never duplicate scarce questions (5.8344ms)
+✔ beta timer uses absolute elapsed time, expires without grading, and freezes only on submission (11.1762ms)
+✔ beta untimed sessions count elapsed time and old records stay valid (7.5766ms)
+✔ learning overview weights submitted questions, excludes drafts, and reads without writes (10.9788ms)
+✔ schema validation rejects broken answers, duplicate stable IDs, mismatched sections and invalid versions (20.3307ms)
+✔ semantic versions compare numerically including prerelease precedence (6.3713ms)
+✔ initialization fetches only bundled local resources and never requests a manifest (212.522ms)
+✔ installed resources take priority over newer application seeds without a startup update (7.9656ms)
+✔ custom resources persist through an offline restart and cannot replace an official bank (13.331ms)
+✔ reimport replaces the same custom bank while retaining stable learning keys, with rollback on failure (9.2683ms)
+✔ backup resource validation checks origin, key consistency and official/custom collisions (6.2563ms)
+✔ one corrupt checksum prevents the entire update, preserving disk, memory and learning history (9.3838ms)
+✔ a correctly hashed but invalid schema or inconsistent version cannot update (5.0997ms)
+✔ database failure after the first put rolls all resources back without publishing memory (5.7923ms)
+✔ manual update commits all verified resources and retains them after offline restart (8.5047ms)
+✔ unsafe manifests and custom ID collisions fail before resource downloads (4.2118ms)
+✔ simultaneous imports are serialized and failed queued work does not poison future writes (5.6635ms)
+ℹ tests 35
+ℹ suites 0
+ℹ pass 32
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 895.0889
+
+✖ failing tests:
+
+test at tests\performance50.test.mjs:104:1
+✖ old history loads question snapshots on demand and reviewing never replaces an unfinished draft (11.6559ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /PRIVATE_EXPLANATION/. Input:
+  
+  '<button class="home-text-button" data-go3="explore">← 返回学习中心</button><div class="page-head"><div><div class="eyebrow">LEARNING / PRACTICE</div><h1>练习中心</h1><p>选择题库，完成一组练习，再统一复盘。</p></div></div><section class="panel"><h2>先完成正在进行的练习</h2><p>此题属于尚未交卷的题组，暂时隐藏历史选择、答案、解析与笔记。</p><button data-quiz-resume>继续练习</button></section>'
+  
+      at TestContext.<anonymous> (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.3/tests/performance50.test.mjs:116:88)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '<button class="home-text-button" data-go3="explore">← 返回学习中心</button><div class="page-head"><div><div class="eyebrow">LEARNING / PRACTICE</div><h1>练习中心</h1><p>选择题库，完成一组练习，再统一复盘。</p></div></div><section class="panel"><h2>先完成正在进行的练习</h2><p>此题属于尚未交卷的题组，暂时隐藏历史选择、答案、解析与笔记。</p><button data-quiz-resume>继续练习</button></section>',
+    expected: /PRIVATE_EXPLANATION/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at tests\quiz.test.mjs:87:1
+✖ atomic failure midway preserves every old mark and leaves the active group retryable (10.2579ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  3 !== 2
+  
+      at TestContext.<anonymous> (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.3/tests/quiz.test.mjs:99:10)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 3,
+    expected: 2,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\quiz.test.mjs:129:1
+✖ wrong practice clears a wrong mark only after a correctly submitted group and preserves favorites (13.6972ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.3/tests/quiz.test.mjs:142:10)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /暂无待巩固/,
+    operator: 'throws',
+    diff: 'simple'
+  }

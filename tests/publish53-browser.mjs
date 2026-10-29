@@ -1,0 +1,23 @@
+import {chromium} from 'file:///C:/Users/LHM66/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright/index.mjs';
+import {access,mkdir,writeFile} from 'node:fs/promises';
+import assert from 'node:assert/strict';
+const out='tests/generated/publish53';await mkdir(out,{recursive:true});
+const browser=await chromium.launch({executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless:true});
+const context=await browser.newContext({viewport:{width:1440,height:1000},locale:'zh-CN'}),page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(60000);
+async function ready(){await page.waitForFunction(()=>!!window.ResumeStudio);if(await page.locator('#startupChoice52[open]').count())await page.locator('#startupContinue52').click();}
+try{
+ await page.goto('https://hualaoming.github.io/qicheng-baosong/');await ready();assert.equal(await page.evaluate(()=>ResumeStudio.version),'5.2.0');
+ await page.evaluate(async()=>{const s=ResumeStudio.getState();s.profile.name='线上升级验收53';ResumeStudio.setState(s);assertPlaceholder:await ResumeStudio.save();await navigator.serviceWorker.ready;});
+ await page.reload();await ready();await page.waitForFunction(()=>!!navigator.serviceWorker.controller);console.log('READY production 5.2.0 installed with synthetic saved profile');
+ const deadline=Date.now()+600000;while(true){try{await access(out+'/deploy-ready.json');break;}catch{}if(Date.now()>deadline)throw Error('deployment wait timed out');await new Promise(r=>setTimeout(r,1000));}
+ assert.equal(await page.evaluate(async()=>(await import('./js/pwa.js')).pwa.checkUpdate()),true);
+ await Promise.all([page.waitForNavigation({waitUntil:'load'}),page.evaluate(async()=>(await import('./js/pwa.js')).pwa.applyUpdate())]);await ready();
+ assert.equal(await page.evaluate(()=>ResumeStudio.version),'5.3.0');assert.equal(await page.evaluate(()=>ResumeStudio.getState().profile.name),'线上升级验收53');
+ await page.evaluate(()=>ResumeStudio.go3('settings'));await page.locator('[data-settings-category53="appearance"]').click();assert.deepEqual(await page.locator('.theme-card small').allTextContents(),['Pudding','Obsidian']);
+ await page.evaluate(()=>scrollTo(0,100));const before=await page.evaluate(()=>scrollY);const pane=await page.locator('#settingsPane53').evaluate(el=>el);
+ for(const key of ['about','appearance','updates','navigation','appearance']){await page.locator('[data-settings-category53="'+key+'"]').click();assert.ok(Math.abs(await page.evaluate(()=>scrollY)-before)<3,'settings switch scrolled page');}
+ await page.locator('[data-settings-category53="about"]').click();assert.match(await page.locator('[data-settings-panel53="about"]').innerText(),/加油/);
+ await page.evaluate(()=>ResumeStudio.go3('home'));await page.locator('.home-edit-button53').click();const motion=await page.locator('.home-card-item53').first().evaluate(async el=>{const anim=el.getAnimations().find(a=>a.animationName==='home-jiggle53');anim.pause();anim.currentTime=0;return {transform:getComputedStyle(el).transform,duration:anim.effect.getTiming().duration};});assert.equal(motion.duration,900);assert.notEqual(motion.transform,'none');await page.locator('.home-edit-button53').click();
+ await context.setOffline(true);await page.reload();await ready();assert.equal(await page.evaluate(()=>ResumeStudio.version),'5.3.0');assert.equal(await page.evaluate(()=>ResumeStudio.getState().profile.name),'线上升级验收53');assert.deepEqual(errors,[]);
+ await writeFile(out+'/evidence.json',JSON.stringify({status:'PASS',from:'5.2.0',to:'5.3.0',profilePreserved:true,settingsStable:true,offlineReload:true,errors},null,2));console.log('PASS actual production update to 5.3.0, preserved profile, stable settings, theme copy, about, jiggle and offline restart');
+}finally{await browser.close();}

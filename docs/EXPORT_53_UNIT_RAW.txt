@@ -1,0 +1,26 @@
+(node:1705144) ExperimentalWarning: vm.USE_MAIN_CONTEXT_DEFAULT_LOADER is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ independent paper, rule and section colors reach HTML, PDF, editable PPTX and Word (3240.5851ms)
+✔ appearance controls keep custom settings and additional statement can be independently excluded (2.4109ms)
+✔ 5.0 document settings keep old documents unchanged and validate optional additions (5.9598ms)
+✔ contents point to actual physical pages and all page numbers include contents (1198.5592ms)
+✔ long multi-page contents use the real offset and never overflow the printable area (61.0043ms)
+✔ page-number toggle and restrained decorations apply to every fixed-layout page (28.4043ms)
+(node:1714836) ExperimentalWarning: vm.USE_MAIN_CONTEXT_DEFAULT_LOADER is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ DOCX carries a dynamic TOC, refresh flag, page/total fields and optional real page borders (96.3724ms)
+✔ PDF and editable PPTX preserve the same contents and total-page count (2026.4388ms)
+✔ all six original formats remain exposed with clear pagination guidance (2.1173ms)
+✔ resolved export rows and all four editable DOCX templates use isolated content and selected TOC headings (127.5438ms)
+✔ PDF pagination, cover, TOC and two-column bounds are finite for long version-only fields (4648.8964ms)
+✔ original template is a non-destructive view of saved styles and exports explicit empty overrides (15.5125ms)
+✔ advanced legacy controls remain visible and unlinked evidence photos retain per-version selection (8.4023ms)
+✔ statement language keeps additional fields and hidden attachment originals stay absent from HTML (7.0514ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5364.1971

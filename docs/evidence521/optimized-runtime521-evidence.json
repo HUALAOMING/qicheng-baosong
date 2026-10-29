@@ -1,0 +1,101 @@
+{
+  "startedAt": "2026-10-29T04:40:24.695Z",
+  "completedAt": "2026-10-29T04:40:38.092Z",
+  "browser": "Windows Edge headless; isolated owned persistent profile",
+  "serviceWorkers": "blocked for data integration; see separate PWA lifecycle test",
+  "profile": "C:\\Users\\LHM66\\.codex\\.chatgpt-projects\\g-p-6acb820145a08191968dcaea43277ba7\\qicheng-5.2.1-optimized\\tests\\generated\\runtime521\\owned-profile-1793248824688",
+  "checks": [
+    {
+      "name": "actual Edge profile edits commit and survive refresh",
+      "status": "PASS"
+    },
+    {
+      "name": "file bank preflight shows actual 1000-count summary before confirmed commit",
+      "status": "PASS",
+      "details": {
+        "questions": 1000
+      }
+    },
+    {
+      "name": "single-field patch UI preserves options, answer, ID and untouched questions",
+      "status": "PASS"
+    },
+    {
+      "name": "quiz UI starts a ten-question lazy sample and homepage resume survives reload",
+      "status": "PASS"
+    },
+    {
+      "name": "original PNG and binary attachment bytes survive Blob storage and full v2 backup roundtrip",
+      "status": "PASS",
+      "details": {
+        "imageBytes": 4096,
+        "binaryBytes": 4096,
+        "digest": "3e28bdfacd74358472a71b7574e002d70e47d78dfc030b7ea93c0f9e427e3bbb"
+      }
+    },
+    {
+      "name": "tampered v2 backup rejects before replacing database",
+      "status": "PASS"
+    },
+    {
+      "name": "injected quota failure reports unsaved state and preserves prior committed profile",
+      "status": "PASS",
+      "details": {
+        "saved": false,
+        "error": true,
+        "dirty": true,
+        "stored": "持久资料验收",
+        "status": "保存失败 · 请立即备份"
+      }
+    },
+    {
+      "name": "aborted restore transaction rolls back clear and all writes",
+      "status": "PASS"
+    },
+    {
+      "name": "two tabs reject stale save even after backup export reads database",
+      "status": "PASS",
+      "details": {
+        "first": false,
+        "retry": false,
+        "localName": "第二窗口过期编辑",
+        "exportedName": "第二窗口过期编辑",
+        "storedName": "第一窗口最新提交",
+        "error": true
+      }
+    },
+    {
+      "name": "stale favorite changes cannot overwrite another tab learning state after reads",
+      "status": "PASS",
+      "details": {
+        "error": "另一窗口已修改此项资料，请先备份当前编辑，再重新载入。未覆盖另一窗口的数据。",
+        "mark": {
+          "bankId": "runtime-longterm",
+          "questionId": "stable-0",
+          "wrong": true,
+          "favorite": false
+        }
+      }
+    },
+    {
+      "name": "persistent browser restart retains profile, attachments, imported question and unfinished answers",
+      "status": "PASS",
+      "details": {
+        "name": "第一窗口最新提交",
+        "assets": 2,
+        "answered": 1
+      }
+    },
+    {
+      "name": "desktop and Android-size emulation show truthful storage status without horizontal overflow",
+      "status": "PASS",
+      "details": {
+        "persisted": false,
+        "label": "持久存储未授权",
+        "mobile": "viewport emulation only; not Android Edge hardware"
+      }
+    }
+  ],
+  "errors": [],
+  "requests404": []
+}

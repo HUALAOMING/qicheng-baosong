@@ -62,6 +62,15 @@ function validateJournalRecords(records) {
   if (readingCount>JOURNAL_LIMIT || dayCount>JOURNAL_LIMIT) throw new Error('学习记录数量超出上限（每类 10,000 条）。');
   return records;
 }
+const JOURNAL_SUMMARY_KEY521='meta:journal-overview';
+function latestJournal521(values){return [...values].sort((a,b)=>(b.createdAt||b.updatedAt).localeCompare(a.createdAt||a.updatedAt)||b.updatedAt.localeCompare(a.updatedAt)||a.id.localeCompare(b.id))[0]||null;}
+async function initializeJournalSummary(){
+  let overview=await storage.get(JOURNAL_SUMMARY_KEY521);
+  if(!overview||overview.schemaVersion!==1){await initializeJournal();overview={schemaVersion:1,latest:getLatestReading()};await storage.set(JOURNAL_SUMMARY_KEY521,overview);}
+  const today=journalDateKey(),keys=Array.from({length:5},(_,i)=>'journal:day:'+journalShiftDate(today,i-4));
+  const days=await Promise.all(keys.map(key=>storage.get(key))),prefs=await storage.get('settings:journal');
+  readingRecords=new Map(overview.latest?[[overview.latest.id,overview.latest]]:[]);dayRecords=new Map(days.filter(Boolean).map(day=>[day.date,day]));sortedReadingCache=null;journalPreferences=prefs||{motto:''};
+}
 async function initializeJournal(records) {
   let loaded=records;
   if (loaded===undefined) {
@@ -101,7 +110,7 @@ function saveReadingProgress(input) {
     if (prior && READING_FIELDS.every(key=>prior[key]===value[key])) return journalClone(prior);
     if(prior)value.createdAt=prior.createdAt||prior.updatedAt;
     if (!readingRecords.has(value.id) && readingRecords.size>=JOURNAL_LIMIT) throw new Error('阅读记录已达到 10,000 条。');
-    await storage.set('journal:reading:'+value.id,value);
+    await storage.setMany({['journal:reading:'+value.id]:value,[JOURNAL_SUMMARY_KEY521]:{schemaVersion:1,latest:latestJournal521([...readingRecords.values()].filter(row=>row.id!==value.id).concat(value))}});
     readingRecords.set(value.id,journalClone(value)); sortedReadingCache=null;
     return journalClone(value);
   });
@@ -109,7 +118,7 @@ function saveReadingProgress(input) {
 function deleteReadingProgress(id) {
   return journalWrite(async()=>{
     if (!readingRecords.has(id)) return false;
-    await storage.remove('journal:reading:'+id);
+    await storage.setMany({[JOURNAL_SUMMARY_KEY521]:{schemaVersion:1,latest:latestJournal521([...readingRecords.values()].filter(row=>row.id!==id))}},['journal:reading:'+id]);
     readingRecords.delete(id); sortedReadingCache=null; return true;
   });
 }
@@ -323,3 +332,5 @@ function bindJournalControls() {
 }
 
 export { initializeJournal, validateJournalRecords, waitForJournalWrites, calendarPage, progressPage, journalPage, bindJournalControls, getReadingProgress, getLatestReading, getReadingBooks, getReadingIntegration, readingBookKey, saveReadingProgress, deleteReadingProgress, saveDailyStatus, deleteDailyStatus, saveJournalPreferences, homeRecentStatusMarkup, getRecentStatus, journalDateKey, journalValidDate, journalShiftDate, getCalendarDays };
+
+export {initializeJournalSummary};

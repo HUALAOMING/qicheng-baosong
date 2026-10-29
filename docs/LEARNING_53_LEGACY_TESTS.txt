@@ -1,0 +1,47 @@
+(node:1055812) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ rapid real answer edits debounce into one independent draft write; repeat selections and timer do not save (678.1173ms)
+✔ a killed process restores partial answers and elapsed time without entering a page or revealing grading (9.298ms)
+✔ malformed draft backups reject invalid schema, IDs, questions, answers and timing before changing memory (7.4861ms)
+✔ failed draft save preserves the previous committed answer and exposes a pure emergency backup snapshot (8.8259ms)
+✔ submission atomically removes the saved draft; failure keeps it retryable and never shows formal statistics (11.512ms)
+✔ replacing an in-flight draft is serialized; pausing persistence blocks new draft writes (7.7779ms)
+✔ old history loads question snapshots on demand and reviewing never replaces an unfinished draft (11.1771ms)
+(node:1003788) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ random groups contain 10/20 distinct snapshots; drafts never write records or reveal answers (20.7675ms)
+✔ answers can be revised, incomplete groups cannot submit, result uses final choices (12.2647ms)
+✔ atomic failure midway preserves every old mark and leaves the active group retryable (11.4602ms)
+✔ rapid double submission creates exactly one formal result (10.8059ms)
+✔ favorites survive initialization; composite IDs isolate banks and failed saves do not toggle memory (9.2048ms)
+✔ correct review records latest correctness while pending review requires explicit mastery and preserves favorites (13.0923ms)
+✔ true-false false is a completed answer; sparse and empty banks behave explicitly (8.4634ms)
+✔ missing live questions retain saved marks and snapshot history but are excluded from practice (9.2342ms)
+✔ restoration resets active drafts and validates results against snapshot answers (35.8634ms)
+✔ rich text allows only exact italic/underline tags, inertly escapes scripts and attributes (4.7219ms)
+✔ backup write barrier waits for favorite and group commits; paused persistence blocks new mutations (8.2466ms)
+✔ beta manual question sizes accept integers and never duplicate scarce questions (7.0899ms)
+✔ beta timer uses absolute elapsed time, expires without grading, and freezes only on submission (9.3663ms)
+✔ beta untimed sessions count elapsed time and old records stay valid (7.8769ms)
+✔ learning overview weights submitted questions, excludes drafts, and reads without writes (13.6635ms)
+✔ schema validation rejects broken answers, duplicate stable IDs, mismatched sections and invalid versions (20.4231ms)
+✔ semantic versions compare numerically including prerelease precedence (8.6227ms)
+✔ initialization fetches only bundled local resources and never requests a manifest (224.5948ms)
+✔ installed resources take priority over newer application seeds without a startup update (7.8811ms)
+✔ custom resources persist through an offline restart and cannot replace an official bank (15.0982ms)
+✔ reimport replaces the same custom bank while retaining stable learning keys, with rollback on failure (15.3358ms)
+✔ backup resource validation checks origin, key consistency and official/custom collisions (4.6474ms)
+✔ one corrupt checksum prevents the entire update, preserving disk, memory and learning history (9.488ms)
+✔ a correctly hashed but invalid schema or inconsistent version cannot update (5.3633ms)
+✔ database failure after the first put rolls all resources back without publishing memory (5.8584ms)
+✔ manual update commits all verified resources and retains them after offline restart (8.21ms)
+✔ unsafe manifests and custom ID collisions fail before resource downloads (3.9057ms)
+✔ simultaneous imports are serialized and failed queued work does not poison future writes (4.6689ms)
+ℹ tests 35
+ℹ suites 0
+ℹ pass 35
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 873.9136

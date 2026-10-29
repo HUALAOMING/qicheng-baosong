@@ -9,7 +9,7 @@ async function harness() {
   const storageModule=new vm.SourceTextModule(await readFile(new URL('../js/storage.js',import.meta.url),'utf8'),{context});
   await storageModule.link(()=>{throw new Error('Unexpected storage dependency');});await storageModule.evaluate();
   const storage=storageModule.namespace.storage, ctx={state:{uiLang:'zh',route:'calendar'},persistencePaused:false};
-  const writes=[];for(const name of ['set','remove']){const original=storage[name];storage[name]=async(...args)=>{writes.push([name,...args]);return original(...args);};}
+  const writes=[];for(const name of ['set','setMany','remove']){const original=storage[name];storage[name]=async(...args)=>{writes.push([name,...args]);return original(...args);};}
   let sequence=0, countdown={name:'考试',date:'2026-10-22'};
   const values={
     '../storage.js':{storage},'../state.js':{ctx},'../app.js':{confirmAction:async()=>true,go3(){}},
@@ -24,8 +24,8 @@ async function harness() {
   const journal=module.namespace;await journal.initializeJournal();
   return {journal,storage,factory,writes,ctx};
 }
-const reading=(patch={})=>({date:'2026-10-22',book:'论语',startPage:1,endPage:12,...patch});
-const storedReading=(patch={})=>({id:'old',...reading(),updatedAt:'2026-10-22T01:00:00.000Z',...patch});
+const reading=(patch={})=>({date:'2026-10-22',book:'论语',author:'孔子',language:'汉语',chapter:'学而第一',edition:'',pages:'1–12',note:'',...patch});
+const storedReading=(patch={})=>({id:'old',date:'2026-10-22',book:'论语',startPage:1,endPage:12,updatedAt:'2026-10-22T01:00:00.000Z',...patch});
 
 test('journal is read only until an explicit content action, including calendar and week/month generation',async()=>{
   const {journal,storage,writes}=await harness();
@@ -43,20 +43,20 @@ test('save, edit, delete and initialize reading progress retain stable IDs witho
   const {journal,storage,writes}=await harness();
   const first=await journal.saveReadingProgress(reading());
   assert.equal(first.id,'entry-1');assert.equal(first.book,'论语');
-  assert.equal(writes[0][1],'journal:reading:entry-1');
-  await journal.saveReadingProgress(reading({id:first.id,endPage:20}));
-  assert.equal(journal.getReadingProgress().length,1);assert.equal(journal.getLatestReading().endPage,20);
-  const written=writes.length;await journal.saveReadingProgress(reading({id:first.id,endPage:20}));assert.equal(writes.length,written);
-  await journal.initializeJournal();assert.equal(journal.getLatestReading().endPage,20);
+  assert.ok(writes[0][1]['journal:reading:entry-1']);assert.equal(writes[0][1]['meta:journal-overview'].latest.id,'entry-1');
+  await journal.saveReadingProgress(reading({id:first.id,chapter:'为政第二'}));
+  assert.equal(journal.getReadingProgress().length,1);assert.equal(journal.getLatestReading().chapter,'为政第二');
+  const written=writes.length;await journal.saveReadingProgress(reading({id:first.id,chapter:'为政第二'}));assert.equal(writes.length,written);
+  await journal.initializeJournal();assert.equal(journal.getLatestReading().chapter,'为政第二');
   assert.equal(await journal.deleteReadingProgress(first.id),true);
   assert.equal(journal.getLatestReading(),null);assert.equal(await storage.get('journal:reading:'+first.id),undefined);
   const count=writes.length;assert.equal(await journal.deleteReadingProgress(first.id),false);assert.equal(writes.length,count);
 });
 
-test('latest reading is by reading date then update time and returned objects cannot mutate saved data',async()=>{
+test('latest legacy reading follows recording time independently of reading date and returned objects cannot mutate saved data',async()=>{
   const {journal}=await harness();
   await journal.initializeJournal({
-    'journal:reading:a':storedReading({id:'a',date:'2026-10-20',book:'旧书',updatedAt:'2026-10-22T09:00:00Z'}),
+    'journal:reading:a':storedReading({id:'a',date:'2026-10-20',book:'旧书',updatedAt:'2026-10-22T00:00:00Z'}),
     'journal:reading:b':storedReading({id:'b',book:'较早修改',updatedAt:'2026-10-22T01:00:00Z'}),
     'journal:reading:c':storedReading({id:'c',book:'最新书目',updatedAt:'2026-10-22T02:00:00Z'})
   });
@@ -66,29 +66,30 @@ test('latest reading is by reading date then update time and returned objects ca
   assert.equal(journal.getLatestReading().book,'最新书目');assert.equal(journal.getLatestReading().date,'2026-10-22');
 });
 
-test('reading validation rejects malformed dates, title, page ranges and IDs before storage writes',async()=>{
+test('reading validation rejects current required fields and malformed legacy page ranges before storage writes',async()=>{
   const {journal,writes}=await harness();
-  for(const patch of [{date:'2026-02-29'},{date:'2026-13-01'},{date:'2026-1-2'},{date:'0001-01-01'},{book:' '},{book:'a'.repeat(201)},{startPage:0},{startPage:1.5},{endPage:0},{startPage:20,endPage:10},{endPage:1000001},{id:'bad/key'}]) assert.throws(()=>journal.saveReadingProgress(reading(patch)));
+  for(const patch of [{date:'2026-02-29'},{date:'2026-13-01'},{date:'2026-1-2'},{date:'0001-01-01'},{book:' '},{book:'a'.repeat(201)},{author:''},{language:''},{chapter:''},{chapter:'x'.repeat(1001)},{id:'bad/key'}]) assert.throws(()=>journal.saveReadingProgress(reading(patch)));
   assert.equal(writes.length,0);assert.equal(journal.getLatestReading(),null);
-  await journal.saveReadingProgress(reading({date:'2024-02-29',startPage:'2',endPage:'2',book:'  道德经  '}));
-  assert.equal(journal.getLatestReading().book,'道德经');assert.equal(journal.getLatestReading().startPage,2);
+  for(const patch of [{startPage:0},{startPage:1.5},{endPage:0},{startPage:20,endPage:10},{endPage:1000001}])assert.throws(()=>journal.validateJournalRecords({'journal:reading:old':storedReading(patch)}));
+  await journal.saveReadingProgress(reading({date:'2024-02-29',pages:'2',book:'  道德经  '}));
+  assert.equal(journal.getLatestReading().book,'道德经');assert.equal(journal.getLatestReading().pages,'2');
 });
 
 test('failed reading writes and deletes retain committed memory and database, and remain retryable',async()=>{
   const {journal,storage,factory}=await harness();
   const first=await journal.saveReadingProgress(reading());
-  factory.failWrite=true;await assert.rejects(journal.saveReadingProgress(reading({id:first.id,endPage:30})));
-  assert.equal(journal.getLatestReading().endPage,12);assert.equal((await storage.get('journal:reading:'+first.id)).endPage,12);
+  factory.failWrite=true;await assert.rejects(journal.saveReadingProgress(reading({id:first.id,chapter:'失败修改'})));
+  assert.equal(journal.getLatestReading().chapter,'学而第一');assert.equal((await storage.get('journal:reading:'+first.id)).chapter,'学而第一');
   factory.failWrite=true;await assert.rejects(journal.deleteReadingProgress(first.id));assert.equal(journal.getLatestReading().id,first.id);
-  await journal.saveReadingProgress(reading({id:first.id,endPage:31}));assert.equal(journal.getLatestReading().endPage,31);
+  await journal.saveReadingProgress(reading({id:first.id,chapter:'重试修改'}));assert.equal(journal.getLatestReading().chapter,'重试修改');
 });
 
 test('writes are serialized, pending edits survive navigation, and paused restore operations cannot interleave',async()=>{
   const {journal,ctx,storage}=await harness();
   const a=journal.saveReadingProgress(reading({id:'a'}));
-  const b=journal.saveReadingProgress(reading({id:'a',endPage:40}));
+  const b=journal.saveReadingProgress(reading({id:'a',chapter:'最新章节'}));
   ctx.state.route='home';await journal.waitForJournalWrites();await Promise.all([a,b]);
-  assert.equal(journal.getLatestReading().endPage,40);assert.equal((await storage.get('journal:reading:a')).endPage,40);
+  assert.equal(journal.getLatestReading().chapter,'最新章节');assert.equal((await storage.get('journal:reading:a')).chapter,'最新章节');
   ctx.persistencePaused=true;await assert.rejects(journal.saveReadingProgress(reading({id:'b'})),/等待/);
   assert.equal(await storage.get('journal:reading:b'),undefined);assert.equal(journal.getReadingProgress().length,1);
 });

@@ -1,0 +1,22 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {setup} from './support.mjs';const env=await setup();const {ctx}=await import('../js/state.js'),{fresh}=await import('../js/model.js'),{storage}=await import('../js/storage.js'),data=await import('../js/data.js'),r=await import('../js/resources.js'),q=await import('../js/modules/quiz.js'),search=await import('../js/search53.js'),runtime=await import('../js/runtime53.js');await data.loadBuiltinData();ctx.state=fresh();await r.initializeResources();
+test('search groups master/version/settings and highlights untrusted text safely',async()=>{
+ ctx.state.awards.push({...ctx.state.awardDraft,id:'record-search53',title:'RecordExact53'});assert.ok((await search.globalSearch53('RecordExact53')).some(row=>row.recordId==='record-search53'&&row.route==='awards'));ctx.state.profile.name='搜索测试同学';ctx.state.versions[0].name='搜索测试简历';const results=await search.globalSearch53('搜索测试');assert.ok(results.some(row=>row.group==='个人资料'&&row.field==='profile.name'));assert.ok(results.some(row=>row.group==='简历版本'&&row.route.includes(ctx.state.versions[0].id)));assert.match(search.highlightSearch53('<script>TEST</script>','test'),/&lt;script&gt;<mark>TEST<\/mark>/);assert.ok((await search.globalSearch53('持久存储')).some(row=>row.category==='storage'));
+});
+test('global search never reveals active unsubmitted question text, explanations or stored note',async()=>{
+ const pack={schemaVersion:1,bank:{id:'privacy53',name:'Privacy',subject:'custom',section:'custom',version:'1.0.0'},questions:[{id:'q1',type:'true-false',question:'SearchPrivate53',answer:true,explanation:'SearchPrivate53 secret'}]};const imported=await r.importResourceJSON(pack,{newBankName:'Privacy'});await r.initializeResources();await q.initializeQuiz();const bank=r.listPracticeBankSummaries().find(b=>b.bank.name==='Privacy');await r.saveQuestionNote('privacy53','q1','SearchPrivate53 private note',{expectedRevision:0});assert.ok((await search.globalSearch53('SearchPrivate53')).some(row=>row.group==='个人笔记'));
+ q.quizStart(bank.bank.id,'random',1);await q.waitForQuizWrites();const results=await search.globalSearch53('SearchPrivate53');assert.equal(results.some(row=>['个人笔记','题目'].includes(row.group)),false);q.resetQuiz();await storage.remove(q.QUIZ_DRAFT_KEY);
+});
+test('device preference stays in meta namespace and safe space logic is independent of mode preference',async()=>{
+ await runtime.saveDeviceSettings53({mode:'lite',startRoute:'resumes',practiceSize:20});assert.equal(runtime.isLite53(),true);assert.equal((await storage.get('meta:device-preferences53')).practiceSize,20);assert.equal(runtime.canEditWorkspace53(412,false),false);assert.equal(runtime.canEditWorkspace53(1024,true),true);assert.equal(runtime.canEditWorkspace53(800,false),false);await runtime.saveDeviceSettings53({mode:'auto',startRoute:'home',practiceSize:10});
+});
+
+test('question detail routes remain valid during saving and emergency backup, malformed routes reject',async()=>{
+ const {validateDraft}=await import('../js/utils/validation.js'),state=fresh();
+ state.route='question:manual-'+ 'a'.repeat(64)+'/question-1';assert.equal(validateDraft(state).route,state.route);
+ for(const route of ['question:missing-question','question:bank/q1/extra','question:bank/../q1','resume-editor:bad/id'])assert.throws(()=>validateDraft({...state,route}),/route/);
+});
+
+test('editor search includes only the resolved current resume and preserves version isolation',async()=>{
+ const m=await import('../js/resume-model53.js');ctx.state=fresh();m.initializeResumeVersions53();const a=ctx.state.versions[0],b=m.createResumeVersion53('Other');m.changeResumeVersion53(a.id,v=>{v.resume53.overrides['profile.name']='独有甲版本';});m.changeResumeVersion53(b.id,v=>{v.resume53.overrides['profile.name']='独有乙版本';});ctx.state.activeVersion=a.id;let hits=search.resumeSearch53('独有甲版本');assert.ok(hits.some(r=>r.resumeTarget.path==='profile.name'));assert.deepEqual(search.resumeSearch53('独有乙版本'),[]);assert.deepEqual(search.resumeSearch53('持久存储'),[]);ctx.state.activeVersion=b.id;assert.equal(search.resumeSearch53('独有甲版本').length,0);assert.ok(search.resumeSearch53('独有乙版本').length);
+});
+test('legacy blue application theme migrates to light without rejecting old data',async()=>{const {validateDraft}=await import('../js/utils/validation.js');const s=fresh();s.theme='blue';assert.equal(validateDraft(s).theme,'pudding');assert.deepEqual((await import('../js/constants.js')).UI_THEMES3.map(t=>t[0]),['pudding','obsidian']);});

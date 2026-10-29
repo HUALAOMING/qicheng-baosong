@@ -1,0 +1,42 @@
+✔ same note host is bound once; repeated late binding cannot erase rapid input before route flush (9.4478ms)
+✔ late detached host read from before restore cannot replace the new canonical note draft (3.3989ms)
+✔ route flush drains text typed during an earlier database commit before it resolves (2.0474ms)
+✔ category/tags roundtrip and atomic incoming conflict resolution preserve notes (112.0313ms)
+✔ unsubmitted group blocks question detail, search snippets and notes across shared identity (163.3781ms)
+✔ submission deduplicates wrongs, timestamps errors and keeps mastery independent of favorite (87.6585ms)
+✔ folders are many-to-many, rename without changing identity and backup validators reject corrupt membership (177.8128ms)
+✔ statistics distinguish repeated attempts, unique source identities and time range (0.6982ms)
+(node:1721876) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ rapid real answer edits debounce into one independent draft write; repeat selections and timer do not save (685.4744ms)
+✔ a killed process restores partial answers and elapsed time without entering a page or revealing grading (9.0805ms)
+✔ malformed draft backups reject invalid schema, IDs, questions, answers and timing before changing memory (7.5294ms)
+✔ failed draft save preserves the previous committed answer and exposes a pure emergency backup snapshot (8.8013ms)
+✔ submission atomically removes the saved draft; failure keeps it retryable and never shows formal statistics (10.0012ms)
+✔ replacing an in-flight draft is serialized; pausing persistence blocks new draft writes (10.3479ms)
+✔ old history loads question snapshots on demand and reviewing never replaces an unfinished draft (16.3474ms)
+(node:1827152) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ random groups contain 10/20 distinct snapshots; drafts never write records or reveal answers (24.3123ms)
+✔ answers can be revised, incomplete groups cannot submit, result uses final choices (13.4281ms)
+✔ atomic failure midway preserves every old mark and leaves the active group retryable (16.502ms)
+✔ rapid double submission creates exactly one formal result (13.3452ms)
+✔ favorites survive initialization; composite IDs isolate banks and failed saves do not toggle memory (10.2628ms)
+✔ correct review records latest correctness while pending review requires explicit mastery and preserves favorites (14.6214ms)
+✔ true-false false is a completed answer; sparse and empty banks behave explicitly (9.4611ms)
+✔ missing live questions retain saved marks and snapshot history but are excluded from practice (10.9068ms)
+✔ restoration resets active drafts and validates results against snapshot answers (30.6528ms)
+✔ rich text allows only exact italic/underline tags, inertly escapes scripts and attributes (7.1904ms)
+✔ backup write barrier waits for favorite and group commits; paused persistence blocks new mutations (8.0422ms)
+✔ beta manual question sizes accept integers and never duplicate scarce questions (7.8064ms)
+✔ beta timer uses absolute elapsed time, expires without grading, and freezes only on submission (8.1029ms)
+✔ beta untimed sessions count elapsed time and old records stay valid (7.6304ms)
+✔ learning overview weights submitted questions, excludes drafts, and reads without writes (13.247ms)
+ℹ tests 30
+ℹ suites 0
+ℹ pass 30
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1195.1821

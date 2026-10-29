@@ -1,3 +1,4 @@
+import {preserveResumeReferences53} from '../resume-model53.js';
 import { $, $$, area, clone, esc, heading3, icon3, input, options, select, toast, tr, translateLabel, uid, moveIn } from '../utils/helpers.js';
 import { ctx } from '../state.js';
 import { ACHIEVEMENT_FIELDS, AWARD_CATS, AWARD_FIELDS, EXP_FIELDS, SCOPES, blankAward, blankExp, blanks, draftKeys } from '../constants.js';
@@ -48,7 +49,7 @@ async function editRecord (kind, id) {
 async function deleteRecord (kind, id) {
   if (! await confirmAction ('移除这条记录？', '移除后可从之前下载的进度备份恢复。', '确认移除')) return;
   const arr = records (kind), i = arr.findIndex (x => x.id === id);
-  if (i >= 0) arr.splice (i, 1);
+  if (i >= 0) {preserveResumeReferences53();arr.splice (i, 1);}
   if (ctx.editing [kind] === id) {
     ctx.state [draftKeys [kind]] = blanks [kind] ();
     ctx.editing [kind] = null;
@@ -168,7 +169,7 @@ function bindRecordsControls () {
   });
   $$ ('[data-block-delete]').forEach (e => e.onclick = async () => {
     if (await confirmAction (tr ('删除这个图文模块？', 'Delete this content block?'), tr ('文字和图片会一起删除，请先备份。', 'Its text and photos will be removed. Back up first.'))) {
-      ctx.state.customBlocks = ctx.state.customBlocks.filter (b => b.id !== e.dataset.blockDelete); changed ()
+      preserveResumeReferences53();ctx.state.customBlocks = ctx.state.customBlocks.filter (b => b.id !== e.dataset.blockDelete); changed ()
     }
   });
   $$ ('[data-record3]').forEach (e => e.oninput = () => {
@@ -193,7 +194,7 @@ function bindRecordsControls () {
   $$ ('[data-delete3]').forEach (b => b.onclick = async () => {
     const [k, id] = b.dataset.delete3.split (':'); if (! await confirmAction (tr ('移除这条记录？', 'Remove this record?'), tr ('将移除文字与附件关联；原文件仍保留在资料中心。',
     'Text and attachment links are removed; source files remain in Materials.'), tr ('确认移除', 'Remove'))) return; const arr = k === 'books' ?
-    ctx.state.learning.books : ctx.state [k], i = arr.findIndex (x => x.id === id); if (i >= 0) arr.splice (i, 1); if (ctx.editing [k] === id) ctx.editing [k] = null; changed ()
+    ctx.state.learning.books : ctx.state [k], i = arr.findIndex (x => x.id === id); if (i >= 0) {preserveResumeReferences53();arr.splice (i, 1);} if (ctx.editing [k] === id) ctx.editing [k] = null; changed ()
   });
 }
 export { bindRecordsControls };

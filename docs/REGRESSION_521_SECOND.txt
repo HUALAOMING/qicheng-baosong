@@ -1,0 +1,93 @@
+(node:329400) ExperimentalWarning: vm.USE_MAIN_CONTEXT_DEFAULT_LOADER is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ independent paper, rule and section colors reach HTML, PDF, editable PPTX and Word (4882.1604ms)
+✔ appearance controls keep custom settings and additional statement can be independently excluded (1.3907ms)
+✔ 5.0 document settings keep old documents unchanged and validate optional additions (17.2798ms)
+✔ contents point to actual physical pages and all page numbers include contents (2537.3771ms)
+✔ long multi-page contents use the real offset and never overflow the printable area (181.6018ms)
+✔ page-number toggle and restrained decorations apply to every fixed-layout page (80.3919ms)
+(node:347448) ExperimentalWarning: vm.USE_MAIN_CONTEXT_DEFAULT_LOADER is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ DOCX carries a dynamic TOC, refresh flag, page/total fields and optional real page borders (113.6616ms)
+✔ PDF and editable PPTX preserve the same contents and total-page count (2072.852ms)
+✔ all six original formats remain exposed with clear pagination guidance (1.4895ms)
+✔ 5.1 snapshots gain only additive 5.2 fields and keep statements and document settings (5.8936ms)
+✔ Chinese character counts and English word counts exclude punctuation (2.6644ms)
+✔ duration conversion accepts overflow seconds and rejects negative or fractional input (0.2945ms)
+✔ countdown runs into overtime, preserves pause and resume, and resets (3.7435ms)
+✔ complete backups preserve introduction versions, drafts, and optional third-language statements (9.2547ms)
+✔ manual local-file save writes a restorable JSON and cancellation keeps user data (74.8163ms)
+✔ AI instruction example satisfies the actual importer and includes strict JSON guidance (2.597ms)
+✔ default-bank dates and provided updatedAt metadata survive validation and storage (247.3573ms)
+✔ 5.2 reading requires date, title, author, language and chapters; all optional values may be empty (22.312ms)
+✔ legacy page records load unchanged and new chapter records round-trip through persistence (79.3635ms)
+✔ same book titles group into one timeline; latest input order is independent of reading date (1.1518ms)
+✔ integration combines every note of the selected book chronologically and remains independently editable (3.0355ms)
+✔ a failed reading write keeps the last committed record intact (18.8992ms)
+✔ weekly quotes require exactly seven unique selections and follow Monday-to-Sunday order for this week only (11.1846ms)
+✖ weekly quotes persist with the existing home backup record and malformed restored plans are rejected (67.6805ms)
+✔ reading text stays escaped and daily quote customization is reachable from home, daily quote and settings (31.8604ms)
+✔ schema validation rejects broken answers, duplicate stable IDs, mismatched sections and invalid versions (45.9107ms)
+✔ semantic versions compare numerically including prerelease precedence (10.1709ms)
+✔ initialization fetches only bundled local resources and never requests a manifest (476.7553ms)
+✔ installed resources take priority over newer application seeds without a startup update (17.1501ms)
+✔ custom resources persist through an offline restart and cannot replace an official bank (102.8692ms)
+✔ reimport replaces the same custom bank while retaining stable learning keys, with rollback on failure (144.2617ms)
+✔ backup resource validation checks origin, key consistency and official/custom collisions (6.0017ms)
+✔ one corrupt checksum prevents the entire update, preserving disk, memory and learning history (27.2025ms)
+✔ a correctly hashed but invalid schema or inconsistent version cannot update (35.747ms)
+✔ database failure after the first put rolls all resources back without publishing memory (36.7395ms)
+✔ manual update commits all verified resources and retains them after offline restart (31.5516ms)
+✔ unsafe manifests and custom ID collisions fail before resource downloads (35.7933ms)
+✔ simultaneous imports are serialized and failed queued work does not poison future writes (64.5869ms)
+✔ New introduction clears an existing edit ID while retaining an unfinished new draft (9.8812ms)
+✔ restore clears rehearsal clocks so an imported version cannot inherit previous overtime (262.2914ms)
+✔ cache clearing asks for confirmation and removes only this installation assets, keeping all database records (23.6549ms)
+✔ manual JSON save preserves unsaved current data even when database writing fails (62.6951ms)
+✔ total and subject metrics use corresponding full marks and corresponding ranks (261.5127ms)
+✔ score rates preserve numeric zero and reject absent, impossible or zero full marks (212.02ms)
+✔ chart offers exactly total/subject and score/rate/rank selectors, with no missing-value NaN (190.7903ms)
+✔ weighted scores and ranks normalize relative weights without requiring 100 percent (445.7165ms)
+✔ invalid weights block calculations and missing scores/ranks are never silently counted as zero (478.9077ms)
+✔ manual calendar arrangements save, reload, edit, group by university and delete independently (231.2725ms)
+✔ manual event validation and storage failures preserve the previous complete event (220.1752ms)
+✔ manual events survive independent-record round trips and text remains inert in the calendar (332.9111ms)
+✖ complete backup restores manual calendar events and rejects damaged events before any mutation (202.5066ms)
+(node:348340) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ startup module failure shows reload, emergency export and double-confirmed clear controls (11.1348ms)
+✔ startup emergency export failure has a visible message and never clears stored data (3.0152ms)
+✔ exported standalone HTML executes without any network imports/resources and restores its embedded workspace (1394.9208ms)
+✔ persistent storage reflects granted/denied/unsupported and never invents authorization (5.0586ms)
+✔ storage permission and estimate failures are reported separately (0.6211ms)
+✔ processed counts cannot complete tasks before commit; failures remain terminal (0.721ms)
+ℹ tests 57
+ℹ suites 0
+ℹ pass 55
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5804.416
+
+✖ failing tests:
+
+test at tests\reading52.test.mjs:86:1
+✖ weekly quotes persist with the existing home backup record and malformed restored plans are rejected (67.6805ms)
+  Error: 资源来源与记录键不一致：resource:official:english-grammar
+      at validateResourceRecords (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/js/resources.js:164:41)
+      at createBackup (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/js/backup.js:50:24)
+      at Module.getCurrentBackup (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/js/backup.js:110:16)
+      at async TestContext.<anonymous> (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/tests/reading52.test.mjs:93:16)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7)
+
+test at tests\scores52.test.mjs:82:1
+✖ complete backup restores manual calendar events and rejects damaged events before any mutation (202.5066ms)
+  Error: 资源来源与记录键不一致：resource:official:english-grammar
+      at validateResourceRecords (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/js/resources.js:164:41)
+      at createBackup (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/js/backup.js:50:24)
+      at Module.getCurrentBackup (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/js/backup.js:110:16)
+      at async TestContext.<anonymous> (file:///C:/Users/LHM66/.codex/.chatgpt-projects/g-p-6acb820145a08191968dcaea43277ba7/qicheng-5.2.1/tests/scores52.test.mjs:85:17)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7)

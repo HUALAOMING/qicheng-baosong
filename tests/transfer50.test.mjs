@@ -23,12 +23,12 @@ test('device save timestamps are committed atomically with real user changes; re
  assert.deepEqual(await storage.getAll(),records);
 });
 test('complete transfer keeps journal and custom user records, omits local receipts and stamps import only on success',async()=>{
- await journal.saveReadingProgress({date:'2026-10-22',book:'管子',startPage:1,endPage:8});
+ await journal.saveReadingProgress({date:'2026-10-22',book:'管子',author:'管仲',language:'汉语',chapter:'牧民',pages:'1–8'});
  await journal.saveDailyStatus('2026-10-22','good');await home.saveHomeCountdown({name:'目标',date:'2027-01-15'});
  await storage.set('meta:device',{lastImportedAt:'2000-01-01T00:00:00Z',lastSavedAt:'2001-01-01T00:00:00Z'});
- const data=await backup.getCurrentBackup();assert.equal(Object.keys(data.data).some(key=>key.startsWith('meta:')||key.startsWith('resource:official:')),false);assert.ok(Object.keys(data.data).some(key=>key.startsWith('journal:reading:')));assert.equal(data.data['journal:day:2026-10-22'].status,'good');
+ const data=await backup.getCurrentBackup();assert.equal(Object.keys(data.data).some(key=>key.startsWith('meta:')),false);assert.ok(Object.keys(data.data).some(key=>key.startsWith('resource:official:')));assert.ok(Object.keys(data.data).some(key=>key.startsWith('journal:reading:')));assert.equal(data.data['journal:day:2026-10-22'].status,'good');
  await backup.commitBackup(data);const receipt=await storage.get('meta:device');assert.equal(receipt.sourceCreatedAt,data.createdAt);assert.notEqual(receipt.lastImportedAt,'2000-01-01T00:00:00Z');assert.ok(Number.isFinite(Date.parse(receipt.lastSavedAt)));assert.equal(journal.getLatestReading().book,'管子');
- const before=await storage.getAll(),bad=structuredClone(data);bad.data['journal:day:2026-10-22'].status='invalid';await assert.rejects(()=>backup.commitBackup(bad));assert.deepEqual(await storage.getAll(),before);
+ const before=await storage.getAll(),bad=structuredClone(data);bad.data['journal:day:2026-10-22'].status='invalid';await assert.rejects(()=>backup.commitBackup(bad),/完整性校验失败/);assert.deepEqual(await storage.getAll(),before);
  env.factory.failAfter=2;await assert.rejects(()=>backup.commitBackup(data));assert.deepEqual(await storage.getAll(),before);
 });
 test('an unsaved answer draft is included in an emergency JSON even if its database write fails',async()=>{

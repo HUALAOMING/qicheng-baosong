@@ -1,5 +1,8 @@
+import {timerCard53,bindTimer53,validateTimer53} from '../timer53.js';
+import {lineChart3} from './dashboard.js';
+import {deviceSettings53} from '../runtime53.js';
 import { SCHOOL_DETAILS3 } from '../data.js';
-import { getRecentQuizSummary as getRecentQuiz, getUnfinishedQuiz } from './quiz.js';
+import { getRecentQuizSummary as getRecentQuiz, getUnfinishedQuiz, selectQuizBank53 } from './quiz.js';
 import { ctx } from '../state.js';
 import { storage } from '../storage.js';
 import { $, $$, esc, tr, icon3, toast } from '../utils/helpers.js';
@@ -9,7 +12,10 @@ import { openClassicPassage, classicAsQuotes } from './explore.js';
 
 import {homeRecentStatusMarkup} from './journal.js';
 let homeCountdown = {name:'',date:''};
-const HOME_DEFAULTS={motto:'',featuredSchool:'',quoteSource:'quotes',quoteBookId:'',weeklyQuotePlan:null};
+const HOME_CARD_NAMES53={motto:'自定义鼓励',dream:'梦想院校',countdown:'目标倒计时',status:'近五天状态',unfinished:'继续未完成练习',learning:'学习工作台',recent:'最近练习与成果',quote:'每日一句',shortcuts:'快捷入口',chart:'成绩趋势图',timer:'计时器'};
+const HOME_CARD_DEFAULTS53=['motto','dream','countdown','status','unfinished','learning','recent','quote','shortcuts'];
+const HOME_DEFAULTS={motto:'',featuredSchool:'',quoteSource:'quotes',quoteBookId:'',weeklyQuotePlan:null,visibleCards:null,displaySchools:null};
+let homeEditing53=false;
 let homePreferences={...HOME_DEFAULTS}, homeWriteChain=Promise.resolve();
 let weeklyDraft=[],weeklySource='quotes',weeklySearch='',weeklyPickerSources=[];
 let homeDayTimer = null;
@@ -43,6 +49,7 @@ function validateHomeRecords(records) {
   const prefs=records['settings:home'];
   if(prefs!==undefined){
     if(!prefs||typeof prefs!=='object'||Array.isArray(prefs)||typeof prefs.motto!=='string'||prefs.motto.length>120||typeof prefs.featuredSchool!=='string'||prefs.featuredSchool.length>200||!['quotes','classic'].includes(prefs.quoteSource)||typeof prefs.quoteBookId!=='string'||(prefs.quoteBookId&&!/^[A-Za-z0-9][A-Za-z0-9._-]{0,119}$/.test(prefs.quoteBookId))||(prefs.quoteSource==='classic'&&!prefs.quoteBookId))throw new Error('首页偏好格式不正确。');
+    for(const [key,limit] of [['visibleCards',Object.keys(HOME_CARD_NAMES53).length],['displaySchools',5]]){const value=prefs[key];if(value!==undefined&&value!==null&&(!Array.isArray(value)||value.length>limit||new Set(value).size!==value.length||value.some(x=>typeof x!=='string'||!x||x.length>200||(key==='visibleCards'&&!Object.hasOwn(HOME_CARD_NAMES53,x)))))throw new Error('首页卡片或院校选择格式不正确。');}
     const plan=prefs.weeklyQuotePlan;
     if(plan!==undefined&&plan!==null){
       const parsed=new Date(plan.weekStart+'T12:00:00');
@@ -52,6 +59,7 @@ function validateHomeRecords(records) {
       }
     }
   }
+  if(records['settings:timer53']!==undefined)validateTimer53(records['settings:timer53']);
   const value = records['settings:countdown'];
   if (value === undefined) return;
   if (!value || typeof value !== 'object' || Array.isArray(value) || typeof value.name !== 'string' || value.name.length > 120 || typeof value.date !== 'string') throw new Error('倒计时设置格式不正确。');
@@ -73,27 +81,28 @@ function waitForHomeWrites(){return homeWriteChain;}
 function saveHomePreferences(patch){
   const write=homeWriteChain.then(async()=>{
     if(ctx.persistencePaused)throw new Error('请等待当前数据操作完成。');
-    const next={...homePreferences,...patch};validateHomeRecords({'settings:home':next});
+    const next={...homePreferences,...patch};if(patch.featuredSchool&&Array.isArray(next.displaySchools)&&!next.displaySchools.includes(patch.featuredSchool))next.displaySchools=[patch.featuredSchool,...next.displaySchools].slice(0,5);validateHomeRecords({'settings:home':next});
     if(JSON.stringify(next)===JSON.stringify(homePreferences))return getHomePreferences();
     await storage.set('settings:home',next);homePreferences=JSON.parse(JSON.stringify(next));return getHomePreferences();
   });
   homeWriteChain=write.catch(()=>{});return write;
 }
 function homeSchoolCandidates(){return [...new Set([ctx.state.profile.targetSchool.trim(),...ctx.state.dreamSchools].filter(Boolean))];}
+function homeDisplayedSchools53(){const candidates=homeSchoolCandidates(),saved=homePreferences.displaySchools;let names=Array.isArray(saved)?saved.filter(name=>candidates.includes(name)).slice(0,5):candidates.slice(0,5);if(!names.length&&candidates.length)names=candidates.slice(0,5);const featured=homePreferences.featuredSchool;if(featured&&candidates.includes(featured)&&!names.includes(featured))names=[featured,...names].slice(0,5);return names;}
 function homeFeaturedSchool(){
-  const candidates=homeSchoolCandidates();
-  const name=candidates.includes(homePreferences.featuredSchool)?homePreferences.featuredSchool:candidates[0]||'';
+  const candidates=homeSchoolCandidates(),display=homeDisplayedSchools53();
+  const name=candidates.includes(homePreferences.featuredSchool)?homePreferences.featuredSchool:display[0]||candidates[0]||'';
   return {name,school:SCHOOL_DETAILS3.find(s=>s.name===name)};
 }
 function homeSchoolSeal52(name,school){
   return '<span class="home-university-seal'+(school?.logo?'':' home-seal-empty')+'">'+(school?.logo?'<img src="'+esc(school.logo)+'" alt="'+esc(name)+tr('校徽',' seal')+'">':icon3('globe'))+'</span>';
 }
 function homeDreamSchoolsMarkup52(){
-  const names=homeSchoolCandidates(),featured=homeFeaturedSchool();
+  const names=homeDisplayedSchools53(),featured=homeFeaturedSchool();
   if(!names.length)return '<div class="home-university">'+homeSchoolSeal52('')+'<div><h2>'+tr('下一站，由你定义。','Choose your next destination.')+'</h2><p class="hint">'+tr('选定一个方向，让努力更具体。','Choose a destination to make progress tangible.')+'</p></div></div>';
   const cards=[featured.name,...names.filter(name=>name!==featured.name)].map(name=>{
     const school=SCHOOL_DETAILS3.find(row=>row.name===name),active=name===featured.name;
-    return '<button type="button" class="home-dream-school52'+(active?' is-featured':'')+'" data-home-dream-school52="'+esc(name)+'" aria-pressed="'+active+'" aria-label="'+esc(name)+(active?tr('，当前主要展示院校',' — currently featured'):tr('，设为主要展示院校',' — make featured'))+'">'+homeSchoolSeal52(name,school)+'<span class="home-dream-identity52"><span class="home-dream-name52">'+esc(name)+'</span><span class="home-school-short">'+esc(school?.abbreviation||tr('梦想正在靠近','Your next destination'))+(school?.city?'<span>'+esc(school.city)+'</span>':'')+'</span></span><span class="home-dream-promote52" aria-hidden="true">↗</span></button>';
+    return '<button type="button" class="home-dream-school52'+(active?' is-featured':'')+'" data-home-dream-school52="'+esc(name)+'" aria-pressed="'+active+'" aria-label="'+esc(name)+(active?tr('，当前主要展示院校',' — currently featured'):tr('，设为主要展示院校',' — make featured'))+'">'+homeSchoolSeal52(name,school)+'<span class="home-dream-identity52"><span class="home-dream-name52">'+esc(name)+'</span><span class="home-school-short">'+esc(school?.abbreviation||tr('梦想正在靠近','Your next destination'))+(school?.city?'<span>'+esc(school.city)+'</span>':'')+'</span></span></button>';
   });
   return '<div class="home-dream-stage52'+(names.length>1?' has-alternatives':'')+'" data-home-dream-stage52 data-featured="'+esc(featured.name)+'" aria-label="'+tr('梦想院校，点击小卡片切换主要展示','Dream universities. Select a small card to feature it.')+'"><div class="home-dream-main52">'+cards[0]+'</div><div class="home-dream-others52">'+cards.slice(1).join('')+'</div></div><p class="home-dream-feedback52" data-home-dream-feedback52 role="status" aria-live="polite">'+(names.length>1?tr('轻点院校小卡，切换你的主要目标。','Select another university to make it your main destination.'):'')+'</p>';
 }
@@ -162,7 +171,7 @@ function homeMottoForm(){
 }
 function homeSettingsMarkup(){
   const books=getClassicBooks().map(book=>({...book,count:classicAsQuotes(book).quotes.length}));
-  return '<section class="settings-section" id="homeSettings"><h2>'+tr('首页与每日一句','Home & daily reading')+'</h2>'+homeMottoForm()+'<label class="field daily-source-choice"><span>'+tr('每日一句的来源','Daily reading source')+'</span><select id="homeQuoteSource"><option value="quotes"'+(homePreferences.quoteSource==='quotes'?' selected':'')+'>'+tr('每日一句句库','Quotes library')+'</option>'+books.map(book=>'<option value="classic:'+esc(book.id)+'"'+(homePreferences.quoteSource==='classic'&&homePreferences.quoteBookId===book.id?' selected':'')+(book.count?'':' disabled')+'>《'+esc(book.title)+'》 · '+(book.count?book.count+tr(' 段原文',' passages'):tr('资料待导入','No content'))+'</option>').join('')+'</select></label><p class="hint">'+tr('典籍 JSON 也可以直接作为每日一句的来源，不需要另做 quotes 文件。每天固定选取一段原文，点击可回到典籍正文；更新该典籍后，两处同步使用新内容。来源不可用时暂用每日一句句库。','A classic JSON can also supply daily reading. One original passage is selected per day and links back to the book. Reimporting the book updates both views; missing sources fall back to the quotes library.')+'</p>'+weeklyQuoteSettingsMarkup()+'<button data-go3="schools">'+tr('选择首页展示院校','Choose featured university')+'</button></section>';
+  return '<section class="settings-section" id="homeSettings"><h2>'+tr('首页与每日一句','Home & daily reading')+'</h2>'+homeMottoForm()+'<label class="field daily-source-choice"><span>'+tr('每日一句的来源','Daily reading source')+'</span><select id="homeQuoteSource"><option value="quotes"'+(homePreferences.quoteSource==='quotes'?' selected':'')+'>'+tr('每日一句句库','Quotes library')+'</option>'+books.map(book=>'<option value="classic:'+esc(book.id)+'"'+(homePreferences.quoteSource==='classic'&&homePreferences.quoteBookId===book.id?' selected':'')+(book.count?'':' disabled')+'>《'+esc(book.title)+'》 · '+(book.count?book.count+tr(' 段原文',' passages'):tr('资料待导入','No content'))+'</option>').join('')+'</select></label><p class="hint">'+tr('典籍 JSON 也可以直接作为每日一句的来源，不需要另做 quotes 文件。每天固定选取一段原文，点击可回到典籍正文；更新该典籍后，两处同步使用新内容。来源不可用时暂用每日一句句库。','A classic JSON can also supply daily reading. One original passage is selected per day and links back to the book. Reimporting the book updates both views; missing sources fall back to the quotes library.')+'</p>'+weeklyQuoteSettingsMarkup()+'<button data-go3="schools">'+tr('选择主要展示院校','Choose featured university')+'</button></section>';
 }
 function homeRefreshDate() {
   const today = homeDateKey();
@@ -200,23 +209,26 @@ function homePage() {
   const motto=homePreferences.motto||tr('每一步，都向梦想靠近。','One step closer to your future.');
   const dateLabel=new Date().toLocaleDateString(ctx.state.uiLang==='en'?'en':'zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
   return '<div class="home-dashboard home-beta"><header class="home-intro"><div class="home-kicker"><span class="eyebrow">QICHENG / TODAY</span><p class="home-date">'+esc(dateLabel)+'</p></div><h1>'+esc(motto)+'</h1><p class="home-subtitle">'+tr('为想去的地方，积累今天的每一步。','Make a little progress today, toward the place you want to be.')+'</p><details class="home-motto-editor"><summary>'+tr('自定义这句鼓励','Make this message yours')+'</summary>'+homeMottoForm()+'</details></header>'+
-    '<div class="home-goals"><section class="home-goal home-destination"><div class="home-panel-heading"><p class="eyebrow">'+tr('你的方向','YOUR DIRECTION')+'</p><span>'+tr('梦想院校','DREAM UNIVERSITY')+'</span></div>'+homeDreamSchoolsMarkup52()+'<div class="home-panel-bottom"><p class="hint">'+(ctx.state.profile.targetMajor?esc(ctx.state.profile.targetMajor):ctx.state.dreamSchools.length+tr(' 所已收藏的梦想院校',' saved destinations'))+'</p><button class="home-text-button" data-go3="schools">'+tr('管理目标院校','Manage destinations')+' ↗</button></div></section>'+
+    '<div class="home-goals"><section class="home-goal home-destination"><div class="home-panel-heading"><p class="eyebrow">'+tr('你的方向','YOUR DIRECTION')+'</p><span>'+tr('梦想院校','DREAM UNIVERSITY')+'</span></div>'+homeDreamSchoolsMarkup52()+'<div class="home-panel-bottom"><p class="hint">'+(ctx.state.profile.targetMajor?esc(ctx.state.profile.targetMajor):ctx.state.dreamSchools.length+tr(' 所已收藏的梦想院校',' saved destinations'))+'</p><button class="home-text-button" data-go3="schools">'+tr('管理目标院校','Manage destinations')+'</button></div></section>'+
     '<section class="home-goal home-countdown"><div class="home-panel-heading"><p class="eyebrow">'+tr('下一站','NEXT MILESTONE')+'</p><span>'+tr('目标倒计时','COUNTDOWN')+'</span></div><h2>'+esc(homeCountdown.name||tr('给期待，一个日期。','Give your next step a date.'))+'</h2><p class="home-countdown-value">'+(days===null?'<span>—</span>':days===0?'<span class="is-today">'+tr('今天','Today')+'</span>':'<span>'+Math.abs(days)+'</span><small>'+tr(days>0?'天后':'天前',days>0?'days to go':'days ago')+'</small>')+'</p><p class="hint">'+(homeCountdown.date?esc(homeCountdown.date):tr('不急于抵达，先看清下一步。','A clear next step is a good beginning.'))+'</p><details class="home-countdown-editor"><summary>'+tr('设置倒计时','Set countdown')+'</summary><form id="homeCountdownForm"><label class="field"><span>'+tr('目标名称','Goal name')+'</span><input name="name" maxlength="120" value="'+esc(homeCountdown.name)+'"></label><label class="field"><span>'+tr('目标日期','Target date')+'</span><input name="date" type="date" value="'+esc(homeCountdown.date)+'"></label><button type="submit" class="primary">'+tr('保存倒计时','Save countdown')+'</button><p class="hint">'+tr('清空日期并保存即可移除。','Clear the date and save to remove.')+'</p></form></details></section></div>'+
-    homeRecentStatusMarkup()+homeResumeMarkup()+'<section class="home-momentum"><div class="home-section-title"><h2>'+tr('日积月累','PROGRESS, DAY BY DAY')+'</h2><p>'+tr('每一次完成，都算数。','Every completed step counts.')+'</p></div><div class="home-progress-grid"><article><span class="home-progress-label">'+tr('最近练习','LATEST PRACTICE')+'</span><strong>'+(recent?recent.correct+' / '+recent.total:tr('从一组练习开始','Start with a short practice'))+'</strong><p>'+(recent?esc(recent.bankTitle)+' · '+Math.round(recent.correct/recent.total*100)+'%':tr('给今天留下一点新的积累。','Make room for something new today.'))+'</p></article><article><span class="home-progress-label">'+tr('最近成果','LATEST DOCUMENT')+'</span><strong>'+esc(lastExport?.name||tr('你的下一份成果','Your next finished document'))+'</strong><p>'+(lastExport?esc(lastExport.type.toUpperCase())+' · '+esc(new Date(lastExport.createdAt).toLocaleDateString()):tr('把经历整理好，离目标更近一步。','Keep your story in order as you move ahead.'))+'</p></article></div></section>'+
-    '<section class="home-quote"><div class="home-section-title"><h2>'+tr('今日所读','READ SOMETHING TIMELESS')+'</h2><button class="home-text-button" data-home-weekly-open>'+tr('自定义每日一句','Customize this week')+' ↗</button></div>'+dailyQuoteMarkup(false)+'</section>'+
+    homeRecentStatusMarkup()+homeResumeMarkup()+homeLearningWorkspace53()+'<section class="home-momentum"><div class="home-section-title"><h2>'+tr('日积月累','PROGRESS, DAY BY DAY')+'</h2><p>'+tr('每一次完成，都算数。','Every completed step counts.')+'</p></div><div class="home-progress-grid"><article><span class="home-progress-label">'+tr('最近练习','LATEST PRACTICE')+'</span><strong>'+(recent?recent.correct+' / '+recent.total:tr('从一组练习开始','Start with a short practice'))+'</strong><p>'+(recent?esc(recent.bankTitle)+' · '+Math.round(recent.correct/recent.total*100)+'%':tr('给今天留下一点新的积累。','Make room for something new today.'))+'</p></article><article><span class="home-progress-label">'+tr('最近成果','LATEST DOCUMENT')+'</span><strong>'+esc(lastExport?.name||tr('你的下一份成果','Your next finished document'))+'</strong><p>'+(lastExport?esc(lastExport.type.toUpperCase())+' · '+esc(new Date(lastExport.createdAt).toLocaleDateString()):tr('把经历整理好，离目标更近一步。','Keep your story in order as you move ahead.'))+'</p></article></div></section>'+
+    '<section class="home-quote"><div class="home-section-title"><h2>'+tr('今日所读','READ SOMETHING TIMELESS')+'</h2><button class="home-text-button" data-home-weekly-open>'+tr('自定义每日一句','Customize this week')+'</button></div>'+dailyQuoteMarkup(false)+'</section>'+
+    (homeEditing53||(homePreferences.visibleCards||HOME_CARD_DEFAULTS53).includes('chart')?'<section class="panel home-chart-card53"><div class="home-section-title"><h2>成绩趋势</h2><button data-go3="dashboard">查看成绩</button></div>'+lineChart3('score')+'</section>':'')+(homeEditing53||(homePreferences.visibleCards||HOME_CARD_DEFAULTS53).includes('timer')?timerCard53():'')+
     '<nav class="home-shortcuts" aria-label="'+tr('开始行动','Take the next step')+'"><button data-go3="profile">'+icon3('edit')+'<span><strong>'+tr('信息录入','Your information')+'</strong><small>'+tr('记录与整理成长','Keep your story in order')+'</small></span>'+icon3('chevron')+'</button><button data-go3="explore">'+icon3('bulb')+'<span><strong>'+tr('学习中心','Learning center')+'</strong><small>'+tr('答题与中华文化典籍','Practice & Chinese classics')+'</small></span>'+icon3('chevron')+'</button></nav></div>';
 }
 function backupPage() {
   return '<div class="backup-page"><p class="eyebrow">QICHENG / YOUR DATA</p><h2>'+tr('保存与备份','Save & backup')+'</h2><p class="home-subtitle">'+tr('资料自动保存在此设备。定期留一份备份，让成长有所归档。','Your work saves on this device. Keep a backup of what matters.')+'</p><div class="backup-operation"><div><h2>'+tr('恢复备份','Restore a backup')+'</h2><p>'+tr('读取启程 JSON 备份，先校验内容，再确认恢复。','Validate a Qicheng JSON backup before confirming restoration.')+'</p></div><button data-action="restore">'+tr('恢复备份','Restore backup')+'</button></div><div class="backup-operation"><div><h2>'+tr('备份数据','Back up your data')+'</h2><p>'+tr('包含录入资料、上传文件、设置、倒计时、答题记录、错题、收藏和自定义题库。','Includes personal materials, files, settings, countdown, quiz records, mistakes, favorites and custom banks.')+'</p></div><button data-action="backup" class="primary">'+tr('备份数据','Back up data')+'</button></div><div class="backup-operation"><div><h2>'+tr('保存本地文件','Save a local file')+'</h2><p>'+tr('生成可继续编辑的完整 HTML 文件，包含当前资料与已安装题库，离线打开即可使用。','Create an editable HTML file with your current materials and installed banks for offline use.')+'</p></div><button data-action="offlineCopy">'+tr('保存本地文件','Save local file')+'</button></div><p class="hint">'+tr('官方资源可重新下载，无需放入日常 JSON 备份。恢复备份会保留当前官方资源。','Official resources are excluded from routine JSON backups and remain installed after restoration.')+'</p></div>';
 }
 function bindHomeControls() {
+  bindHomeCustomization53();if(document.querySelector('[data-home-timer53]'))bindTimer53();
+  $$('[data-home-recent-bank53]').forEach(button=>button.onclick=async()=>{try{const id=button.dataset.homeRecentBank53;await go3('quiz');if(id)selectQuizBank53(id);}catch(error){toast(error.message);}});
   bindHomeDreamSchools52();
   $$('[data-home-weekly-open]').forEach(button=>button.onclick=homeOpenWeeklyQuotes);
   $$('[data-home-weekly-reset]').forEach(button=>button.onclick=async()=>{try{await saveHomePreferences({weeklyQuotePlan:null});render();toast(tr('已恢复默认顺序滚动','Default daily rotation restored'));}catch(error){toast(error.message);}});
   const motto=$('#homeMottoForm');
   if(motto)motto.onsubmit=async event=>{event.preventDefault();const button=motto.querySelector('[type="submit"]');if(button)button.disabled=true;try{await saveHomePreferences({motto:motto.elements.motto.value.trim()});render();toast(tr('首页标语已保存','Home message saved'));}catch(error){toast(error.message);if(button)button.disabled=false;}};
   $$('[data-home-motto-reset]').forEach(button=>button.onclick=async()=>{try{await saveHomePreferences({motto:''});render();}catch(error){toast(error.message);}});
-  const school=$('#homeSchoolChoice');if(school)school.onchange=async()=>{try{await saveHomePreferences({featuredSchool:school.value});render();toast(tr('首页展示院校已保存','Featured university saved'));}catch(error){toast(error.message);}};
+  const school=$('#homeSchoolChoice');if(school)school.onchange=async()=>{try{await saveHomePreferences({featuredSchool:school.value});render();toast(tr('主要展示院校已保存','Featured university saved'));}catch(error){toast(error.message);}};
   const source=$('#homeQuoteSource');if(source)source.onchange=async()=>{const value=source.value;try{await saveHomePreferences({quoteSource:value==='quotes'?'quotes':'classic',quoteBookId:value==='quotes'?'':value.slice(8)});render();toast(tr('每日一句来源已保存','Daily reading source saved'));}catch(error){toast(error.message);}};
   $$('[data-home-daily-settings]').forEach(button=>button.onclick=()=>{go3('settings');$('#homeSettings')?.scrollIntoView({block:'start'});});
   const form = $('#homeCountdownForm');
@@ -243,7 +255,7 @@ export { homePage, backupPage, dailyQuotePage, dailyQuoteMarkup, bindHomeControl
 function dailyQuoteMarkup(compact=false) {
   const quote=homeQuoteForDate(getDailyQuoteResource());
   if(!quote)return compact?'':'<p class="home-quote-empty">'+tr('每日一句资源尚未安装','Daily quotes have not been installed')+'</p>';
-  return '<a href="#daily-quote" data-daily-quote class="'+(compact?'topbar-quote':'daily-quote-link')+'" title="'+esc(quote.source||tr('阅读原文','Read source'))+'">'+(compact?'':'<blockquote>')+esc(quote.text)+(compact?'':'</blockquote>')+'</a>'+(compact?'':quote.source?'<p class="home-quote-source">'+esc(quote.source)+'</p>':'');
+  return '<button type="button" data-daily-quote class="'+(compact?'topbar-quote':'daily-quote-link')+'" title="'+esc(quote.source||tr('阅读原文','Read source'))+'">'+(compact?'':'<span class="home-quote-text53">')+esc(quote.text)+(compact?'':'</span>')+'</button>'+(compact?'':quote.source?'<p class="home-quote-source">'+esc(quote.source)+'</p>':'');
 }
 function dailyQuotePage() {
   return '<section class="daily-quote-page"><p class="eyebrow">'+tr('每日一句','DAILY QUOTE')+'</p><h1>'+tr('今日所读','A thought for today')+'</h1>'+dailyQuoteMarkup(false)+weeklyQuoteSettingsMarkup()+'</section>';
@@ -253,7 +265,7 @@ export { getHomePreferences, saveHomePreferences, waitForHomeWrites, homeSchoolC
 
 function homeResumeMarkup(){
   const draft=getUnfinishedQuiz();
-  return draft?'<aside class="home-resume"><div><strong>'+tr('继续上次练习','Continue your practice')+'</strong><p>'+esc(draft.bankTitle)+' · '+draft.answered+' / '+draft.total+tr(' 题已答',' answered')+'</p></div><button data-quiz-resume>'+tr('继续答题','Resume')+' ↗</button></aside>':'';
+  return draft?'<aside class="home-resume"><div><strong>'+tr('继续上次练习','Continue your practice')+'</strong><p>'+esc(draft.bankTitle)+' · '+draft.answered+' / '+draft.total+tr(' 题已答',' answered')+'</p></div><button data-quiz-resume>'+tr('继续答题','Resume')+'</button></aside>':'';
 }
 
 function weeklyQuoteSettingsMarkup() {
@@ -394,3 +406,42 @@ function renderWeeklyQuoteDialog(dialog) {
   dialog.querySelector('[data-weekly-save]').onclick=async()=>{try{await saveWeeklyQuotes(weeklyDraft);dialog.close();render();toast(tr('本周每日一句已保存','This week’s daily quotes saved'));}catch(error){dialog.querySelector('#weeklyQuoteFeedback52').textContent=error.message;}};
 }
 export {homeWeekStart,saveWeeklyQuotes,weeklyQuoteSources,weeklyQuoteSnapshot,reorderWeeklyQuotes52,homeDreamSchoolsMarkup52};
+
+function homeLearningWorkspace53(){
+ if(!deviceSettings53.homeCards)return '';const overview=ctx.homeOverview53||{},now=new Date(),monday=new Date(now.getFullYear(),now.getMonth(),now.getDate());monday.setDate(monday.getDate()-(monday.getDay()+6)%7);const week=[monday.getFullYear(),String(monday.getMonth()+1).padStart(2,'0'),String(monday.getDate()).padStart(2,'0')].join('-');
+ return '<section class="home-study53"><div class="home-section-title"><h2>学习工作台</h2><button data-go3="learning-review">错题复习</button></div><div class="home-study-grid53"><article class="panel"><strong>'+Number(overview.pendingWrong||0)+'</strong><small>待复习错题</small></article><article class="panel"><strong>'+Number(overview.weekStart===week?overview.weekAnswers||0:0)+'</strong><small>本周作答题次</small></article><article class="panel"><strong>'+esc(overview.recent?overview.recent.correct+'/'+overview.recent.total:'—')+'</strong><small>最近练习 · '+esc(overview.recent?.bankTitle||'完成一组后自动记录')+'</small></article></div><div class="actions"><button data-home-recent-bank53="'+esc(overview.lastBankId||'')+'">'+(overview.lastBankId?'继续最近使用的题库':'开始一组练习')+'</button><button data-go3="quiz-history">答题历史</button><button data-go3="learning-stats">查看学习统计</button></div>'+(ctx.homeOverview53?'':'<p class="hint">首次进入学习工作区后整理旧记录概要；未完成练习不计入统计。</p>')+'</section>';
+}
+// Update the overview in place so a background write cannot discard an open home form.
+function refreshHomeOverviewView53(){
+ const card=document.querySelector('.home-study53');if(!card)return;
+ const overview=ctx.homeOverview53||{},now=new Date(),monday=new Date(now.getFullYear(),now.getMonth(),now.getDate());monday.setDate(monday.getDate()-(monday.getDay()+6)%7);
+ const week=[monday.getFullYear(),String(monday.getMonth()+1).padStart(2,'0'),String(monday.getDate()).padStart(2,'0')].join('-'),items=card.querySelectorAll('.home-study-grid53 article');
+ if(items.length!==3)return;
+ items[0].querySelector('strong').textContent=Number(overview.pendingWrong||0);
+ items[1].querySelector('strong').textContent=Number(overview.weekStart===week?overview.weekAnswers||0:0);
+ items[2].querySelector('strong').textContent=overview.recent?overview.recent.correct+'/'+overview.recent.total:'—';
+ items[2].querySelector('small').textContent='最近练习 · '+(overview.recent?.bankTitle||'完成一组后自动记录');
+ const button=card.querySelector('[data-home-recent-bank53]');if(button){button.dataset.homeRecentBank53=overview.lastBankId||'';button.textContent=overview.lastBankId?'继续最近使用的题库':'开始一组练习';}
+ if(ctx.homeOverview53)card.querySelector(':scope > .hint')?.remove();
+}
+export {refreshHomeOverviewView53};
+
+function homeDisplayPicker53(){
+ const candidates=homeSchoolCandidates(),shown=homeDisplayedSchools53(),featured=homeFeaturedSchool().name;let dialog=document.getElementById('homeSchoolDisplay53');if(!dialog){dialog=document.createElement('dialog');dialog.id='homeSchoolDisplay53';document.body.append(dialog);}
+ dialog.innerHTML='<form><h2>编辑展示梦想院校</h2><p>最多展示 5 所；点击首页的小卡片可切换主要展示院校。</p><div class="home-school-options53">'+candidates.map(name=>'<label><input type="checkbox" name="school" value="'+esc(name)+'" '+(shown.includes(name)?'checked':'')+'><span>'+esc(name)+'</span></label>').join('')+'</div><label class="field"><span>主要展示院校</span><select name="featured">'+candidates.map(name=>'<option value="'+esc(name)+'" '+(name===featured?'selected':'')+'>'+esc(name)+'</option>').join('')+'</select></label><p role="alert"></p><div class="actions"><button type="button" data-home-school-cancel53>取消</button><button type="submit" class="primary">保存选择</button></div></form>';
+ dialog.querySelector('[data-home-school-cancel53]').onclick=()=>dialog.close();dialog.querySelector('form').onsubmit=async e=>{e.preventDefault();const data=new FormData(e.currentTarget),names=data.getAll('school').map(String),main=String(data.get('featured')||'');if(names.length>5||(!names.length&&candidates.length)||main&&!names.includes(main)){dialog.querySelector('[role=alert]').textContent='请选择 1—5 所院校，并确保主要展示院校已选中。';return;}try{await saveHomePreferences({displaySchools:names,featuredSchool:main});dialog.close();render();}catch(error){dialog.querySelector('[role=alert]').textContent=error.message;}};dialog.showModal();
+}
+function bindHomeCustomization53(){
+ const root=document.querySelector('.home-beta');if(!root||root.dataset.customized53)return;root.dataset.customized53='true';
+ const intro=root.querySelector('.home-intro'),kicker=intro?.querySelector('.home-kicker');if(!intro||!kicker)return;
+ const motto=document.createElement('div');motto.className='home-motto-card53';for(const selector of ['h1','.home-subtitle','.home-motto-editor']){const node=intro.querySelector(selector);if(node)motto.append(node);}intro.append(motto);
+ const edit=document.createElement('button');edit.className='home-edit-button53';edit.textContent=homeEditing53?'完成编辑':'编辑首页';edit.setAttribute('aria-pressed',String(homeEditing53));edit.onclick=()=>{homeEditing53=!homeEditing53;render();};kicker.append(edit);
+ const visible=homePreferences.visibleCards||HOME_CARD_DEFAULTS53,selectors={motto:'.home-motto-card53',dream:'.home-destination',countdown:'.home-countdown',status:'.home-status-board',unfinished:'.home-resume',learning:'.home-study53',recent:'.home-momentum',quote:'.home-quote',shortcuts:'.home-shortcuts',chart:'.home-chart-card53',timer:'[data-home-timer53]'};
+ const settings=document.createElement('section');settings.className='home-edit-panel53';settings.hidden=!homeEditing53;settings.innerHTML='<div><h2>选择首页卡片</h2><p>勾选要展示的内容，选择会自动保存。</p></div><div class="home-card-options53">'+Object.entries(HOME_CARD_NAMES53).map(([key,name])=>'<label><input type="checkbox" data-home-card-choice53="'+key+'" '+(visible.includes(key)?'checked':'')+'><span>'+name+'</span></label>').join('')+'</div>';intro.after(settings);
+ for(const [key,selector] of Object.entries(selectors)){const node=root.querySelector(selector);if(!node)continue;node.classList.add('home-card-item53');node.dataset.homeCard53=key;node.hidden=!homeEditing53&&!visible.includes(key);node.classList.toggle('home-card-off53',homeEditing53&&!visible.includes(key));}
+ const goals=root.querySelector('.home-goals');if(goals)goals.classList.toggle('home-goals-single53',[...goals.children].filter(n=>!n.hidden).length===1);
+ root.classList.toggle('home-editing53',homeEditing53);
+ settings.querySelectorAll('[data-home-card-choice53]').forEach(input=>input.onchange=async()=>{const selected=[...settings.querySelectorAll('[data-home-card-choice53]:checked')].map(x=>x.dataset.homeCardChoice53);input.disabled=true;try{await saveHomePreferences({visibleCards:selected});render();}catch(error){toast(error.message);input.disabled=false;}});
+ const destination=root.querySelector('.home-destination');if(destination){const bottom=destination.querySelector('.home-panel-bottom');if(bottom){const button=document.createElement('button');button.type='button';button.className='home-school-edit53';button.textContent='编辑展示院校';button.onclick=homeDisplayPicker53;bottom.append(button);}let timer=0,start=null,suppress=false;destination.addEventListener('contextmenu',e=>{e.preventDefault();homeDisplayPicker53();});destination.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch'||homeEditing53)return;start={x:e.clientX,y:e.clientY};clearTimeout(timer);timer=setTimeout(()=>{suppress=true;homeDisplayPicker53();},650);});destination.addEventListener('pointermove',e=>{if(start&&Math.hypot(e.clientX-start.x,e.clientY-start.y)>10){clearTimeout(timer);start=null;}});for(const type of ['pointerup','pointercancel'])destination.addEventListener(type,()=>{clearTimeout(timer);start=null;});destination.addEventListener('click',e=>{if(suppress){e.preventDefault();e.stopImmediatePropagation();suppress=false;}},true);}
+}
+export {homeDisplayedSchools53,homeDisplayPicker53};
