@@ -1,5 +1,5 @@
 {
-  "revision": "0cf5329e6660",
+  "revision": "7da8098dd28b",
   "appVersion": "5.3.0",
   "assets": [
     "assets/editable-template.html",
@@ -153,7 +153,7 @@
     "workers/json-worker.js"
   ],
   "hashes": {
-    "assets/editable-template.html": "a908109473229f0fb071003d16c68126c29fc69decd8444bebb44f7fc0f82461",
+    "assets/editable-template.html": "8fcca244ee0a4568d1f4f3eef62f7871cd0a574896d507f30252b0b2a9b8138b",
     "assets/fonts/cjk.ttf": "ee38813ea00c3e32add4268fff7fff9e39417b4913cb13be2415164a47807cc2",
     "assets/fonts/latin.ttf": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280",
     "assets/icons/apple-touch-icon.png": "93d6cdf4393012dc9d70987d25908d6eae661840fcff9d3e4ddc7bc4a654c5fd",
@@ -283,7 +283,7 @@
     "js/modules/quiz.js": "cb371e7f7f1fe239ef586853449e4f75e58a6df765fb9b044e7c2f08f6ad6546",
     "js/modules/records.js": "62b03034ac6434b7f48fa6151fe49af3eb1b0dfe11e9021285bde13af1a151c0",
     "js/modules/resume.js": "421dab78c93b28c021bcd2c5e12087a2702f1f328eb30b6e1da802fca84c0b27",
-    "js/modules/settings.js": "9e46ad49941d4aa04262b9f1f710f04c47580d0d9d2e75400d0ebaa1b3ff4aa7",
+    "js/modules/settings.js": "d785877e86df6e800651e36de841e88b76b1049ea7170d79e5c739c6daf31b5d",
     "js/modules/universities.js": "97b0cf975fe16d1e0ce346b827e93e1d7aba0ddfb1bb651853d4a3bb5d05dfc9",
     "js/pwa.js": "a6544fa8d357d6e577afc54782c0afefd4f134ebc81d79751ba5ae15f9b22048",
     "js/resources.js": "7e00f13c060ab67cf49b9018347bebf383fd9fd6c55d936c8af89a26caa7b4b4",

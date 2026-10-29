@@ -157,6 +157,7 @@ export { themeChoices, settingsPage, openSettings, openOfflineGuide, bindSetting
 let settingsCategory53='appearance';
 const settingsCategories53=[['appearance','外观与界面'],['navigation','启动与导航'],['storage','数据与存储'],['learning','学习与答题'],['updates','更新与离线'],['about','关于启程']];
 function selectSettingsCategory53(category){
+ const position={top:globalThis.scrollY||0,left:globalThis.scrollX||0,behavior:'instant'};
  if(!settingsCategories53.some(([key])=>key===category))return;settingsCategory53=category;
  document.querySelectorAll('[data-settings-panel53]').forEach(node=>node.hidden=node.dataset.settingsPanel53!==category);
  document.querySelectorAll('[data-settings-category53]').forEach(node=>{if(node.dataset.settingsCategory53===category)node.setAttribute('aria-current','page');else node.removeAttribute('aria-current');});
@@ -164,6 +165,7 @@ function selectSettingsCategory53(category){
  const panel=document.querySelector('[data-settings-panel53="'+category+'"]');
  panel?.getAnimations?.().forEach(animation=>animation.cancel());
  if(panel&&!globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches)panel.animate?.([{opacity:.85},{opacity:1}],{duration:120,easing:'ease-out'});
+ globalThis.scrollTo?.(position);
 }
 function bindSettingsNavigation53(){
  const root=document.querySelector('.settings-page');if(!root||!root.children||root.querySelector('.settings-layout53'))return;root.classList.add('settings-page53');
