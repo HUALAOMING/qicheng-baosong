@@ -1,0 +1,27 @@
+{
+  "version": "5.3.1",
+  "commit": "0412c97544c42f45cc3f977ce6742c12898e330b",
+  "deployment": "success",
+  "upgrade": {
+    "from": "5.3.0",
+    "to": "5.3.1",
+    "checks": [
+      "Production version and saved profile",
+      "Legacy imported question visible under its parent bank",
+      "Learning home and unified dashboard navigation"
+    ],
+    "errors": []
+  },
+  "installedOffline": {
+    "status": "PASS",
+    "from": "5.3.1",
+    "to": "5.3.1",
+    "checks": [
+      "Production version and saved profile",
+      "Legacy imported question visible under its parent bank",
+      "Learning home and unified dashboard navigation",
+      "Offline restart preserves application and imported questions"
+    ],
+    "errors": []
+  }
+}

@@ -10,4 +10,4 @@
 
 本次证据：[题库](docs/evidence531/banks.json)、[AI导入](docs/evidence531/import.json)、[简历](docs/evidence531/resume.json)、[热更新](docs/evidence531/pwa.json)、[单元测试](docs/evidence531/unit.json)。功能与数据流见 [5.3.1说明](docs/HOTFIX_5.3.1.md)。
 
-测试使用隔离浏览器与合成资料；移动端仅为视口模拟。线上部署结果在发布后由隔离的5.3.0浏览器继续验证。
+测试使用隔离浏览器与合成资料；移动端仅为视口模拟。GitHub Pages 已部署成功；线上5.3.0升级后保留资料及旧题包，导航和旧题目管理通过；已验证5.3.1离线重开与题库搜索。详见 [线上证据](docs/evidence531/production.json)。
