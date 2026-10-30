@@ -1,0 +1,29 @@
+{
+  "checks": [
+    {
+      "name": "5.3.0 existing app boots and commits baseline user data",
+      "status": "PASS"
+    },
+    {
+      "name": "5.3.0 saved single-window update migrates to 5.3.1 without losing database",
+      "status": "PASS"
+    },
+    {
+      "name": "offline restart and lazy school/map, quiz and document route work under GitHub Pages subpath",
+      "status": "PASS"
+    },
+    {
+      "name": "editing peer blocks actual waiting-worker activation without refresh",
+      "status": "PASS"
+    },
+    {
+      "name": "all clean windows acknowledge, save and reload together; new boot verifies expected revision",
+      "status": "PASS"
+    },
+    {
+      "name": "interrupted/mismatched new resources fail installation; old offline program and data remain usable",
+      "status": "PASS"
+    }
+  ],
+  "errors": []
+}

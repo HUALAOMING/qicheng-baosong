@@ -62,9 +62,10 @@ test('settings has one set of JSON controls and keeps independent HTML copies un
   const html=settings.settingsPage();assert.equal((html.match(/data-action="backup"/g)||[]).length,1);assert.equal((html.match(/data-transfer-import>/g)||[]).length,1);assert.equal((html.match(/data-local-save>/g)||[]).length,1);
   assert.doesNotMatch(html,/data-transfer-role|data-transfer-export|id="backupSettings"/);assert.match(html,/高级工具/);assert.match(html,/导出可编辑 HTML 副本/);assert.match(html,/不与原 PWA 持续同步/);
 });
-test('materials/results and practice data have separate pages and independent filters',()=>{
+test('materials/results and unified practice statistics have separate pages and independent filters',async()=>{
+  const learning=await(await import('../js/features53.js')).loadFeature53('learning');await learning.prepareLearning53('practice-dashboard');
   assert.doesNotMatch(dashboard.dashboardPage3(),/quiz-dashboard/);assert.match(dashboard.dashboardPage3(),/考试成绩与排名/);
-  assert.match(dashboard.practiceDashboardPage(),/quiz-dashboard/);assert.doesNotMatch(dashboard.practiceDashboardPage(),/exam-dashboard3|stat-grid3/);
+  const practice=dashboard.practiceDashboardPage();assert.match(practice,/learning-stat-grid53/);assert.match(practice,/不同题目|最近30天|题库表现/);assert.doesNotMatch(practice,/exam-dashboard3|stat-grid3|learning-nav53/);
   assert.equal(app.routeGroup3('practice-dashboard').id,'dashboard');assert.equal(app.routeGroup3('exam-calendar').id,'info');
 });
 test('empty examination framework ships no dates and month rows are Monday-first, including leap years',()=>{

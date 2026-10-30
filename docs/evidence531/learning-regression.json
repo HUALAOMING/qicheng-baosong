@@ -1,0 +1,37 @@
+{
+  "checks": [
+    {
+      "name": "visual bank manager creates a real question, category and tags in selected practice bank",
+      "status": "PASS"
+    },
+    {
+      "name": "visual single-question editor and shared note auto-save survive refresh",
+      "status": "PASS"
+    },
+    {
+      "name": "named folder membership is durable and independent of mastery",
+      "status": "PASS"
+    },
+    {
+      "name": "unfinished practice hides answer and old notes in detail, history and search",
+      "status": "PASS"
+    },
+    {
+      "name": "wrong submission reveals shared notes; mastery is explicit and a new wrong answer reopens review",
+      "status": "PASS"
+    },
+    {
+      "name": "statistics count attempts and distinct source identities separately; history snapshot remains unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "backup, clear and restore retains new folders and current notes, including mobile note editor",
+      "status": "PASS"
+    },
+    {
+      "name": "quota-failed personal note remains available in emergency full backup",
+      "status": "PASS"
+    }
+  ],
+  "errors": []
+}

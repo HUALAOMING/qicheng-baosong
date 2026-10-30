@@ -1,0 +1,37 @@
+{
+  "checks": [
+    {
+      "name": "sidebar learning homepage and legacy statistics route resolve to the correct groups",
+      "status": "PASS"
+    },
+    {
+      "name": "new bank requires subject and a new named subject appears in practice filters",
+      "status": "PASS"
+    },
+    {
+      "name": "management shows all packs, searches options and explanations, and edits the exact shared ID",
+      "status": "PASS"
+    },
+    {
+      "name": "selected bank defaults to all questions and a child pack limits the actual practice group",
+      "status": "PASS"
+    },
+    {
+      "name": "dashboard time filters exclude old attempts and container performance merges packs",
+      "status": "PASS"
+    },
+    {
+      "name": "mobile bank search and nested practice filters fit the screen",
+      "status": "PASS"
+    },
+    {
+      "name": "removing the last question on a later page returns to an existing page",
+      "status": "PASS"
+    },
+    {
+      "name": "moving a selected review pack and deleting its bank clear invalid filters",
+      "status": "PASS"
+    }
+  ],
+  "errors": []
+}

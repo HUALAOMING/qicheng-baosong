@@ -1,0 +1,21 @@
+{
+  "checks": [
+    {
+      "name": "complete AI instructions download as Markdown and clipboard contains only the short brief",
+      "status": "PASS"
+    },
+    {
+      "name": "settings requires a subject, supports English and creates a named subject reused by practice filters",
+      "status": "PASS"
+    },
+    {
+      "name": "local JSON preview imports into the chosen bank and all imported questions are searchable in bank management",
+      "status": "PASS"
+    },
+    {
+      "name": "create from question pack also requires subject and atomically stores the chosen existing subject",
+      "status": "PASS"
+    }
+  ],
+  "errors": []
+}

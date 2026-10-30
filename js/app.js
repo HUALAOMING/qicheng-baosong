@@ -133,6 +133,7 @@ let routeSequence521=0,quizInitialized521=false,calendarInitialized521=false,jou
 async function go3 (route) {
   if (ctx.busy || ctx.uploadBusy) return;
   if (route === 'backup') route = 'settings';
+  if (route === 'learning-stats') route = 'practice-dashboard';
   const legacyOrder53=route==='studio';if(legacyOrder53){const version=ctx.state.activeVersion||ctx.state.versions[0]?.id;route=version?'resume-editor:'+version:'resumes';}
   let blockedEditor53=false;
   if(route.startsWith('resume-editor:')&&(isLite53()||!canEditWorkspace53())){route=route.replace('resume-editor:','resume-review:');blockedEditor53=true;}
@@ -145,7 +146,7 @@ async function go3 (route) {
     await loadRouteData(route);
     if(['resumes','export-center'].includes(route)||route.startsWith('resume-')){const resume=await loadFeature53('resume');await resume.prepareResume53(route);if(legacyOrder53)resume.showResumeOrder53();}
     if(route==='export-center'){const exporting=await loadFeature53('export');await exporting.prepareExport53(route);}
-    if(['quiz','learning-review','question-bank','quiz-history','learning-stats'].includes(route)||route.startsWith('question:')){const learning=await loadFeature53('learning');await learning.prepareLearning53(route);}
+    if(['quiz','learning-review','question-bank','quiz-history','practice-dashboard'].includes(route)||route.startsWith('question:')){const learning=await loadFeature53('learning');await learning.prepareLearning53(route);}
     if(['calendar','reading-progress','learning'].includes(route)&&!journalInitialized521){await initializeJournal();journalInitialized521=true;}
     if(['exam-calendar','exams'].includes(route)&&!calendarInitialized521){await initializeExamCalendar();calendarInitialized521=true;}
     if(['quiz','settings','reading','explore','daily-quote','calendar','practice-dashboard'].includes(route)||route.startsWith('classic:'))await initializeResources({metadataOnly:true});

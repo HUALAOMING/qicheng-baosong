@@ -167,10 +167,12 @@ const pageHelpContent52 = {
   'practice-dashboard': {
     title: ['练习数据', 'Practice data'],
     sections: [
-      ['统计口径', 'What is counted', '只统计整组提交的练习，未提交的答题草稿暂不计入。总体正确率按总答题数计算，重复练习也会累计。', 'Only submitted practice groups are counted; unfinished drafts are excluded. Overall accuracy uses the total question count, including repeated practice.'],
-      ['安排复练', 'Plan a review', '查看各题库练习量与正确率，回到练习中心选择错题或收藏模式巩固薄弱部分。', 'Review question counts and accuracy by bank, then return to Practice center and use mistakes or favorites mode for revision.']
+      ['统计范围与时间', 'Scope and time range', '练习数据已整合学习统计。选择最近7天、最近30天或全部时间，只统计已交卷记录，未提交草稿不计入。待复习与收藏反映当前状态，不随时间范围改变。', 'Practice data includes learning statistics. Choose the last 7 days, last 30 days or all time. Only submitted groups count; drafts are excluded. Review and favorites show their current state regardless of the date range.'],
+      ['题次与不同题目', 'Attempts and distinct questions', '作答题次累计每一次练习，重复作答也计入；不同题目按题包与永久题目ID去重。同一道题练习三次计3题次、1道不同题目。总体正确率按正确题次除以作答题次计算，历史成绩保留当时的评分依据。', 'Attempts count each answer, including repeats. Distinct questions are deduplicated by pack and permanent question ID: practicing one question three times gives three attempts and one distinct question. Accuracy is correct attempts divided by all attempts; historical scores keep their original grading basis.'],
+      ['安排复练', 'Plan a review', '查看题库、题包与分类表现、当前待复习及收藏数量，回到练习中心选择错题或收藏模式巩固薄弱部分。', 'Review performance by bank, pack and category, plus current review and favorite counts. Return to Practice center to revise mistakes or favorites.']
     ]
   },
+
   images: {
     title: ['图片管理', 'Images'],
     sections: [
@@ -230,7 +232,7 @@ const pageHelpContent52 = {
   settings: {
     title: ['设置', 'Settings'],
     sections: [
-      ['外观与资源', 'Appearance and resources', '选择浅色、深色或蓝图主题及界面语言。导入自定义题库时，先复制给 AI 的格式指令，再核对它生成的 JSON；导入前会校验格式并让你选择目标题库。', 'Choose Light, Dark or Blueprint and the interface language. For custom banks, copy the AI format instructions and check the generated JSON. Import validates its format and asks for a destination bank.'],
+      ['外观与资源', 'Appearance and resources', '选择浅色、深色或蓝图主题及界面语言。导入题包时，先下载AI指令md文档，附给AI并补充出题需求；可复制AI说明提供简短背景。核对生成的JSON后选择目标题库，导入题目会归入该题库。新建题库需选择科目。', 'Choose Light, Dark or Blueprint and the interface language. For question packs, download the Markdown instructions and attach them with your requirements. Copy AI brief supplies short context. Verify generated JSON and choose a destination bank; imported questions belong to that bank. New banks require a subject.'],
       ['保存与恢复', 'Save and restore', '自动保存写入当前浏览器的本地数据库。“手动保存”或完整 JSON 备份会生成可另存的本地文件，启动时可选择继续当前进度或载入该文件。建议定期保留完整文件。', 'Autosave writes to this browser’s local database. Save file or complete JSON backup creates a file you can keep separately. At startup, continue the current progress or load that file. Keep complete files regularly.'],
       ['缓存与本地数据', 'Cache and local records', '“清除程序缓存”清理离线程序资源，与“清除本地数据”分开；清除前请先手动保存。清除本地数据会移除个人资料和学习记录，操作前请核对提示。', 'Clear application cache removes offline program resources and is separate from Clear local data. Save a file before clearing. Clearing local data removes personal and study records; read the confirmation first.'],
       ['获取更新', 'Get updates', '点击“检查应用新版本”，发现更新后使用“保存并更新应用”。已安装的题库资源可单独通过“在线获取最新版资源”更新。', 'Choose Check for app updates, then Save & update app when an update is available. Installed bank resources can be updated separately with Get latest resources online.']

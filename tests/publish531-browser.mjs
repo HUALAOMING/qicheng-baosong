@@ -1,0 +1,23 @@
+// Explicit production verification, using an isolated synthetic browser profile.
+// Start before publication; the release owner writes deploy-ready.json once Pages succeeds.
+import {chromium531 as chromium} from './browser531-support.mjs';
+import {access,mkdir,writeFile} from 'node:fs/promises';
+import assert from 'node:assert/strict';
+const out='tests/generated/publish531';await mkdir(out,{recursive:true});
+const browser=await chromium.launch({executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless:true});
+const context=await browser.newContext({viewport:{width:1440,height:1000},locale:'zh-CN'}),page=await context.newPage(),errors=[],checks=[];
+page.on('pageerror',error=>errors.push(error.message));page.setDefaultTimeout(60000);
+async function ready(){await page.waitForFunction(()=>!!window.ResumeStudio);if(await page.locator('#startupChoice52[open]').count())await page.locator('#startupContinue52').click();}
+try{
+ await page.goto('https://hualaoming.github.io/qicheng-baosong/');await ready();
+ const from=await page.evaluate(()=>ResumeStudio.version);assert.ok(['5.3.0','5.3.1'].includes(from));
+ await page.evaluate(async()=>{const s=ResumeStudio.getState();s.profile.name='5.3.1线上隔离验收';ResumeStudio.setState(s);await ResumeStudio.save();const r=await import('./js/resources.js');await r.initializeResources({metadataOnly:true});await r.importResourceJSON({schemaVersion:1,bank:{id:'publish531-legacy',name:'线上验收旧题包',subject:'english',section:'grammar',version:'1.0.0'},questions:[{id:'same-id',type:'true-false',question:'线上热更新题库归属保留',answer:true,explanation:'仅用于隔离测试'}]},{targetBankId:'english-grammar'});await navigator.serviceWorker.ready;});
+ await page.reload();await ready();await page.waitForFunction(()=>!!navigator.serviceWorker.controller);console.log('READY production '+from+' installed with synthetic profile and imported pack');
+ if(!process.env.QICHENG_LIVE_ONLY){const deadline=Date.now()+3600000;while(true){try{await access(out+'/deploy-ready.json');break;}catch{}if(Date.now()>deadline)throw Error('Timed out waiting for confirmed Pages deployment');await new Promise(resolve=>setTimeout(resolve,1000));}}
+ if(from==='5.3.0'){assert.equal(await page.evaluate(async()=>(await import('./js/pwa.js')).pwa.checkUpdate()),true);await Promise.all([page.waitForNavigation({waitUntil:'load'}),page.evaluate(async()=>(await import('./js/pwa.js')).pwa.applyUpdate())]);await ready();}
+ assert.equal(await page.evaluate(()=>ResumeStudio.version),'5.3.1');assert.equal(await page.evaluate(()=>ResumeStudio.getState().profile.name),'5.3.1线上隔离验收');checks.push('Production version and saved profile');
+ await page.evaluate(()=>ResumeStudio.go3('question-bank'));await page.locator('#bankSource53').selectOption('english-grammar');await page.locator('#bankSearch53').fill('线上热更新题库归属');await page.locator('[data-bank-search53]').click();await page.waitForFunction(()=>document.querySelector('.learning-list53').textContent.includes('线上热更新题库归属保留'));checks.push('Legacy imported question visible under its parent bank');
+ await page.evaluate(()=>ResumeStudio.go3('learning-stats'));assert.equal(await page.evaluate(()=>ResumeStudio.getState().route),'practice-dashboard');assert.equal(await page.locator('.sidebar3 [data-go3="explore"]').count(),1);assert.equal(await page.locator('.sidebar3 [data-go3="learning-stats"]').count(),0);checks.push('Learning home and unified dashboard navigation');
+ await context.setOffline(true);await page.reload();await ready();assert.equal(await page.evaluate(()=>ResumeStudio.version),'5.3.1');assert.equal(await page.evaluate(()=>ResumeStudio.getState().profile.name),'5.3.1线上隔离验收');await page.evaluate(()=>ResumeStudio.go3('question-bank'));await page.locator('#bankSource53').selectOption('english-grammar');await page.locator('#bankSearch53').fill('线上热更新题库归属');await page.locator('[data-bank-search53]').click();await page.waitForFunction(()=>document.querySelector('.learning-list53').textContent.includes('线上热更新题库归属保留'));checks.push('Offline restart preserves application and imported questions');
+ assert.deepEqual(errors,[]);await page.screenshot({path:out+'/production-offline-bank.png'});await writeFile(out+'/evidence.json',JSON.stringify({status:'PASS',from,to:'5.3.1',checks,errors},null,2));console.log('PASS production '+from+' → 5.3.1, imported questions, profile, navigation and offline restart');
+}catch(error){await writeFile(out+'/evidence.json',JSON.stringify({status:'FAIL',checks,errors,error:error.stack},null,2));throw error;}finally{await browser.close();}

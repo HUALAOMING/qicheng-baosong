@@ -1,12 +1,13 @@
 import { $, $$, esc, tr, toast, uid } from '../utils/helpers.js';
 import { storage } from '../storage.js';
-import { listPracticeBankSummaries, getPracticeBank, loadPracticeSample, countPracticeMarks } from '../resources.js';
+import { listPracticeBankSummaries, getPracticeBank, loadPracticeSample, countPracticeMarks, listPracticeSubjects, listImportedQuizPackSummaries } from '../resources.js';
 import { render, confirmAction, go3 } from '../app.js';
 import { ctx } from '../state.js';
 
 // Draft answers have their own small record; only submission produces formal statistics.
 let quizHistory = [], quizMarks = new Map(), quizSession = null, quizDraft = null;
 let quizSelectedBank = '', quizMode = 'random', quizSize = 10, quizView = 'setup';
+let quizSelectedSubject531='',quizSelectedPack531='';
 let quizSubmitting = false, quizMarkBusy = false, quizReady = false;
 let quizCountdown = false, quizMinutes = 20, quizClockTimer = null;
 const QUIZ_MAX_SIZE = 200;
@@ -176,7 +177,7 @@ function resetQuiz() {
   quizStopClock();quizCountdown=false;quizMinutes=20;
   quizUnfinishedSummary521=null;quizExpectedMarkRevisions521=new Map();
   quizHistory = []; quizMarks = new Map(); quizSession = null; quizDraft = null;
-  quizSelectedBank = ''; quizMode = 'random'; quizSize = ctx.device53?.practiceSize||10; quizView = 'setup';
+  quizSelectedBank = '';quizSelectedSubject531='';quizSelectedPack531=''; quizMode = 'random'; quizSize = ctx.device53?.practiceSize||10; quizView = 'setup';
   quizSubmitting = false; quizMarkBusy = false; quizReady = false;
 }
 async function initializeQuiz(records) {
@@ -320,14 +321,15 @@ function quizChoiceLabel(question, answer) {
 }
 function quizBankCard(resource) { return '<button type="button" class="quiz-bank ' + (resource.bank.id === quizSelectedBank ? 'selected' : '') + '" data-quiz-bank="' + esc(resource.bank.id) + '" aria-pressed="' + (resource.bank.id === quizSelectedBank) + '"><span class="quiz-selection-indicator" aria-hidden="true">✓</span><strong>' + esc(resource.bank.name) + '</strong><span>' + (resource.questionCount??resource.questions.length) + tr(' 题', ' questions') + (resource.origin === 'custom' ? tr(' · 自定义', ' · Custom') : '') + '</span>' + ((resource.questionCount??resource.questions.length) ? '' : '<small>' + tr('暂无题目 · 可导入题库', 'No questions · Import a bank') + '</small>') + '</button>'; }
 function quizSetupPage() {
-  const banks = listPracticeBankSummaries();
+  const banks = listPracticeBankSummaries().filter(b=>!quizSelectedSubject531||b.bank.subject===quizSelectedSubject531);
   if (!banks.some(resource => resource.bank.id === quizSelectedBank)) quizSelectedBank = banks.find(resource => (resource.questionCount??resource.questions.length))?.bank.id || banks[0]?.bank.id || '';
   const selected = banks.find(resource => resource.bank.id === quizSelectedBank);
-  const count=selected?(quizMode==='random'?selected.questionCount:countPracticeMarks(selected.bank.id,quizMode==='wrong'?'wrong':'favorite',[...quizMarks.values()].map(m=>({...m,wrong:m.reviewPending??m.wrong})))):0;
+  const packs=selected?[...(selected.origin==='official'?[{bank:selected.bank,questionCount:selected.questionCount-listImportedQuizPackSummaries().filter(p=>p.targetBankId===selected.bank.id).reduce((n,p)=>n+p.questionCount,0)}]:[]),...listImportedQuizPackSummaries().filter(p=>p.targetBankId===selected.bank.id)]:[];if(quizSelectedPack531&&!packs.some(p=>p.bank.id===quizSelectedPack531))quizSelectedPack531='';
+  const count=selected?(quizMode==='random'?(quizSelectedPack531?packs.find(p=>p.bank.id===quizSelectedPack531)?.questionCount||0:selected.questionCount):countPracticeMarks(selected.bank.id,quizMode==='wrong'?'wrong':'favorite',[...quizMarks.values()].map(m=>({...m,wrong:m.reviewPending??m.wrong})),quizSelectedPack531)):0;
   const cards=banks.map(quizBankCard).join('');
   const resume = quizDraft ? '<div class="quiz-notice">' + tr('有一组练习尚未交卷，答案已保留。', 'Your unfinished answers are kept.') + ' <button type="button" data-quiz-resume>' + tr('继续作答', 'Resume') + '</button></div>' : '';
   const history = quizHistory.length ? '<div class="quiz-history"><h2>' + tr('已完成的练习', 'Completed groups') + '</h2>' + quizHistory.slice(0, 30).map(record => '<button type="button" data-quiz-review="' + esc(record.id) + '"><span>' + esc(record.bankTitle) + '</span><span>' + record.correct + ' / ' + record.total + ' · ' + Math.round(record.correct / record.total * 100) + '%</span><small>' + esc(new Date(record.submittedAt).toLocaleString()) + '</small></button>').join('') + '</div>' : '<p class="quiz-empty">' + tr('交卷后，这里会显示成绩与解析。', 'Submit a group to see results and explanations here.') + '</p>';
-  return '<div class="quiz-setup"><div class="actions"><button data-action="resources">'+tr('管理题库 / 导入题目','Manage banks / import questions')+'</button></div>' + resume + '<div class="quiz-grid">' + cards + '</div><section class="quiz-controls card"><label>' + tr('练习方式', 'Practice mode') + '<select id="quizMode">' + [['random', '随机练习', 'Random'], ['wrong', '错题巩固', 'Wrong answers'], ['favorites', '收藏练习', 'Favorites']].map(([value, zh, en]) => '<option value="' + value + '"' + (value === quizMode ? ' selected' : '') + '>' + tr(zh, en) + '</option>').join('') + '</select></label><label>' + tr('每组题数', 'Group size') + '<input id="quizSize" type="number" inputmode="numeric" min="1" max="200" step="1" value="'+(Number.isFinite(quizSize)?quizSize:'')+'" required></label><div class="quiz-timing-controls"><label class="quiz-timing-toggle"><input id="quizCountdown" type="checkbox" '+(quizCountdown?'checked':'')+'>'+tr('开启倒计时','Countdown')+'</label><label>'+tr('时长（分钟）','Minutes')+'<input id="quizMinutes" type="number" inputmode="numeric" min="1" max="180" step="1" value="'+quizMinutes+'" '+(quizCountdown?'':'disabled')+'></label></div><button type="button" class="primary" data-quiz-start' + (!count || !quizReady ? ' disabled' : '') + '>' + tr('开始练习', 'Start practice') + '</button><p class="quiz-notice" id="quizSetupStatus" role="status">' + (!quizReady ? tr('正在读取本地练习记录。', 'Loading local practice records.') : !count ? tr('当前范围暂无题目，请更换题库或练习方式。', 'No questions in this selection. Choose another bank or mode.') : count < quizSize ? tr('当前范围只有 ', 'Only ') + count + tr(' 题，本组将练习全部可用题目。', ' questions available; this group uses all of them.') : count + tr(' 道可用题目 · 交卷后统一批改', ' available questions · Graded on submission')) + '</p><p class="quiz-notice">'+tr('题数可手填 1–200；不足时练习全部可用题。倒计时到时只提醒，不自动交卷；计时不触发保存。','Enter 1–200 questions. A smaller pool uses all available questions. Countdown gives a reminder without auto-submission.')+'</p></section>' + history + '</div>';
+  return '<div class="quiz-setup"><div class="actions"><button data-action="resources">'+tr('管理题库 / 导入题目','Manage banks / import questions')+'</button></div>' + resume + '<section class="panel learning-filters53"><label>'+tr('科目','Subject')+'<select id="quizSubject531"><option value="">'+tr('全部科目','All subjects')+'</option>'+listPracticeSubjects().map(s=>'<option value="'+esc(s.id)+'" '+(s.id===quizSelectedSubject531?'selected':'')+'>'+esc(s.name)+'</option>').join('')+'</select></label><p class="hint">'+tr('先选择科目与题库，再选择整个题库或其中一个题包。','Choose a subject and bank, then all questions or one pack.')+'</p></section><div class="quiz-grid">' + cards + '</div><section class="quiz-controls card"><label>'+tr('题包（可选）','Question pack (optional)')+'<select id="quizPack531"><option value="">'+tr('整个题库 · 全部题目','Entire bank · All questions')+'</option>'+packs.map(p=>'<option value="'+esc(p.bank.id)+'" '+(p.bank.id===quizSelectedPack531?'selected':'')+'>'+esc(p.bank.name)+(p.bank.id===selected?.bank.id?' · '+tr('内置题目','Built-in questions'):'')+' · '+p.questionCount+tr('题',' questions')+'</option>').join('')+'</select></label><label>' + tr('练习方式', 'Practice mode') + '<select id="quizMode">' + [['random', '随机练习', 'Random'], ['wrong', '错题巩固', 'Wrong answers'], ['favorites', '收藏练习', 'Favorites']].map(([value, zh, en]) => '<option value="' + value + '"' + (value === quizMode ? ' selected' : '') + '>' + tr(zh, en) + '</option>').join('') + '</select></label><label>' + tr('每组题数', 'Group size') + '<input id="quizSize" type="number" inputmode="numeric" min="1" max="200" step="1" value="'+(Number.isFinite(quizSize)?quizSize:'')+'" required></label><div class="quiz-timing-controls"><label class="quiz-timing-toggle"><input id="quizCountdown" type="checkbox" '+(quizCountdown?'checked':'')+'>'+tr('开启倒计时','Countdown')+'</label><label>'+tr('时长（分钟）','Minutes')+'<input id="quizMinutes" type="number" inputmode="numeric" min="1" max="180" step="1" value="'+quizMinutes+'" '+(quizCountdown?'':'disabled')+'></label></div><button type="button" class="primary" data-quiz-start' + (!count || !quizReady ? ' disabled' : '') + '>' + tr('开始练习', 'Start practice') + '</button><p class="quiz-notice" id="quizSetupStatus" role="status">' + (!quizReady ? tr('正在读取本地练习记录。', 'Loading local practice records.') : !count ? tr('当前范围暂无题目，请更换题库或练习方式。', 'No questions in this selection. Choose another bank or mode.') : count < quizSize ? tr('当前范围只有 ', 'Only ') + count + tr(' 题，本组将练习全部可用题目。', ' questions available; this group uses all of them.') : count + tr(' 道可用题目 · 交卷后统一批改', ' available questions · Graded on submission')) + '</p><p class="quiz-notice">'+tr('题数可手填 1–200；不足时练习全部可用题。倒计时到时只提醒，不自动交卷；计时不触发保存。','Enter 1–200 questions. A smaller pool uses all available questions. Countdown gives a reminder without auto-submission.')+'</p></section>' + history + '</div>';
 }
 function quizSessionPage() {
   const session = quizSession, question = session.questions[session.index], answer = session.answers[session.index], reviewed = !!session.record && !questionProtected53(question.learningBankId||session.bankId,question.learningQuestionId||question.id);
@@ -347,7 +349,9 @@ function quizRender() { if (ctx.state?.route === 'quiz') render(); }
 function bindQuizControls() {
   quizTickClock();
   quizUpdateDraftStatus();
-  $$('[data-quiz-bank]').forEach(button => button.onclick = () => { quizSelectedBank = button.dataset.quizBank; quizRender(); });
+  $$('[data-quiz-bank]').forEach(button => button.onclick = () => { quizSelectedBank = button.dataset.quizBank;quizSelectedPack531=''; quizRender(); });
+  if($('#quizSubject531'))$('#quizSubject531').onchange=event=>{quizSelectedSubject531=event.target.value;quizSelectedPack531='';quizRender();};
+  if($('#quizPack531'))$('#quizPack531').onchange=event=>{quizSelectedPack531=event.target.value;quizRender();};
   if ($('#quizMode')) $('#quizMode').onchange = event => { quizMode = event.target.value; quizRender(); };
   if ($('#quizSize')) $('#quizSize').oninput = event => { quizSize = event.target.value===''?NaN:Number(event.target.value); };
   if($('#quizCountdown'))$('#quizCountdown').onchange=event=>{quizCountdown=event.target.checked;$('#quizMinutes').disabled=!quizCountdown;};
@@ -356,7 +360,7 @@ function bindQuizControls() {
   if (start) start.onclick = async () => {
     if(!$('#quizSize').reportValidity() || (quizCountdown&&!$('#quizMinutes').reportValidity()))return;
     if (quizDraft && !await confirmAction(tr('开始新一组练习？', 'Start another group?'), tr('当前未交卷答案将被替换，不计入成绩。', 'Your unfinished answers will be replaced without recording a result.'))) return;
-    try { start.disabled=true;const sampleResource521=await loadPracticeSample(quizSelectedBank,{size:quizSize,mode:quizMode,marks:[...quizMarks.values()].map(m=>({...m,wrong:m.reviewPending??m.wrong}))});quizStart(quizSelectedBank, quizMode, quizSize,Math.random,{limitSeconds:quizCountdown?quizMinutes*60:0,sampleResource521}); quizRender(); } catch (error) { toast(error.message); }
+    try { start.disabled=true;const sampleResource521=await loadPracticeSample(quizSelectedBank,{size:quizSize,mode:quizMode,sourceBankId:quizSelectedPack531,marks:[...quizMarks.values()].map(m=>({...m,wrong:m.reviewPending??m.wrong}))});quizStart(quizSelectedBank, quizMode, quizSize,Math.random,{limitSeconds:quizCountdown?quizMinutes*60:0,sampleResource521}); quizRender(); } catch (error) { toast(error.message); }
   };
   $$('[data-quiz-resume]').forEach(button => button.onclick = async()=>{
     // Home intentionally holds only an overview; read the real draft before resuming.
@@ -426,5 +430,5 @@ export {quizHomeSummary53};
 async function refreshQuizMarks53(){const rows=await storage.getPrefix('quiz:mark:');validateQuizRecords(rows);quizMarks=new Map(Object.entries(rows));quizExpectedMarkRevisions521=new Map(Object.keys(rows).map(key=>[key,storage.revision?.(key)||0]));}
 export {refreshQuizMarks53};
 
-function selectQuizBank53(bankId){if(!listPracticeBankSummaries().some(b=>b.bank.id===bankId))return false;quizSelectedBank=bankId;quizView='setup';quizRender();return true;}
+function selectQuizBank53(bankId){if(!listPracticeBankSummaries().some(b=>b.bank.id===bankId))return false;quizSelectedBank=bankId;quizSelectedSubject531='';quizSelectedPack531='';quizView='setup';quizRender();return true;}
 export {selectQuizBank53};

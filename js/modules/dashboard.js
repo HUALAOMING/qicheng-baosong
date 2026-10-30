@@ -1,7 +1,7 @@
 import { render } from '../app.js';
 import { $, $$, checkbox, esc, heading3, icon3, tr, translateLabel, flip } from '../utils/helpers.js';
 import { ctx } from '../state.js';
-import { getQuizDashboard, quizFormatTime } from './quiz.js';
+import { loadedFeature53 } from '../features53.js';
 // 启程 · js/modules/dashboard.js
 
 
@@ -161,15 +161,13 @@ function dashboardPage3 () {
 function drawDashboard3 () {
 }
 function practiceDashboardPage() {
-  return heading3('LEARNING / PRACTICE DATA',tr('每一次练习，都在积累。','Every practice adds up.'),tr('查看已经提交的练习、错题与收藏。','Review submitted practice, mistakes and favorites.')) + quizDashboardMarkup();
+  return loadedFeature53('learning')?.learningPage53('practice-dashboard') || heading3('LEARNING / PRACTICE DATA',tr('练习数据','Practice data'),tr('正在整理已提交的练习记录。','Preparing submitted practice records.'));
 }
 
 export { numeric3, pieChart3, selectedExams3, chartValue3, lineChart3, dashboardPage3, drawDashboard3,practiceDashboardPage };
 
 // All controls for this feature, in their original override order.
 function bindDashboardControls () {
-  const section=$('#quizDashboardSection');
-  if(section)section.onchange=()=>{quizDashboardSection=section.value;render();};
   $$ ('[data-chart-exam3]').forEach (e => e.onchange = () => {
     if (! ctx.state.chartSelectionSet) {
       ctx.state.chartExamIds = ctx.state.exams.map (x => x.id); ctx.state.chartSelectionSet = true
@@ -197,21 +195,3 @@ function bindDashboardControls () {
   });
 }
 export { bindDashboardControls, calculateWeightedExams52 };
-
-// View filters are ephemeral, just like the existing examination chart filters.
-let quizDashboardSection='';
-function quizDashboardMarkup() {
-  const stats=getQuizDashboard(quizDashboardSection);
-  const percent=(correct,total)=>total?Math.round(correct/total*100)+'%':'—';
-  const metrics=[
-    [stats.total,tr('累计答题','Questions completed')],
-    [stats.groups,tr('已提交组数','Groups submitted')],
-    [stats.accuracy===null?'—':stats.accuracy+'%',tr('整体正确率','Overall accuracy')],
-    [stats.timedGroups?quizFormatTime(stats.elapsedSeconds):'—',tr('记录用时','Recorded time')]
-  ];
-  return '<section class="quiz-dashboard panel" aria-labelledby="quizDashboardTitle"><div class="quiz-dashboard-heading"><div><p class="eyebrow">LEARNING / PRACTICE</p><h2 id="quizDashboardTitle">'+tr('练习的积累，看得见。','Watch your practice add up.')+'</h2><p class="hint">'+tr('只统计整组提交的练习。正确率按总题数加权，重复练习也计入。','Submitted groups only. Accuracy is weighted by question count, including repeat practice.')+'</p></div><button data-go3="quiz">'+tr('前往练习中心','Open practice center')+' ↗</button></div>'+ 
-    '<div class="quiz-dashboard-filter"><label for="quizDashboardSection">'+tr('练习范围','Practice section')+'</label><select id="quizDashboardSection"><option value="">'+tr('全部练习','All practice')+'</option>'+stats.sections.map(item=>'<option value="'+esc(item.id)+'"'+(quizDashboardSection===item.id?' selected':'')+'>'+esc(tr(item.zh,item.en))+'</option>').join('')+'</select><p>'+tr('待巩固错题','Mistakes to revisit')+' <strong data-quiz-stat="wrong">'+stats.wrong+'</strong><span aria-hidden="true"> · </span>'+tr('收藏题','Favorites')+' <strong data-quiz-stat="favorites">'+stats.favorites+'</strong></p></div>'+ 
-    '<dl class="quiz-dashboard-metrics">'+metrics.map(([value,label],i)=>'<div><dd data-quiz-stat="'+['total','groups','accuracy','time'][i]+'">'+value+'</dd><dt>'+label+'</dt></div>').join('')+'</dl>'+ 
-    '<div class="quiz-dashboard-details"><div><h3>'+tr('分板块表现','By section')+'</h3><div class="quiz-section-results">'+stats.sections.filter(item=>!quizDashboardSection||item.id===quizDashboardSection).map(item=>'<div><span>'+esc(tr(item.zh,item.en))+'</span><strong>'+percent(item.correct,item.total)+'</strong><span class="quiz-stat-track" aria-hidden="true"><i style="width:'+(item.total?item.correct/item.total*100:0)+'%"></i></span><small>'+item.total+tr(' 题 · ',' questions · ')+item.groups+tr(' 组',' groups')+'</small></div>').join('')+'</div></div><div><h3>'+tr('最近七组','Last seven groups')+'</h3>'+(stats.recent.length?'<ol class="quiz-recent-results">'+stats.recent.map(record=>'<li><div><strong>'+esc(record.bankTitle)+'</strong><small>'+esc(new Date(record.submittedAt).toLocaleDateString(ctx.state.uiLang==='en'?'en':'zh-CN'))+' · '+record.correct+' / '+record.total+'</small></div><span>'+percent(record.correct,record.total)+'</span></li>').join('')+'</ol>':'<p class="quiz-stats-empty">'+tr('完成并提交第一组练习，积累会从这里开始。','Complete and submit a group to start seeing your progress.')+'</p>')+'</div></div>'+ 
-    (stats.timedGroups<stats.groups?'<p class="hint quiz-time-coverage">'+tr('部分旧练习没有用时记录；用时仅汇总含计时信息的 ','Some older groups have no timing data. Time covers ')+stats.timedGroups+tr(' 组。',' timed groups.')+'</p>':'')+'</section>';
-}

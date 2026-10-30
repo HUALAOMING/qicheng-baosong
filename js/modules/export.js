@@ -78,7 +78,7 @@ function wrapText (text, size, width) {
 
 function exportColors (v = currentVersion ()) {
   const hex = (value, fallback) => /^#[0-9a-f]{6}$/i.test (value || '') ? value : fallback;
-  return { bg : hex (v.paperColor, '#ffffff'), paper : hex (v.paperColor, '#ffffff'), ink : '#000000', muted : '#000000',
+  return { bg : hex (v.paperColor, '#ffffff'), paper : hex (v.paperColor, '#ffffff'), ink : hex(v.bodyColor,'#000000'), muted : hex(v.bodyColor,'#000000'),
     accent : hex (v.titleColor, '#000000'), line : hex (v.lineColor, '#d6d6d6') };
 }
 
@@ -136,6 +136,10 @@ function decorateDocumentPages (plan, margin) {
   pages.forEach ((page, index) => {
     if(page.kind==='cover')return;
     const chrome = plan.backgroundData ? [{ kind : 'image', role : 'paper-background', data : plan.backgroundData, x : 0, y : 0, w : W, h : H }] : [];
+    if(v._sectionFill531){
+      chrome.push({kind:'line',role:'template-rail531',x:0,y:0,w:v._template53==='lively'?12:6,h:H,color:c.accent});
+      chrome.push({kind:'line',role:'template-cap531',x:0,y:0,w:W*.28,h:9,color:v._accent531});
+    }
     if (decoration === 'frame') {
       const edge = Math.max (10, m * .45), line = .6;
       chrome.push ({ kind : 'line', role : 'page-frame', x : edge, y : edge, w : W - edge * 2, h : line, color : c.line },
@@ -143,7 +147,7 @@ function decorateDocumentPages (plan, margin) {
       { kind : 'line', role : 'page-frame', x : edge, y : edge, w : line, h : H - edge * 2, color : c.line },
       { kind : 'line', role : 'page-frame', x : W - edge, y : edge, w : line, h : H - edge * 2, color : c.line });
     }
-    if(v._sectionLines53!==false)chrome.push ({ kind : 'line', role : 'page-accent', x : m, y : m, w : decoration === 'editorial' ? Math.min (90, width * .25) : width, h : decoration === 'editorial' ? 3 : 1.2, color : c.line });
+    if(v._sectionLines53!==false&&!v._sectionFill531)chrome.push ({ kind : 'line', role : 'page-accent', x : m, y : m, w : decoration === 'editorial' ? Math.min (90, width * .25) : width, h : decoration === 'editorial' ? 3 : 1.2, color : c.line });
     page.items.unshift (...chrome);
     if (v.showPageNumbers !== false) {
       const number = (index + 1) + ' / ' + pages.length;
@@ -203,15 +207,16 @@ async function documentPlan (options={}) {
     const labelBold = r.style?.bold??moduleStyle (r.module, v).labelBold, size = r.style?.fontSize||v.fontSize, lh = size * v.lineHeight, width = y < portraitBottom ?
     Math.min (contentW, portraitLeft - m - 16) : contentW, label = r.label, value = r.value, labelW = widthOf (label,
     size) + 4;
-    if (labelW > width * .7) {
-      text (label, size, c.ink, labelBold, 0);
+    if (r.style?.labelLayout==='stacked'||labelW > width * .7) {
+      ensure(lh*2);
+      text (label, size, color, labelBold, 0);
       text (value, size, color, false, 4);
       return
     }
     const first = wrapText (value, size, Math.max (20, width - labelW)) [0] || '';
     ensure (lh);
     items.push ( {
-      kind : 'text', text : label, x : m, y, w : labelW, h : lh, size, color : labelBold ? c.ink : color, bold : labelBold
+      kind : 'text', text : label, x : m, y, w : labelW, h : lh, size, color, bold : labelBold
     });
     if (first) items.push ( {
       kind : 'text', text : first, x : m + labelW, y, w : width - labelW, h : lh, size, color, bold : false
@@ -276,7 +281,17 @@ async function documentPlan (options={}) {
       }
       if (estimate < bottom - pageMargin53 - 24) ensure (estimate)
     }
-    if (r.kind === 'title') {
+    if(r.kind==='hero531'){
+      const heroSize531=r.style?.fontSize||26,labelSize531=Math.min(v.fontSize,heroSize531*.55),heroColor531=r.style?.color||v._heroInk531,padding531=18,stacked531=r.style?.labelLayout==='stacked',labelWidth531=widthOf(r.label,labelSize531)+8;
+      const width531=contentW-padding531*2,summaryLines531=wrapText(r.subheading||'',v.fontSize-1,width531),nameLines531=wrapText(r.value,heroSize531,Math.max(20,width531-(stacked531?0:labelWidth531)));
+      ensure(padding531*2+nameLines531.length*heroSize531*v.lineHeight+(stacked531?labelSize531*v.lineHeight+5:0)+summaryLines531.length*(v.fontSize-1)*v.lineHeight+12);
+      const heroTop531=y,heroItems531=items; y+=padding531;
+      if(stacked531){text(r.label,labelSize531,heroColor531,false,5,m+padding531,width531);text(r.value,heroSize531,heroColor531,true,0,m+padding531,width531);}
+      else{items.push({kind:'text',role:'hero-label531',text:r.label,x:m+padding531,y:y+(heroSize531-labelSize531)*.7,w:labelWidth531,h:heroSize531*v.lineHeight,size:labelSize531,color:heroColor531,bold:false});text(r.value,heroSize531,heroColor531,true,0,m+padding531+labelWidth531,Math.max(20,width531-labelWidth531));}
+      if(r.subheading){y+=6;text(r.subheading,v.fontSize-1,heroColor531,false,0,m+padding531,width531);}y+=padding531;
+      heroItems531.splice(0,0,{kind:'line',role:'hero-background531',x:m,y:heroTop531,w:contentW,h:y-heroTop531,color:v._heroFill531},{kind:'line',role:'hero-accent531',x:m,y:heroTop531,w:3,h:y-heroTop531,color:v._accent531});y+=8;
+    }
+    else if (r.kind === 'title') {
       ensure (90);
       text (r.text, v.fontSize * 2, c.ink, true, 12);
     }
@@ -293,7 +308,9 @@ async function documentPlan (options={}) {
         portraitLeft = m + contentW - size
       }
       y += v.gap;
-      const headingPage = text (r.text, style.titleSize, v._template53==='original'?c.ink:/^#[0-9a-f]{6}$/i.test (style.titleColor || '') ? style.titleColor : c.accent, style.titleBold, 5, m, contentW, style.titleAlign);
+      const sectionFill531=v._sectionFill531,headingStart531=items.length;
+      const headingPage = text (r.text, style.titleSize, v._template53==='original'?c.ink:/^#[0-9a-f]{6}$/i.test (style.titleColor || '') ? style.titleColor : c.accent, style.titleBold, 5, m+(sectionFill531?9:0), contentW-(sectionFill531?18:0), style.titleAlign);
+      if(sectionFill531){for(let i=items.length-1;i>=headingStart531;i--){const headingItem531=items[i];if(headingItem531.kind==='text')items.splice(i,0,{kind:'line',role:'section-fill531',x:m,y:headingItem531.y-3,w:contentW,h:headingItem531.h+5,color:sectionFill531},{kind:'line',role:'section-mark531',x:m,y:headingItem531.y-3,w:3,h:headingItem531.h+5,color:v._accent531});}}
       // The actual text placement wins over estimates, including oversized/wrapped custom headings.
       if(!v._tocSections53||v._tocSections53.includes(r.module))tocEntries.push ({ text : r.text, page : headingPage });
       if(v._sectionLines53!==false)items.push ( {
@@ -502,6 +519,11 @@ async function wordBlob (options={}) {
     if (r.breakBefore && children.length) children.push (new Paragraph ( {
       children : [new PageBreak ()]
     }));
+    if(r.kind==='hero531'){
+      const heroColor531=(v.wordBW?col.ink:r.style?.color||v._heroInk531).slice(1),fill531=v.wordBW?'ffffff':v._heroFill531.slice(1),heroSize531=(r.style?.fontSize||26)*2,stacked531=r.style?.labelLayout==='stacked';
+      children.push(new Paragraph({keepNext:true,shading:{fill:fill531},indent:{left:220,right:220},spacing:{before:200,after:0,line:Math.round(v.lineHeight*240)},children:[new TextRun({text:r.label,size:Math.min(v.fontSize*2,heroSize531*.55),color:heroColor531,font:v._fontFamily53}),new TextRun({text:r.value,break:stacked531?1:0,bold:true,size:heroSize531,color:heroColor531,font:v._fontFamily53})]}));
+      children.push(new Paragraph({keepNext:true,shading:{fill:fill531},indent:{left:220,right:220},spacing:{before:0,after:200,line:Math.round(v.lineHeight*240)},border:{bottom:{style:BorderStyle.SINGLE,size:6,color:col.line.slice(1),space:9}},children:[new TextRun({text:r.subheading||'',size:(v.fontSize-1)*2,color:heroColor531,font:v._fontFamily53})]}));continue;
+    }
     if (r.kind === 'photos' || r.kind === 'custom') {
       if (r.text) children.push (new Paragraph ( {
         spacing : {
@@ -539,10 +561,9 @@ async function wordBlob (options={}) {
     let runs;
     if (r.label) {
       runs = [new TextRun ( {
-        text : r.label, bold : style.labelBold, font : 'Microsoft YaHei', size, color : (style.labelBold ? col.ink : r.kind === 'meta' ?
-        col.muted : col.ink).slice (1)
+        text : r.label, bold : style.labelBold, font : v._fontFamily53||'Microsoft YaHei', size, color : bodyColor53.slice (1)
       }), ...r.value.split ('\n').map ((t, j) => new TextRun ( {
-        text : t, break : j ? 1 : 0, font : v._fontFamily53||'Microsoft YaHei', size, color : bodyColor53.slice (1)
+        text : t, break : j||r.style?.labelLayout==='stacked' ? 1 : 0, font : v._fontFamily53||'Microsoft YaHei', size, color : bodyColor53.slice (1)
       }))]
     }
     else runs = String (r.text || '').split ('\n').map ((t, j) => new TextRun ( {
@@ -550,7 +571,7 @@ async function wordBlob (options={}) {
       font : v._fontFamily53||'Microsoft YaHei', size, color : (r.kind === 'section' ? !v.wordBW && /^#[0-9a-f]{6}$/i.test (style.titleColor || '') ? style.titleColor : col.accent : bodyColor53).slice (1)
     }));
     children.push (new Paragraph ( {
-      heading, alignment : (r.kind === 'section' ? style.titleAlign : r.kind === 'entry' ? style.subtitleAlign : 'left') === 'center' ?
+      heading, shading:r.kind==='section'&&v._sectionFill531&&!v.wordBW?{fill:v._sectionFill531.slice(1)}:undefined, alignment : (r.kind === 'section' ? style.titleAlign : r.kind === 'entry' ? style.subtitleAlign : 'left') === 'center' ?
       AlignmentType.CENTER : AlignmentType.LEFT, keepNext : ! ! heading, spacing : {
         before : r.kind === 'section' ? v.gap * 20 : 40, after : 80, line : Math.round (v.lineHeight * 240)
       }, border : r.kind === 'section'&&v._sectionLines53!==false ? { bottom : { style : BorderStyle.SINGLE, size : 4, color : col.line.slice (1), space : 5 } } : undefined, children : runs

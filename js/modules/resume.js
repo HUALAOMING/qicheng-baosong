@@ -989,14 +989,30 @@ export { bindResumeControls };
 // Lazy editor registers its pure resolver. The base application never imports editor UI.
 let resumeResolverHook53=null;
 function configureResumeResolver53(resolver){resumeResolverHook53=resolver;}
+// Complete presentation presets: content, visibility, labels and section order stay intact.
+const readyResumeTemplates531={
+ lively:{titleColor:'#12685e',lineColor:'#d69a73',paperColor:'#f5faf7',bodyColor:'#243c37',pageDecoration:'editorial',margin:18,fontSize:10.5,lineHeight:1.5,gap:10,layoutPreset:'custom',wordBW:false,paperImage:'',orientation:'portrait',showPageNumbers:true,_sectionFill531:'#e0eee6',_accent531:'#df946d',_heroFill531:'#12685e',_heroInk531:'#ffffff'},
+ business:{titleColor:'#24384e',lineColor:'#aa8a59',paperColor:'#faf9f5',bodyColor:'#293745',pageDecoration:'frame',margin:19,fontSize:10.5,lineHeight:1.5,gap:10,layoutPreset:'custom',wordBW:false,paperImage:'',orientation:'portrait',showPageNumbers:true,_sectionFill531:'#e9edf0',_accent531:'#aa8a59',_heroFill531:'#eef0ed',_heroInk531:'#24384e'}
+};
+function applyResumeTemplate531(version,template){
+ const r=version.resume53;r.template=template;
+ if(!readyResumeTemplates531[template]){if(template==='academic')r.design.columns=2;return;}
+ r.design={...r.design,columns:1,fontFamily:'Microsoft YaHei',sectionLines:true,labelLayout:'inline',presets:{...r.design.presets,[template]:{}}};
+ // Applying a complete design also resets previous local typography that could defeat its palette.
+ const presentationKeys=['fontSize','titleSize','color','titleColor','bodyColor','titleAlign','titleBold','subtitleSize','subtitleAlign','subtitleBold','labelBold'];
+ for(const style of Object.values(r.styles))for(const key of presentationKeys)delete style[key];
+ for(const module of r.customModules||[]){for(const key of presentationKeys)delete (module.style||{})[key];for(const entry of module.entries||[])for(const field of entry.fields||[])for(const key of presentationKeys)delete (field.style||{})[key];}
+ for(const fields of Object.values(r.addedFields||{}))for(const field of fields)for(const key of presentationKeys)delete (field.style||{})[key];
+ version.moduleStyles=Object.fromEntries(Object.entries(version.moduleStyles||{}).map(([key,style])=>[key,{...style,titleSize:13,titleColor:'',titleAlign:'left',titleBold:true,subtitleSize:11,subtitleAlign:'left',subtitleBold:true,labelBold:false}]));
+}
 function effectiveExportVersion53(version){
  const v=clone(version),r=v.resume53;if(!r)return v;
  const design=r.design||{},template=r.template||'classic',defaults={classic:{},modern:{titleColor:'#244c70',pageDecoration:'editorial'},academic:{titleColor:'#253449',lineHeight:1.45,gap:8},original:{}};
- Object.assign(v,defaults[template]||{},design.presets?.[template]||{});
+ Object.assign(v,{bodyColor:'#000000'},defaults[template]||{},readyResumeTemplates531[template]||{},design.presets?.[template]||{});
  v._columns53=design.columns===2?2:1;v._fontFamily53=design.fontFamily||'Microsoft YaHei';v._sectionLines53=design.sectionLines!==false;v._template53=template;
  v.showToc=!!r.toc?.enabled;v._tocSections53=Array.isArray(r.toc?.sections)?r.toc.sections:null;
  v._cover53=r.cover?.enabled?{title:String(r.cover.title||v.name||''),enabled:true}:null;
- if(template==='original'){Object.assign(v,{wordBW:true,paperColor:'#ffffff',paperImage:'',titleColor:'#000000',lineColor:'#000000',pageDecoration:'plain',_sectionLines53:false});v.moduleStyles=Object.fromEntries(Object.entries(v.moduleStyles||{}).map(([k,style])=>[k,{...style,titleColor:'#000000'}]));}
+ if(template==='original'){Object.assign(v,{wordBW:true,paperColor:'#ffffff',paperImage:'',titleColor:'#000000',bodyColor:'#000000',lineColor:'#000000',pageDecoration:'plain',_sectionLines53:false});v.moduleStyles=Object.fromEntries(Object.entries(v.moduleStyles||{}).map(([k,style])=>[k,{...style,titleColor:'#000000'}]));}
  return v;
 }
 function resolveExportContext53(options={},legacySnapshot=true){
@@ -1015,13 +1031,14 @@ function photoChoices53(resolved){
 function rowsFromResolved53(resolved){
  const v=effectiveExportVersion53(resolved.version),out=[],appendix53=[],assets=new Map((resolved.workspace.assets||[]).map(a=>[a.id,a]));
  for(const module of resolved.modules){
-  if(module.hidden)continue;const rows=[];
-  for(const entry of module.entries||[]){if(entry.hidden)continue;
+  if(module.hidden)continue;const rows=[];let hero531=null;
+  for(const entry of module.entries||[]){if(entry.hidden)continue;if(module.key==='education'&&!(entry.fields||[]).some(f=>!f.hidden&&f.role!=='title'&&String(f.value??'').trim())&&!(entry.photos||[]).length&&!(entry.attachments||[]).length)continue;
    if(entry.title&&!entry.titleHidden)rows.push({kind:'entry',text:String(entry.title),module:module.key,style:{...(entry.style||{}),subtitleSize:entry.style?.fontSize||entry.style?.subtitleSize},fieldKey:entry.path||module.key+':'+entry.id+':title'});
-   for(const field of entry.fields||[]){if(field.hidden||field.role==='title')continue;const statementLanguageField53=module.key==='statement'&&['statement.zh','statement.en','statement.other','statement.otherLanguage'].includes(field.path);if(statementLanguageField53&&v.statementLang==='zh'&&field.path!=='statement.zh')continue;if(statementLanguageField53&&v.statementLang==='en'&&field.path!=='statement.en')continue;const value=Array.isArray(field.value)?field.value.join('、'):String(field.value??'');if(!value.trim())continue;const displayLabel=v.exportLang==='en'?(EN[field.label]||field.label):field.label,label=displayLabel?String(displayLabel)+'：':'';rows.push({kind:'body',text:label+value,label,value,module:module.key,fieldKey:field.path,style:field.style||{}});}
+   for(const field of entry.fields||[]){if(field.hidden||field.role==='title')continue;const statementLanguageField53=module.key==='statement'&&['statement.zh','statement.en','statement.other','statement.otherLanguage'].includes(field.path);if(statementLanguageField53&&v.statementLang==='zh'&&field.path!=='statement.zh')continue;if(statementLanguageField53&&v.statementLang==='en'&&field.path!=='statement.en')continue;const value=Array.isArray(field.value)?field.value.join('、'):String(field.value??'');if(!value.trim())continue;const displayLabel=v.exportLang==='en'?(EN[field.label]||field.label):field.label,label=displayLabel?String(displayLabel)+'：':'';const style={labelLayout:resolved.version.resume53?.design?.labelLayout||'inline',...(field.style||{})};if(v._heroFill531&&module.key==='profile'&&field.path==='profile.name'&&value.length<=120){const summary=(entry.fields||[]).filter(f=>!f.hidden&&['profile.school','profile.targetSchool'].includes(f.path)&&String(f.value??'').trim()).map(f=>(f.path==='profile.targetSchool'?'申请意向 · ':'')+f.value).join('  /  ');hero531={kind:'hero531',text:label+value,label,value,subheading:summary,module:module.key,fieldKey:field.path,style};continue;}rows.push({kind:'body',text:label+(style.labelLayout==='stacked'&&label?'\n':'')+value,label,value,module:module.key,fieldKey:field.path,style});}
    const pictures53=(entry.photos||[]).filter(p=>!(v.excluded||[]).includes('photo:'+p.id));if(v.photoMode!=='none'&&pictures53.length){const photoRow53={kind:'photos',module:v.photoMode==='appendix'?'appendix':module.key,photos:pictures53};if(v.photoMode==='appendix')appendix53.push({kind:'entry',module:'appendix',text:entry.title||module.title},photoRow53);else rows.push(photoRow53);}
    for(const aid of entry.attachments||[]){const a=assets.get(aid);if(a&&!(v.hiddenFields||[]).includes('attachment:'+module.key+':'+entry.id+':'+aid))rows.push({kind:'body',module:module.key,label:'文件附件：',value:a.name,text:'文件附件：'+a.name,attachmentId:aid});}
   }
+  if(hero531)out.push(hero531);
   if(rows.length)out.push({kind:'section',text:String(v.exportLang==='en'?(EN[module.title]||module.title):module.title),module:module.key,style:{...(module.style||{}),titleSize:module.style?.titleSize||module.style?.fontSize,titleColor:module.style?.titleColor||module.style?.color},breakBefore:(v.breaks||[]).includes(module.key),avatar:module.key==='profile'&&v.showAvatar&&!!resolved.workspace.avatar},...rows);
  }
  if(v.photoMode==='appendix'){const attachedIDs53=new Set((resolved.modules||[]).flatMap(m=>(m.entries||[]).flatMap(e=>(e.photos||[]).map(p=>p.id))));const extras53=photoChoices53(resolved).filter(p=>!attachedIDs53.has(p.id)&&!(v.excluded||[]).includes('photo:'+p.id));if(extras53.length)appendix53.push({kind:'photos',module:'appendix',photos:extras53});}
@@ -1030,4 +1047,4 @@ function rowsFromResolved53(resolved){
 }
 function preflightResolved53(resolved){return preflight3({resolved});}
 
-export {photoChoices53,configureResumeResolver53,effectiveExportVersion53,resolveExportContext53,rowsFromResolved53,preflightResolved53};
+export {readyResumeTemplates531,applyResumeTemplate531,photoChoices53,configureResumeResolver53,effectiveExportVersion53,resolveExportContext53,rowsFromResolved53,preflightResolved53};

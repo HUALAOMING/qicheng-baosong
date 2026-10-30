@@ -21,7 +21,7 @@ async function quizHarness() {
   let nextId = 0;
   const modules = {
     '../storage.js':{storage:storageModule.namespace.storage},
-    '../resources.js':{listPracticeBankSummaries:()=>banks.map(b=>({...b,questionCount:b.questions.length,sourceBankIds:[b.bank.id]})),getPracticeBank:id=>banks.find(b=>b.bank.id===id),loadPracticeSample:async id=>banks.find(b=>b.bank.id===id),countPracticeMarks:(id,field,marks)=>marks.filter(mark=>mark.bankId===id&&mark[field]&&banks.find(b=>b.bank.id===id)?.questions.some(q=>q.id===mark.questionId)).length},
+    '../resources.js':{listPracticeSubjects:()=>[{id:'english',name:'英语'},{id:'chinese',name:'语文'}],listImportedQuizPackSummaries:()=>[],listPracticeBankSummaries:()=>banks.map(b=>({...b,questionCount:b.questions.length,sourceBankIds:[b.bank.id]})),getPracticeBank:id=>banks.find(b=>b.bank.id===id),loadPracticeSample:async id=>banks.find(b=>b.bank.id===id),countPracticeMarks:(id,field,marks)=>marks.filter(mark=>mark.bankId===id&&mark[field]&&banks.find(b=>b.bank.id===id)?.questions.some(q=>q.id===mark.questionId)).length},
     '../state.js':{ctx},
     '../app.js':{render(){},confirmAction:async()=>true,go3:route=>{ctx.state.route=route;}},
     '../utils/helpers.js':{$:()=>null,$$:()=>[],esc:value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),tr:(zh,en)=>ctx.state.uiLang==='en'?en:zh,toast(){},uid:()=> 'test-'+(++nextId)}

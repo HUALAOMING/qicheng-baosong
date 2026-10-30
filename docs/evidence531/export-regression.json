@@ -1,0 +1,33 @@
+{
+  "checks": [
+    {
+      "name": "independent version content reaches full editor and design modes without changing master",
+      "status": "PASS"
+    },
+    {
+      "name": "advanced legacy settings remain editable and template switching preserves saved appearance",
+      "status": "PASS"
+    },
+    {
+      "name": "all four DOCX templates contain editable independent text, selective TOC and native columns",
+      "status": "PASS"
+    },
+    {
+      "name": "native portrait images stay separate from editable body paragraphs in all templates",
+      "status": "PASS"
+    },
+    {
+      "name": "unified export button navigates before generation; filename does not rename version and files persist",
+      "status": "PASS"
+    },
+    {
+      "name": "PDF/PPTX/HTML/Markdown and PNG share resolved content, cover and finite page geometry",
+      "status": "PASS"
+    },
+    {
+      "name": "landscape tablet layout keeps design controls usable and avoids document horizontal overflow",
+      "status": "PASS"
+    }
+  ],
+  "errors": []
+}

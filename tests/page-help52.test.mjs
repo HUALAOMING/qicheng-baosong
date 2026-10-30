@@ -12,8 +12,7 @@ const {calculateWeightedExams52,dashboardPage3} = await import('../js/modules/da
 beforeEach(() => { ctx.state = fresh(); ctx.studioTab = 'content'; });
 
 test('every current page has its own help, including detail routes outside navigation', () => {
-  const routes = [...new Set(NAV3.flatMap(group => group.items.map(item => item[0])))].filter(route => route !== 'studio');
-  routes.push('explore','classic:lunyu','school:北京大学','settings','daily-quote');
+  const routes = [...new Set([...NAV3.flatMap(group => group.items.map(item => item[0])), 'explore','classic:lunyu','school:北京大学','settings','daily-quote'])].filter(route => route !== 'studio');
   const help = routes.map(route => getPageHelp52(route));
   assert.equal(new Set(help.map(entry => entry.title)).size,routes.length);
   assert.equal(new Set(help.map(entry => entry.html)).size,routes.length);

@@ -25,6 +25,6 @@ test('a failed create-from-pack leaves no empty bank and no imported pack; faile
  const first=await r.createPracticeBank({name:'原题库'}),second=await r.createPracticeBank({name:'目标题库'});await r.importResourceJSON(pack(),{targetBankId:first.id});const saved=await storage.getAll();env.factory.failWrite=true;await assert.rejects(r.moveImportedQuizPack('math-pack',second.id));assert.deepEqual(await storage.getAll(),saved);assert.equal(r.listImportedQuizPacks()[0].targetBankId,first.id);env.factory.failWrite=false;
  const original=storage.set;let writes=0;storage.set=(...args)=>{writes++;return original(...args);};try{assert.equal(await r.moveImportedQuizPack('math-pack',first.id),false);assert.equal(writes,0);}finally{storage.set=original;}
 });
-test('custom bank names are escaped in per-bank dashboard filters and results',async()=>{
- const bank=await r.createPracticeBank({name:'<img src=x onerror=alert(1)>'});await r.importResourceJSON(pack(),{targetBankId:bank.id});const session=q.quizStart(bank.id,'random',1);q.quizAnswer(0,true);await q.quizSubmit();const html=dashboard.practiceDashboardPage();assert.match(html,/&lt;img/);assert.doesNotMatch(html,/<img src=x/);
+test('custom bank names are escaped in the unified practice dashboard results',async()=>{
+ const bank=await r.createPracticeBank({name:'<img src=x onerror=alert(1)>'});await r.importResourceJSON(pack(),{targetBankId:bank.id});const session=q.quizStart(bank.id,'random',1);q.quizAnswer(0,true);await q.quizSubmit();const learning=await(await import('../js/features53.js')).loadFeature53('learning');await learning.prepareLearning53('practice-dashboard');const html=dashboard.practiceDashboardPage();assert.match(html,/&lt;img/);assert.doesNotMatch(html,/<img src=x/);
 });

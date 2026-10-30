@@ -1,0 +1,45 @@
+{
+  "checks": [
+    {
+      "name": "manager creates version A from master and uses real fullscreen editor with all fields",
+      "status": "PASS"
+    },
+    {
+      "name": "version B inherits master independently and no-op save never updates modification time",
+      "status": "PASS"
+    },
+    {
+      "name": "undo and redo work after persistence and selective restore requires confirmation",
+      "status": "PASS"
+    },
+    {
+      "name": "version-only custom module has editable structured entries, fields, styles and cover/TOC choices",
+      "status": "PASS"
+    },
+    {
+      "name": "content/design switches preserve current version, template settings and native content",
+      "status": "PASS"
+    },
+    {
+      "name": "refresh reopens saved edits without new version creation and export center keeps version name",
+      "status": "PASS"
+    },
+    {
+      "name": "touch-sized tablet permits explicit module ordering and ordinary mode cannot drag",
+      "status": "PASS"
+    },
+    {
+      "name": "manager deletion needs two confirmations and leaves master and other version intact",
+      "status": "PASS"
+    },
+    {
+      "name": "different-version writes from stale tabs are rejected instead of silently overwriting either version",
+      "status": "PASS"
+    },
+    {
+      "name": "confirmed master deletion preserves latest inherited record text without altering version edit timestamp",
+      "status": "PASS"
+    }
+  ],
+  "errors": []
+}

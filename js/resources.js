@@ -279,7 +279,28 @@ function validateQuizLibrary(input) {
     if (!seen.has(target)) throw new Error('题目包的目标题库不存在。');
     assignments[source] = target;
   }
-  return {schemaVersion:1,banks,assignments};
+  const subjects=[];
+  if(input.subjects!==undefined){
+    if(!Array.isArray(input.subjects)||input.subjects.length>200)throw new Error('科目目录格式无效。');
+    const ids=new Set(['english','chinese','custom']);
+    for(const entry of input.subjects){resourceObject(entry,'科目');const id=resourceID(entry.id,'科目 ID'),name=resourceString(entry.name,'科目名称',100);if(ids.has(id))throw new Error('科目 ID 重复。');ids.add(id);subjects.push({id,name});}
+  }
+  return {schemaVersion:1,banks,assignments,...(subjects.length?{subjects}:{})};
+}
+function listPracticeSubjects(){
+ const subjects=new Map([['english','英语'],['chinese','语文']]);
+ for(const subject of quizLibrary.subjects||[])subjects.set(subject.id,subject.name);
+ for(const bank of quizLibrary.banks)if(!subjects.has(bank.subject))subjects.set(bank.subject,bank.subject==='custom'?'其他':bank.subject);
+ return [...subjects].map(([id,name])=>({id,name}));
+}
+function practiceBankMetadata531({name,subject='custom',subjectName,section},library){
+ if(subject==='new'){
+  const label=resourceString(subjectName?.trim(),'科目名称',100),existing=listPracticeSubjects().find(item=>item.name===label);
+  if(existing)subject=existing.id;
+  else {subject='subject-'+(globalThis.crypto?.randomUUID?.()||Date.now().toString(36)+'-'+Math.random().toString(36).slice(2));library.subjects=[...(library.subjects||[]),{id:subject,name:label}];}
+ }
+ section=section||RESOURCE_SECTIONS[subject]?.[0]||'custom';
+ return validateQuizBank({schemaVersion:1,bank:{id:'user-'+(globalThis.crypto?.randomUUID?.()||Date.now().toString(36)+'-'+Math.random().toString(36).slice(2)),name:name?.trim(),subject,section,version:'1.0.0'},questions:[]}).bank;
 }
 function defaultQuizTarget(bank) {
   if(!['english','chinese'].includes(bank.subject))return undefined;
@@ -305,12 +326,11 @@ function listPracticeBanks(){return listPracticeBankSummaries().map(item=>getPra
 function listImportedQuizPacks() {
   return resourceBanks.filter(item => item.origin === 'custom').map(item => ({...structuredClone(item),targetBankId:assignedQuizTarget(item.bank.id) || defaultQuizTarget(item.bank)}));
 }
-function createPracticeBank({name, subject='custom', section='custom'}) {
+function createPracticeBank(options) {
   return resourceEnqueue(async () => {
     await initializeResources({metadataOnly:true});
-    const id = 'user-' + (globalThis.crypto?.randomUUID?.() || Date.now().toString(36)+'-'+Math.random().toString(36).slice(2));
-    const bank = validateQuizBank({schemaVersion:1,bank:{id,name:name?.trim(),subject,section,version:'1.0.0'},questions:[]}).bank;
-    const next = validateQuizLibrary({...quizLibrary,banks:[...quizLibrary.banks,bank]});
+    const draft=structuredClone(quizLibrary),bank=practiceBankMetadata531(options,draft);
+    const next = validateQuizLibrary({...draft,banks:[...draft.banks,bank]});
     await storage.set(QUIZ_LIBRARY_KEY,next); quizLibrary = next;
     return structuredClone(bank);
   });
@@ -433,7 +453,7 @@ async function prepareResourceImport(input,options={}){
     if(isPatch){const next=new Map(clean.questions.map(q=>[q.id,q]));for(const qid of [...parsed.patch.questions.map(q=>q.id),...(parsed.patch.deleteIds||[])]){const old=before.questions.find(q=>q.id===qid),value=next.get(qid);if(JSON.stringify(old)===JSON.stringify(value))continue;const key=questionEditKey521(origin,id,qid),prior=await storage.get(key);localWrites521[key]={schemaVersion:1,origin,bankId:id,questionId:qid,kind:!value?'deleted':prior?.kind==='created'?'created':'modified',base:prior?prior.base:old??null,baseVersion:prior?.baseVersion??before.bank.version,updatedAt:new Date().toISOString()};}}
     task.stage('检测重复与冲突');const summary=clean.bank?resourceChanges521(before,clean):null;
     const plan=Object.freeze({id,name:clean.bank?.name||clean.book?.title||id,summary:summary?Object.freeze(summary):null,isPatch});
-    preparedResourcePlans521.set(plan,{clean:structuredClone(clean),origin,options:{targetBankId:options.targetBankId,newBankName:options.newBankName},revision,metaKey,task,localWrites521,localRemovals53});
+    preparedResourcePlans521.set(plan,{clean:structuredClone(clean),origin,options:{targetBankId:options.targetBankId,newBankName:options.newBankName,newBankSubject:options.newBankSubject,newBankSubjectName:options.newBankSubjectName},revision,metaKey,task,localWrites521,localRemovals53});
     task.succeed(summary?'已预检 '+summary.total+' 道，等待确认；尚未写入数据库。':'资源已预检，等待确认。');return plan;
   }catch(error){task.fail(error);throw error;}
 }
@@ -449,7 +469,7 @@ function applyPreparedResourceImport(plan){
       if(clean.bank&&!plan.isPatch){
         if(newBankName!==undefined){
           if(targetBankId)throw new Error('请选择已有题库或新建题库，不能同时指定。');
-          const bank=validateQuizBank({schemaVersion:1,bank:{id:'user-'+(globalThis.crypto?.randomUUID?.()||Date.now().toString(36)+'-'+Math.random().toString(36).slice(2)),name:typeof newBankName==='string'?newBankName.trim():newBankName,subject:'custom',section:'custom',version:'1.0.0'},questions:[]}).bank;
+          const bank=practiceBankMetadata531({name:newBankName,subject:options.newBankSubject||'custom',subjectName:options.newBankSubjectName},next);
           next.banks.push(bank);targetBankId=bank.id;
         }
         const target=targetBankId||assignedQuizTarget(clean.bank.id,next)||defaultQuizTarget(clean.bank);
@@ -570,15 +590,17 @@ export {validateExamSchedule,getExamScheduleResource,EXAM_SCHEDULE_ID};
 
 export {getPracticeBank,initializeHomeResources,loadPracticeBank,listPracticeBankSummaries,listImportedQuizPackSummaries,prepareResourceImport,applyPreparedResourceImport,resourceImportSummary,exportBankRecords};
 
-function countPracticeMarks(id,field,marks){const sources=listPracticeBankSummaries().find(item=>item.bank.id===id)?.sourceBankIds||[];return marks.filter(mark=>sources.includes(mark.bankId)&&mark[field]&&resourceBanks.find(item=>item.bank.id===mark.bankId)?.questionIDs521?.has(mark.questionId)).length;}
+function countPracticeMarks(id,field,marks,sourceBankId=''){const sources=listPracticeBankSummaries().find(item=>item.bank.id===id)?.sourceBankIds||[];return marks.filter(mark=>sources.includes(mark.bankId)&&(!sourceBankId||mark.bankId===sourceBankId)&&mark[field]&&resourceBanks.find(item=>item.bank.id===mark.bankId)?.questionIDs521?.has(mark.questionId)).length;}
 export {countPracticeMarks};
 
-async function loadPracticeSample(id,{size=10,mode='random',marks=[],random=Math.random}={}){
+async function loadPracticeSample(id,{size=10,mode='random',marks=[],random=Math.random,sourceBankId=''}={}){
   await initializeResources({metadataOnly:true});
   const summary=listPracticeBankSummaries().find(item=>item.bank.id===id);if(!summary)throw new Error('题库已移除，请重新选择。');
+  if(sourceBankId&&!summary.sourceBankIds.includes(sourceBankId))throw new Error('所选题包不属于当前题库，请重新选择。');
   const marked=new Set(marks.filter(mark=>mark[mode==='wrong'?'wrong':'favorite']).map(mark=>JSON.stringify([mark.bankId,mark.questionId])));
   const identities=[],headers=[];
   for(const source of summary.sourceBankIds){
+    if(sourceBankId&&source!==sourceBankId)continue;
     const item=resourceBanks.find(item=>item.bank.id===source);if(!item)continue;
     const key=bankMetaKey521(item.origin,source),header=await storage.get(key);if(!header)throw new Error('题库已在其他窗口移除，请重新载入。');
     headers.push({key,revision:storage.revision?.(key)});
@@ -661,6 +683,25 @@ async function queryQuestions(bankId,{offset=0,limit=50,keyword='',type='',categ
 
  await storage.get(h.key);if(storage.revision(h.key)!==h.revision)throw new Error('查询期间题库已变化，请重试。');return {items,nextOffset:cursor<h.header.questionIds.length?cursor:null,revision:h.revision,total:h.header.questionIds.length};
 }
+// A practice bank is a container. Preserve source identities while paging across its packs.
+async function queryPracticeQuestions(bankId,{offset=0,limit=30,keyword='',type='',category=''}={}){
+ if(!Number.isInteger(offset)||offset<0||!Number.isInteger(limit)||limit<1||limit>200||typeof keyword!=='string'||keyword.length>200||typeof category!=='string'||category.length>200)throw new Error('分页或筛选参数无效。');
+ await initializeResources({metadataOnly:true});const bank=listPracticeBankSummaries().find(item=>item.bank.id===bankId);if(!bank)throw new Error('题库不存在。');
+ const headers=[];for(const source of bank.sourceBankIds){if(resourceBanks.some(item=>item.bank.id===source))headers.push(await questionHeader521(source));}
+ const items=[],term=keyword.trim().toLocaleLowerCase(),filter=!!(term||type||category);let total=0;
+ for(const h of headers){const ids=h.header.questionIds,source=h.header.bank.id;
+  if(!filter){const start=Math.max(0,offset-total),end=Math.max(0,Math.min(ids.length,offset+limit-total));if(end>start){const rows=await storage.readMany(ids.slice(start,end).map(id=>bankQuestionKey521(h.origin,source,id)));for(const row of rows){if(!row)throw new Error('题目读取期间已变化，请重试。');items.push({...row,sourceBankId:source});}}total+=ids.length;continue;}
+  for(let start=0;start<ids.length;start+=100){const rows=await storage.readMany(ids.slice(start,start+100).map(id=>bankQuestionKey521(h.origin,source,id)));for(const row of rows){if(!row)throw new Error('题目读取期间已变化，请重试。');if(category&&row.category!==category||type&&row.type!==type||term&&![row.question,row.explanation,row.source,row.category,...(row.tags||[]),...(row.options||[]).map(o=>o.text)].join(' ').toLocaleLowerCase().includes(term))continue;if(total>=offset&&items.length<limit)items.push({...row,sourceBankId:source});total++;}await resourceYield521();}
+ }
+ for(const h of headers){await storage.get(h.key);if(storage.revision(h.key)!==h.revision)throw new Error('查询期间题库已变化，请重新查询。');}
+ return {items,total,nextOffset:offset+limit<total?offset+limit:null};
+}
+async function exportPracticeQuestionBank(bankId){
+ const bank=listPracticeBankSummaries().find(item=>item.bank.id===bankId);if(!bank)throw new Error('题库不存在。');
+ const questions=[];let offset=0;do{const page=await queryPracticeQuestions(bankId,{offset,limit:200});for(const row of page.items){const {sourceBankId,...q}=row;const hash=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([sourceBankId,q.id])));q.id='q-'+[...new Uint8Array(hash)].map(v=>v.toString(16).padStart(2,'0')).join('');questions.push(q);}offset=page.nextOffset;}while(offset!==null);
+ return {schemaVersion:1,bank:{...bank.bank,id:('export-'+bankId).slice(0,120)},questions};
+}
+export {listPracticeSubjects,queryPracticeQuestions,exportPracticeQuestionBank};
 async function saveQuestionNote(bankId,id,text,{expectedRevision}={}){
  resourceID(bankId,'来源题包ID');resourceID(id,'题目ID');if(typeof text!=='string'||text.length>64000)throw new Error('批注最多64000字符。');const key=questionNoteKey521(bankId,id);
  // Capture the caller token explicitly; reading metadata must not bypass stale-edit checks.

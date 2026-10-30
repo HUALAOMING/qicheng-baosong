@@ -1,0 +1,21 @@
+{
+  "checks": [
+    {
+      "name": "white palette and field-level line wrapping persist through save and reload",
+      "status": "PASS"
+    },
+    {
+      "name": "lively applies finished design and creates native Word/PDF",
+      "status": "PASS"
+    },
+    {
+      "name": "business applies finished design and creates native Word/PDF",
+      "status": "PASS"
+    },
+    {
+      "name": "global line wrapping and per-field override are reflected in actual preview",
+      "status": "PASS"
+    }
+  ],
+  "errors": []
+}

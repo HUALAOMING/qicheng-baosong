@@ -1,0 +1,125 @@
+{
+  "checks": [
+    {
+      "name": "manager uses two columns and reversible animated management menu",
+      "status": "PASS",
+      "flavor": "pwa"
+    },
+    {
+      "name": "old composer link opens integrated animated chapter editor",
+      "status": "PASS",
+      "flavor": "pwa"
+    },
+    {
+      "name": "toolbar is grouped, fields are rounded and numbered, selection includes cover and TOC",
+      "status": "PASS",
+      "flavor": "pwa"
+    },
+    {
+      "name": "standard colors change only selected version and source badge explains inheritance",
+      "status": "PASS",
+      "flavor": "pwa"
+    },
+    {
+      "name": "saving feedback holds at least one second; settled save and view switches never write",
+      "status": "PASS",
+      "flavor": "pwa"
+    },
+    {
+      "name": "failed transaction shows steady red feedback, retry commits and returns green",
+      "status": "PASS",
+      "flavor": "pwa"
+    },
+    {
+      "name": "content sort mode is visible and actual pointer drag follows the finger and commits order",
+      "status": "PASS",
+      "flavor": "pwa"
+    },
+    {
+      "name": "design has chapter and scheme tabs; density connects page geometry with animated segment",
+      "status": "PASS",
+      "flavor": "pwa"
+    },
+    {
+      "name": "fullscreen editor search and reduced motion remain operable",
+      "status": "PASS",
+      "flavor": "pwa"
+    },
+    {
+      "name": "landscape tablet keeps content and order controls usable without overflow",
+      "status": "PASS",
+      "flavor": "pwa"
+    },
+    {
+      "name": "settings uses six icon rows; topbar has no mode badge and search expands inline",
+      "status": "PASS",
+      "flavor": "pwa"
+    },
+    {
+      "name": "mobile inline search stays within viewport and remains nonmodal",
+      "status": "PASS",
+      "flavor": "pwa"
+    },
+    {
+      "name": "manager uses two columns and reversible animated management menu",
+      "status": "PASS",
+      "flavor": "portable"
+    },
+    {
+      "name": "old composer link opens integrated animated chapter editor",
+      "status": "PASS",
+      "flavor": "portable"
+    },
+    {
+      "name": "toolbar is grouped, fields are rounded and numbered, selection includes cover and TOC",
+      "status": "PASS",
+      "flavor": "portable"
+    },
+    {
+      "name": "standard colors change only selected version and source badge explains inheritance",
+      "status": "PASS",
+      "flavor": "portable"
+    },
+    {
+      "name": "saving feedback holds at least one second; settled save and view switches never write",
+      "status": "PASS",
+      "flavor": "portable"
+    },
+    {
+      "name": "failed transaction shows steady red feedback, retry commits and returns green",
+      "status": "PASS",
+      "flavor": "portable"
+    },
+    {
+      "name": "content sort mode is visible and actual pointer drag follows the finger and commits order",
+      "status": "PASS",
+      "flavor": "portable"
+    },
+    {
+      "name": "design has chapter and scheme tabs; density connects page geometry with animated segment",
+      "status": "PASS",
+      "flavor": "portable"
+    },
+    {
+      "name": "fullscreen editor search and reduced motion remain operable",
+      "status": "PASS",
+      "flavor": "portable"
+    },
+    {
+      "name": "landscape tablet keeps content and order controls usable without overflow",
+      "status": "PASS",
+      "flavor": "portable"
+    },
+    {
+      "name": "settings uses six icon rows; topbar has no mode badge and search expands inline",
+      "status": "PASS",
+      "flavor": "portable"
+    },
+    {
+      "name": "mobile inline search stays within viewport and remains nonmodal",
+      "status": "PASS",
+      "flavor": "portable"
+    }
+  ],
+  "errors": []
+}
