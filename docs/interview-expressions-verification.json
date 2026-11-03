@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "checks": [
+    "current repository validateClassic: exact round trip",
+    "24 unique IDs, 6 chapters, original text / explanation / source for every entry",
+    "manual JSON import persists all 24 passages",
+    "latest resource manifest downloads, checks SHA-256, and commits official classic",
+    "saved official classic survives resource reload",
+    "repeated update is a no-op",
+    "checksum failure leaves previously saved text intact"
+  ],
+  "sha256": "596663c843b35222aca359318cbf607a089ffd4899da574217b95754a4f61c3a"
+}

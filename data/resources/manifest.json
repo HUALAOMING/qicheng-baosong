@@ -30,6 +30,13 @@
       "sha256": "e7bc9d610d55b80319b0d437c7f925f34f1ecef56f530dd94fb4ee1c3a4dc0b7"
     },
     {
+      "id": "english-interview-expressions",
+      "type": "classic",
+      "version": "1.0.0",
+      "url": "english-interview-expressions.json",
+      "sha256": "596663c843b35222aca359318cbf607a089ffd4899da574217b95754a4f61c3a"
+    },
+    {
       "id": "english-vocabulary",
       "type": "quiz-bank",
       "version": "1.0.0",
