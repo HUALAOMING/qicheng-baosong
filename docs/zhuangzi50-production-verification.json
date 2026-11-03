@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "site": "https://hualaoming.github.io/qicheng-baosong/",
+  "checks": [
+    "live manifest includes classic",
+    "HTTP 200 and exact SHA-256 / download bytes",
+    "real Edge browser update saves 50 passages / 17 chapters",
+    "page reload retains all 50 passages"
+  ],
+  "result": {
+    "status": "已更新并保存到本机：zhuangzi",
+    "count": 50,
+    "chapters": 17
+  },
+  "persisted": 50,
+  "errors": []
+}
