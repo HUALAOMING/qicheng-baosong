@@ -5,7 +5,8 @@ import { readFile } from 'node:fs/promises';
 import { FakeFactory } from './support.mjs';
 
 async function harness() {
-  const factory=new FakeFactory(), context=vm.createContext({console,indexedDB:factory,Date,Math,structuredClone,setTimeout,clearTimeout,AbortController});
+  class JournalTestDate extends Date {constructor(...args){super(...(args.length?args:[2026,9,22,12]));}static now(){return new Date(2026,9,22,12).getTime();}}
+  const factory=new FakeFactory(), context=vm.createContext({console,indexedDB:factory,Date:JournalTestDate,Math,structuredClone,setTimeout,clearTimeout,AbortController});
   const storageModule=new vm.SourceTextModule(await readFile(new URL('../js/storage.js',import.meta.url),'utf8'),{context});
   await storageModule.link(()=>{throw new Error('Unexpected storage dependency');});await storageModule.evaluate();
   const storage=storageModule.namespace.storage, ctx={state:{uiLang:'zh',route:'calendar'},persistencePaused:false};

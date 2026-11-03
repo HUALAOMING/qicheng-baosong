@@ -32,9 +32,9 @@
     {
       "id": "english-interview-expressions",
       "type": "classic",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "url": "english-interview-expressions.json",
-      "sha256": "596663c843b35222aca359318cbf607a089ffd4899da574217b95754a4f61c3a"
+      "sha256": "6acef4a3d3b8edbec0ef3bc9e47b93e65d7320e8035dac8962f3db22c7d9166c"
     },
     {
       "id": "english-vocabulary",

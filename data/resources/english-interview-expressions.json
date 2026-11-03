@@ -3,9 +3,9 @@
   "book": {
     "id": "english-interview-expressions",
     "title": "英文面试表达积累",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "englishTitle": "Ideas for Interview Conversations",
-    "subtitle": "24句双语精选｜六个主题·可靠出处·理解与面试接话"
+    "subtitle": "50句双语精选｜六个主题·可靠出处·理解与面试接话"
   },
   "passages": [
     {
@@ -151,6 +151,162 @@
       "chapter": "行动与韧性",
       "text": "The fault, dear Brutus, is not in our stars, but in ourselves, that we are underlings.\n亲爱的布鲁图斯，我们屈居人下，过错不在星辰，而在我们自己。\n— William Shakespeare｜威廉·莎士比亚",
       "explanation": "出处 / Source：William Shakespeare｜威廉·莎士比亚；Julius Caesar《裘力斯·凯撒》，Act I, Scene II；Cassius 台词。\n原文核对：https://www.folger.edu/explore/shakespeares-works/julius-caesar/read/\n\n含义 / Meaning：不要把所有结果归于命运，应识别自己能改变的选择与行为。\n适用问题 / Interview prompts：Personal agency / 如何回应失败\n\n面试接话示例（本资源原创，使用时接自己的真实经历）：\nI cannot control every outcome, but I can examine my preparation and decisions. That is where I look first when I want to improve.\n我不能控制每个结果，但能审视准备和决策。希望改进时，我会先从这里寻找空间。\n\n表达抓手：先回答问题，再用一句名言点明观点；紧接一个真实事例，说明自己做了什么、改变了什么。无需每题引用，也不要把下面示例当成已经发生的个人经历。\n使用说明 / Context：台词有劝说和政治语境；用于自我反省，不据此指责受害者，也不否认外部条件和结构性困难。\n译文说明：英文原句按注明版本保留；中文由本资源译写。中文经典的英文已单独标明为本次译文。"
+    },
+    {
+      "id": "interview-expression-025",
+      "chapter": "语言与思维",
+      "text": "Whereof one cannot speak, thereof one must be silent.\n对于不能言说的东西，应当保持沉默。\n— Ludwig Wittgenstein｜维特根斯坦",
+      "explanation": "出处 / Source：Ludwig Wittgenstein｜维特根斯坦；Tractatus Logico-Philosophicus《逻辑哲学论》7；C. K. Ogden 译。\n原文核对：https://www.kfs.org/jonathan/witt/t7en.html\n\n含义 / Meaning：承认表达与知识的边界。\n适用问题 / Interview prompts：How do you handle a question you cannot answer?\n\n面试接话示例（本资源原创，使用时接自己的真实经历）：\nWhen I lack enough information, I would rather state the limits of my answer and explain how I would investigate further.\n信息不足时，我宁愿说明回答的限度，并解释下一步如何调查。\n\n使用说明 / Context：原命题讨论可言说性的哲学界限；这里对知识边界的联系是面试引申，不意味着对一切困难问题保持沉默。\n译文说明：中文由本资源译写；中文经典的英文已单独标明为本次译文。"
+    },
+    {
+      "id": "interview-expression-026",
+      "chapter": "语言与思维",
+      "text": "Never use a long word where a short one will do.\n短词能说明白时，就不要用长词。\n— George Orwell｜乔治·奥威尔",
+      "explanation": "出处 / Source：George Orwell｜乔治·奥威尔；Politics and the English Language《政治与英语》，写作规则。\n原文核对：https://www.orwellfoundation.com/the-orwell-foundation/orwell/essays-and-other-works/politics-and-the-english-language/\n\n含义 / Meaning：表达的价值在于清晰，而非用词显得高深。\n适用问题 / Interview prompts：How do you communicate with a non-specialist?\n\n面试接话示例（本资源原创，使用时接自己的真实经历）：\nI try to make an explanation easy to follow before making it sound impressive. A useful example often matters more than technical vocabulary.\n我先让解释容易理解，再考虑措辞是否出彩。一个有用的例子往往比术语更重要。\n\n使用说明 / Context：这是一条写作指导，不是禁用必要的专业词。\n译文说明：中文由本资源译写；中文经典的英文已单独标明为本次译文。"
+    },
+    {
+      "id": "interview-expression-027",
+      "chapter": "语言与思维",
+      "text": "Brevity is the soul of wit.\n简洁是智慧表达的灵魂。\n— William Shakespeare｜威廉·莎士比亚",
+      "explanation": "出处 / Source：William Shakespeare｜威廉·莎士比亚；Hamlet《哈姆雷特》2.2；Polonius 台词。\n原文核对：https://www.folger.edu/explore/shakespeares-works/hamlet/read/\n\n含义 / Meaning：把最有价值的判断集中表达，让听者容易抓住重点。\n适用问题 / Interview prompts：How would you introduce yourself?\n\n面试接话示例（本资源原创，使用时接自己的真实经历）：\nI try to organize an answer around one clear point, support it with one example, and stop before I repeat myself.\n我尽量围绕一个明确观点组织回答，用一个例子支持，并在重复自己之前停下。\n\n使用说明 / Context：波洛涅斯说此话时本身颇为啰嗦，具有戏剧反讽；不是作者提供的无语境格言。\n译文说明：中文由本资源译写；中文经典的英文已单独标明为本次译文。"
+    },
+    {
+      "id": "interview-expression-028",
+      "chapter": "语言与思维",
+      "text": "When names are not right, words do not accord with what they mean.\n名不正，则言不顺。\n— Confucius｜孔子",
+      "explanation": "出处 / Source：Confucius｜孔子；《论语·子路》13.3；英文为本次译文。\n原文核对：https://ctext.org/analects/zi-lu/zh\n\n含义 / Meaning：先厘清概念与职责，再开展有效讨论。\n适用问题 / Interview prompts：How do you resolve misunderstandings?\n\n面试接话示例（本资源原创，使用时接自己的真实经历）：\nBefore debating a solution, I ask whether we mean the same thing by the key terms. A shared definition can prevent unnecessary disagreement.\n讨论方案前，我先确认大家对关键概念的理解是否一致。共同定义能减少不必要的分歧。\n\n使用说明 / Context：原文“正名”含政治与伦理秩序语境；澄清概念是应用性引申。\n译文说明：中文由本资源译写；中文经典的英文已单独标明为本次译文。"
+    },
+    {
+      "id": "interview-expression-029",
+      "chapter": "判断与求知",
+      "text": "It is wrong always, everywhere, and for any one, to believe anything upon insufficient evidence.\n无论何时何地、无论对谁，在证据不足时相信某事都是错误的。\n— William Kingdon Clifford｜威廉·金顿·克利福德",
+      "explanation": "出处 / Source：William Kingdon Clifford｜威廉·金顿·克利福德；The Ethics of Belief《信念的伦理》（1877），第一部分结尾。\n原文核对：https://www.gutenberg.org/files/50189/50189-h/50189-h.htm\n\n含义 / Meaning：相信与传播信息也带有责任，不能只因愿意相信就忽略证据。\n适用问题 / Interview prompts：How do you judge information online?\n\n面试接话示例（本资源原创，使用时接自己的真实经历）：\nBefore sharing an impressive claim, I check where it came from, what evidence supports it, and whether another explanation is possible.\n转发惊人的说法前，我会核查来源、证据和其他可能解释。\n\n使用说明 / Context：这是严格的证据主义立场，哲学上有争论；可说明自己如何实践核查，而非把它当成公认定理。\n译文说明：中文由本资源译写；中文经典的英文已单独标明为本次译文。"
+    },
+    {
+      "id": "interview-expression-030",
+      "chapter": "判断与求知",
+      "text": "All silencing of discussion is an assumption of infallibility.\n压制讨论，总隐含着自认为不会犯错的假定。\n— John Stuart Mill｜约翰·斯图尔特·密尔",
+      "explanation": "出处 / Source：John Stuart Mill｜约翰·斯图尔特·密尔；On Liberty《论自由》，Chapter II。\n原文核对：https://www.gutenberg.org/files/34901/34901-h/34901-h.htm\n\n含义 / Meaning：愿意让主张接受质疑，是承认自己可能犯错。\n适用问题 / Interview prompts：How do you respond when challenged?\n\n面试接话示例（本资源原创，使用时接自己的真实经历）：\nI try to treat a serious challenge as a chance to improve my reasoning, rather than as a threat to my position.\n我努力把认真质疑看作改进推理的机会，而不是对个人地位的威胁。\n\n使用说明 / Context：讨论自由也有具体伦理与制度问题；不以此合理化骚扰或阻止他人表达。\n译文说明：中文由本资源译写；中文经典的英文已单独标明为本次译文。"
+    },
+    {
+      "id": "interview-expression-031",
+      "chapter": "自我与选择",
+      "text": "The despotism of custom is everywhere the standing hindrance to human advancement.\n习俗的专制，处处都是人类进步的持久障碍。\n— John Stuart Mill｜约翰·斯图尔特·密尔",
+      "explanation": "出处 / Source：John Stuart Mill｜约翰·斯图尔特·密尔；On Liberty《论自由》，Chapter III。\n原文核对：https://www.gutenberg.org/files/34901/34901-h/34901-h.htm\n\n含义 / Meaning：传统做法需要接受理由与效果的检验，不能只以“历来如此”作答。\n适用问题 / Interview prompts：How do you balance tradition and innovation?\n\n面试接话示例（本资源原创，使用时接自己的真实经历）：\nI respect practices that have proved useful, but I also ask whether their original reasons still apply to the problem we face today.\n我尊重经实践证明有用的做法，也会追问其原先理由是否仍适用于今天的问题。\n\n使用说明 / Context：不是一概否定传统，而是反对不容审视的强制从众。\n译文说明：中文由本资源译写；中文经典的英文已单独标明为本次译文。"
+    },
+    {
+      "id": "interview-expression-032",
+      "chapter": "判断与求知",
+      "text": "Custom, then, is the great guide of human life.\n因此，习惯是人类生活的重要向导。\n— David Hume｜大卫·休谟",
+      "explanation": "出处 / Source：David Hume｜大卫·休谟；An Enquiry Concerning Human Understanding《人类理解研究》，Section V。\n原文核对：https://www.gutenberg.org/files/9662/9662-h/9662-h.htm\n\n含义 / Meaning：经验中的重复形成预期，使我们得以行动；这些预期也应接受新证据检验。\n适用问题 / Interview prompts：What have routines taught you?\n\n面试接话示例（本资源原创，使用时接自己的真实经历）：\nA routine reduces the effort of getting started, but I review it when it stops producing the results I need.\n规律能降低开始行动的阻力，但当它不再带来所需结果时，我会重新检查。\n\n使用说明 / Context：休谟原文在解释因果预期的形成，不是在宣称一切习惯都正确。\n译文说明：中文由本资源译写；中文经典的英文已单独标明为本次译文。"
+    },
+    {
+      "id": "interview-expression-033",
+      "chapter": "学习与创新",
+      "text": "Read not to contradict and confute; nor to believe and take for granted; nor to find talk and discourse; but to weigh and consider.\n读书不是为了争辩驳倒，也不是为了盲信照收，更不是为了寻找谈资，而是为了权衡思考。\n— Francis Bacon｜弗朗西斯·培根",
+      "explanation": "出处 / Source：Francis Bacon｜弗朗西斯·培根；Of Studies《论读书》。\n原文核对：https://www.gutenberg.org/files/575/575-h/575-h.htm\n\n含义 / Meaning：阅读要经过判断，既不为反驳而读，也不无条件接受。\n适用问题 / Interview prompts：What makes you a critical reader?\n\n面试接话示例（本资源原创，使用时接自己的真实经历）：\nI try to understand an author before deciding whether I agree. Then I compare the argument with evidence and alternative views.\n我先理解作者，再判断是否赞同；之后用证据和其他观点检验论证。\n\n使用说明 / Context：保留原文的排比；日常接话不必仿用古式表达。\n译文说明：中文由本资源译写；中文经典的英文已单独标明为本次译文。"
+    },
+    {
+      "id": "interview-expression-034",
+      "chapter": "学习与创新",
+      "text": "Some books are to be tasted, others to be swallowed, and some few to be chewed and digested.\n有些书宜浅尝，有些宜通读，少数则须细嚼慢咽。\n— Francis Bacon｜弗朗西斯·培根",
+      "explanation": "出处 / Source：Francis Bacon｜弗朗西斯·培根；Of Studies《论读书》。\n原文核对：https://www.gutenberg.org/files/575/575-h/575-h.htm\n\n含义 / Meaning：阅读深度应与目的、作品价值相匹配。\n适用问题 / Interview prompts：How do you choose what to read?\n\n面试接话示例（本资源原创，使用时接自己的真实经历）：\nI read broadly to discover questions, but I return slowly to a few books that keep changing how I think.\n我广泛阅读以发现问题，也会慢慢重读少数不断改变我思考方式的书。\n\n使用说明 / Context：比喻的是不同阅读方式，不是只选容易读的书。\n译文说明：中文由本资源译写；中文经典的英文已单独标明为本次译文。"
+    },
+    {
+      "id": "interview-expression-035",
+      "chapter": "判断与求知",
+      "text": "Thinking begins in what may fairly enough be called a forked-road situation.\n思考始于一种可以称作“岔路口”的处境。\n— John Dewey｜约翰·杜威",
+      "explanation": "出处 / Source：John Dewey｜约翰·杜威；How We Think《我们怎样思维》（1910），Chapter I；节引。\n原文核对：https://brocku.ca/MeadProject/Dewey/Dewey_1910a/Dewey_1910_a.html\n\n含义 / Meaning：真正需要反思时，往往存在疑难、冲突或多种可能路径。\n适用问题 / Interview prompts：How do you solve an unfamiliar problem?\n\n面试接话示例（本资源原创，使用时接自己的真实经历）：\nWhen I face several plausible options, I make the uncertainty explicit and look for evidence that could distinguish between them.\n面对几种看似可行的选择，我会把不确定性说清，再寻找能够区分它们的证据。\n\n使用说明 / Context：节引长句前部；原排版 forked- road 规范为 forked-road。\n译文说明：中文由本资源译写；中文经典的英文已单独标明为本次译文。"
+    },
+    {
+      "id": "interview-expression-036",
+      "chapter": "自我与选择",
+      "text": "My experience is what I agree to attend to.\n我的经验，取决于我选择关注什么。\n— William James｜威廉·詹姆斯",
+      "explanation": "出处 / Source：William James｜威廉·詹姆斯；The Principles of Psychology《心理学原理》，Chapter XI: Attention。\n原文核对：https://psychclassics.yorku.ca/James/Principles/prin11.htm\n\n含义 / Meaning：注意力的取舍会影响我们实际经历、记住和学习到什么。\n适用问题 / Interview prompts：How do you protect your attention?\n\n面试接话示例（本资源原创，使用时接自己的真实经历）：\nI try to decide what deserves my attention before the loudest notification decides for me. That gives important work a better chance.\n我尽量在最响的通知替我作决定前，先决定什么值得关注，让重要事情获得更多机会。\n\n使用说明 / Context：不是说主观注意能任意改变客观现实。\n译文说明：中文由本资源译写；中文经典的英文已单独标明为本次译文。"
+    },
+    {
+      "id": "interview-expression-037",
+      "chapter": "学习与创新",
+      "text": "Wonder is the feeling of a philosopher, and philosophy begins in wonder.\n惊奇是哲学家的情感，哲学始于惊奇。\n— Socrates in Plato｜柏拉图笔下的苏格拉底",
+      "explanation": "出处 / Source：Socrates in Plato｜柏拉图笔下的苏格拉底；Theaetetus《泰阿泰德篇》155d；Benjamin Jowett 译，节引。\n原文核对：https://www.gutenberg.org/files/1726/1726-h/1726-h.htm\n\n含义 / Meaning：不把熟悉现象视为当然，持续追问其原因。\n适用问题 / Interview prompts：Why are you interested in this subject?\n\n面试接话示例（本资源原创，使用时接自己的真实经历）：\nMy interest usually begins with a simple question that refuses to go away. I enjoy turning that curiosity into a careful investigation.\n我的兴趣常始于一个挥之不去的简单问题。我喜欢把这种好奇转化为认真调查。\n\n使用说明 / Context：长句中节引，首字母大写；注明作品中的说话人。\n译文说明：中文由本资源译写；中文经典的英文已单独标明为本次译文。"
+    },
+    {
+      "id": "interview-expression-038",
+      "chapter": "自我与选择",
+      "text": "Understanding others is wisdom; understanding oneself is clarity.\n知人者智，自知者明。\n— Laozi｜老子",
+      "explanation": "出处 / Source：Laozi｜老子；《道德经》第三十三章；英文为本次译文。\n原文核对：https://ctext.org/dao-de-jing/zh\n\n含义 / Meaning：认识自己的能力、动机和局限，比只评价别人更难。\n适用问题 / Interview prompts：What is your main strength and weakness?\n\n面试接话示例（本资源原创，使用时接自己的真实经历）：\nI try to describe my strengths with evidence and my weaknesses with a plan. Self-awareness should lead to better choices, not just a flattering label.\n我用事实说明长处，用计划面对不足。自知应带来更好的选择，而非好听的标签。\n\n使用说明 / Context：“明”在此译为清明、自知，不简单等于智商。\n译文说明：中文由本资源译写；中文经典的英文已单独标明为本次译文。"
+    },
+    {
+      "id": "interview-expression-039",
+      "chapter": "合作与责任",
+      "text": "The best way of avenging thyself is not to become like the wrong doer.\n最好的回应方式，是不要变成伤害你的人那样。\n— Marcus Aurelius｜马可·奥勒留",
+      "explanation": "出处 / Source：Marcus Aurelius｜马可·奥勒留；Meditations《沉思录》6.6；George Long 译。\n原文核对：https://classics.mit.edu/Antoninus/meditations.6.six.html\n\n含义 / Meaning：面对不当行为，仍坚持自己的行为标准。\n适用问题 / Interview prompts：How do you deal with an unfair teammate?\n\n面试接话示例（本资源原创，使用时接自己的真实经历）：\nI can set a firm boundary without copying the behaviour I disagree with. I try to address the problem clearly and keep my own conduct fair.\n我可以坚定设立边界，而不复制自己反对的行为；既说明问题，也保持自身行为公平。\n\n使用说明 / Context：哲学上的自我要求不等于放弃维权、报告问题或寻求帮助。\n译文说明：中文由本资源译写；中文经典的英文已单独标明为本次译文。"
+    },
+    {
+      "id": "interview-expression-040",
+      "chapter": "行动与韧性",
+      "text": "We suffer more often in imagination than in reality.\n我们更多时候受苦于想象，而非现实。\n— Seneca｜塞涅卡",
+      "explanation": "出处 / Source：Seneca｜塞涅卡；Moral Letters to Lucilius《致鲁基利乌斯道德书简》13.4；Richard M. Gummere 译。\n原文核对：https://en.wikisource.org/wiki/Moral_letters_to_Lucilius/Letter_13\n\n含义 / Meaning：区分已经发生的困难与对未来的灾难化想象。\n适用问题 / Interview prompts：How do you cope with interview anxiety?\n\n面试接话示例（本资源原创，使用时接自己的真实经历）：\nI prepare for realistic difficulties, but I try not to treat every imagined failure as if it had already happened.\n我会准备应对真实困难，但尽量不把每种想象中的失败当成已经发生。\n\n使用说明 / Context：是哲学劝诫，不否认现实痛苦，也不替代必要的支持。\n译文说明：中文由本资源译写；中文经典的英文已单独标明为本次译文。"
+    },
+    {
+      "id": "interview-expression-041",
+      "chapter": "自我与选择",
+      "text": "Some things are in our control and others not.\n有些事在我们掌控之中，有些则不在。\n— Epictetus｜爱比克泰德",
+      "explanation": "出处 / Source：Epictetus｜爱比克泰德；Enchiridion《手册》I；Thomas W. Higginson 译。\n原文核对：https://www.gutenberg.org/files/45109/45109-h/45109-h.htm\n\n含义 / Meaning：把行动重点放在判断、努力与选择，而不是执著于所有外部结果。\n适用问题 / Interview prompts：What if your first plan fails?\n\n面试接话示例（本资源原创，使用时接自己的真实经历）：\nI cannot guarantee the result, but I can improve my preparation, ask for feedback, and choose my next action carefully.\n我不能保证结果，但可以改善准备、寻求反馈，并认真选择下一步行动。\n\n使用说明 / Context：可控与不可控的边界需要具体分析，不是逃避共同责任。\n译文说明：中文由本资源译写；中文经典的英文已单独标明为本次译文。"
+    },
+    {
+      "id": "interview-expression-042",
+      "chapter": "自我与选择",
+      "text": "Whoso would be a man must be a nonconformist.\n想成为独立的人，就不能一味随众。\n— Ralph Waldo Emerson｜拉尔夫·沃尔多·爱默生",
+      "explanation": "出处 / Source：Ralph Waldo Emerson｜拉尔夫·沃尔多·爱默生；Self-Reliance《论自立》。\n原文核对：https://www.gutenberg.org/files/16643/16643-h/16643-h.htm\n\n含义 / Meaning：独立判断意味着有理由地坚持，而不是仅仅追求与众不同。\n适用问题 / Interview prompts：Have you ever taken a different approach?\n\n面试接话示例（本资源原创，使用时接自己的真实经历）：\nI am willing to try a different approach when I can explain why it fits the problem, and I remain open to evidence that I was wrong.\n能说明不同方法为何适合问题时，我愿意尝试；同时也接受表明自己可能错误的证据。\n\n使用说明 / Context：保留历史语词 Whoso；nonconformist 不等于无条件反对规则或合作。\n译文说明：中文由本资源译写；中文经典的英文已单独标明为本次译文。"
+    },
+    {
+      "id": "interview-expression-043",
+      "chapter": "合作与责任",
+      "text": "Neither love without knowledge, nor knowledge without love can produce a good life.\n没有知识的爱，与没有爱的知识，都不足以成就美好生活。\n— Bertrand Russell｜伯特兰·罗素",
+      "explanation": "出处 / Source：Bertrand Russell｜伯特兰·罗素；What I Believe《我的信仰》，Chapter II。\n原文核对：https://www.gutenberg.org/cache/epub/73782/pg73782-images.html\n\n含义 / Meaning：关怀与能力需要结合：想帮忙，还要知道怎样才真正有效。\n适用问题 / Interview prompts：What does responsible service mean to you?\n\n面试接话示例（本资源原创，使用时接自己的真实经历）：\nBefore offering help, I try to understand what is needed and whether my method actually works. Caring should make me more willing to learn.\n提供帮助前，我先了解真正需求以及方法是否有效。关怀应让我更愿意学习。\n\n使用说明 / Context：与原第17句互相补充，分别强调方向与不可偏废的条件。\n译文说明：中文由本资源译写；中文经典的英文已单独标明为本次译文。"
+    },
+    {
+      "id": "interview-expression-044",
+      "chapter": "学习与创新",
+      "text": "Strengthen the female mind by enlarging it, and there will be an end to blind obedience.\n通过拓展女性的心智使其坚强，盲从便会走向终结。\n— Mary Wollstonecraft｜玛丽·沃斯通克拉夫特",
+      "explanation": "出处 / Source：Mary Wollstonecraft｜玛丽·沃斯通克拉夫特；A Vindication of the Rights of Woman《女权辩护》，Chapter II；节引。\n原文核对：https://www.gutenberg.org/cache/epub/3420/pg3420-images.html\n\n含义 / Meaning：教育不仅传授答案，也应增强理性判断与自主性。\n适用问题 / Interview prompts：What should a good education provide?\n\n面试接话示例（本资源原创，使用时接自己的真实经历）：\nA good education should help people ask for reasons, examine assumptions, and make responsible choices rather than simply obey familiar voices.\n好的教育应帮助人追问理由、检验假设并负责地选择，而非只服从熟悉的声音。\n\n使用说明 / Context：原文以女性教育反对压制心智；从分号前节引，保留原语境。\n译文说明：中文由本资源译写；中文经典的英文已单独标明为本次译文。"
+    },
+    {
+      "id": "interview-expression-045",
+      "chapter": "合作与责任",
+      "text": "The exemplary person seeks harmony without demanding sameness.\n君子和而不同。\n— Confucius｜孔子",
+      "explanation": "出处 / Source：Confucius｜孔子；《论语·子路》13.23；英文为本次译文。\n原文核对：https://ctext.org/analects/zi-lu/zh\n\n含义 / Meaning：合作可以建立在不同意见之上，不需要每个人完全相同。\n适用问题 / Interview prompts：How do you work with different personalities?\n\n面试接话示例（本资源原创，使用时接自己的真实经历）：\nI do not expect a good team to think alike. I look for a shared goal and a fair way to discuss our differences.\n我不要求好团队里的每个人想法一致，而是寻找共同目标和公平讨论分歧的方式。\n\n使用说明 / Context：不是以和谐为名回避原则或压制不同意见。\n译文说明：中文由本资源译写；中文经典的英文已单独标明为本次译文。"
+    },
+    {
+      "id": "interview-expression-046",
+      "chapter": "自我与选择",
+      "text": "One who knows what is enough is rich.\n知足者富。\n— Laozi｜老子",
+      "explanation": "出处 / Source：Laozi｜老子；《道德经》第三十三章；英文为本次译文。\n原文核对：https://ctext.org/dao-de-jing/zh\n\n含义 / Meaning：清楚什么已经足够，能减少无止境比较与外部评价的支配。\n适用问题 / Interview prompts：How do you define success?\n\n面试接话示例（本资源原创，使用时接自己的真实经历）：\nI want my definition of success to include meaningful work and reliable relationships, not only a position that looks impressive from outside.\n我希望成功也包括有意义的工作与可靠关系，而不只是旁人看来出色的位置。\n\n使用说明 / Context：知足不等于不再努力或接受本可改善的不公。\n译文说明：中文由本资源译写；中文经典的英文已单独标明为本次译文。"
+    },
+    {
+      "id": "interview-expression-047",
+      "chapter": "自我与选择",
+      "text": "If a man does not keep pace with his companions, perhaps it is because he hears a different drummer.\n一个人若未与同伴步调一致，也许是因为他听见了不同的鼓点。\n— Henry David Thoreau｜亨利·戴维·梭罗",
+      "explanation": "出处 / Source：Henry David Thoreau｜亨利·戴维·梭罗；Walden《瓦尔登湖》，Conclusion。\n原文核对：https://www.gutenberg.org/files/205/205-h/205-h.htm\n\n含义 / Meaning：尊重不同的成长节奏，避免把同一时间表强加于所有人。\n适用问题 / Interview prompts：How do you handle comparison with others?\n\n面试接话示例（本资源原创，使用时接自己的真实经历）：\nI learn from other people’s progress, but I try to judge my own path by the goals and responsibilities that actually matter to me.\n我借鉴他人的进步，但会依据真正重视的目标和责任评价自己的道路。\n\n使用说明 / Context：不是否认期限、承诺或合作中必要的协调。\n译文说明：中文由本资源译写；中文经典的英文已单独标明为本次译文。"
+    },
+    {
+      "id": "interview-expression-048",
+      "chapter": "自我与选择",
+      "text": "I took the one less traveled by, and that has made all the difference.\n我选择了那条较少人走的路，而这让一切有所不同。\n— Robert Frost｜罗伯特·弗罗斯特",
+      "explanation": "出处 / Source：Robert Frost｜罗伯特·弗罗斯特；The Road Not Taken《未选择的路》，末两行。\n原文核对：https://www.poetryfoundation.org/poems/44272/the-road-not-taken\n\n含义 / Meaning：选择也会通过事后的讲述影响我们理解自己。\n适用问题 / Interview prompts：Why did you choose this path?\n\n面试接话示例（本资源原创，使用时接自己的真实经历）：\nI want to explain my choice through the questions and experiences that shaped it, rather than simply claim that being different made it better.\n我希望用塑造选择的问题和经历来说明它，而不只是宣称不同就更好。\n\n使用说明 / Context：诗前文说两路其实相近；不可简单解释为诗人证明“越少人走就越正确”。合并诗行并规范第二行首字母。\n译文说明：中文由本资源译写；中文经典的英文已单独标明为本次译文。"
+    },
+    {
+      "id": "interview-expression-049",
+      "chapter": "判断与求知",
+      "text": "Being in uncertainties, mysteries, doubts, without any irritable reaching after fact and reason.\n置身于不确定、神秘与疑惑之中，而不焦躁地抓取事实和理性解释。\n— John Keats｜约翰·济慈",
+      "explanation": "出处 / Source：John Keats｜约翰·济慈；致 George 与 Tom Keats 书信（1817年12月）；Colvin 编 Letters，Letter XXIV，节引。\n原文核对：https://www.gutenberg.org/files/35698/35698-h/35698-h.htm\n\n含义 / Meaning：面对复杂经验，允许暂时没有完整答案，避免用仓促解释终结探索。\n适用问题 / Interview prompts：How do you deal with uncertainty?\n\n面试接话示例（本资源原创，使用时接自己的真实经历）：\nI try to tolerate a question long enough to investigate it properly. A quick explanation can feel comforting without being reliable.\n我努力容忍问题暂未解决，以便充分调查。迅速的解释可能让人安心，却未必可靠。\n\n使用说明 / Context：是 negative capability 定义中的短语节引；日期不同编本有差异，这里只记月份。不是主张拒绝证据或科学。\n译文说明：中文由本资源译写；中文经典的英文已单独标明为本次译文。"
+    },
+    {
+      "id": "interview-expression-050",
+      "chapter": "行动与韧性",
+      "text": "'Tis not too late to seek a newer world.\n寻找一个更新的世界，为时未晚。\n— Alfred, Lord Tennyson｜阿尔弗雷德·丁尼生",
+      "explanation": "出处 / Source：Alfred, Lord Tennyson｜阿尔弗雷德·丁尼生；Ulysses《尤利西斯》，末段。\n原文核对：https://www.poetryfoundation.org/poems/45392/ulysses\n\n含义 / Meaning：在已有经历之外仍保持继续学习与重新开始的可能。\n适用问题 / Interview prompts：What would you like to explore next?\n\n面试接话示例（本资源原创，使用时接自己的真实经历）：\nI do not see my current experience as a final definition of who I can become. I want to keep testing my interests through real work.\n我不把现有经历视为未来可能性的最终定义，而希望通过实际工作继续检验兴趣。\n\n使用说明 / Context：保留诗中人物的声音与古式 ’Tis；重启应考虑现实责任，而非鼓励不计代价的冒险。\n译文说明：中文由本资源译写；中文经典的英文已单独标明为本次译文。"
     }
   ]
 }

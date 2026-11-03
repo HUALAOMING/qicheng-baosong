@@ -51,6 +51,10 @@ function assertJSON (value, path = 'data', depth = 0) {
     assertJSON (v, path + '.' + key, depth + 1);
   }
 }
+function cropExtras532(value,path){
+  if(value.rotation!==undefined)number(value.rotation,-180,180,path+'.rotation');
+  if(value.rect!==undefined){object(value.rect,path+'.rect');for(const key of ['x','y'])number(value.rect[key],0,1,path+'.rect.'+key);for(const key of ['w','h'])number(value.rect[key],.000001,1,path+'.rect.'+key);if(value.rect.x+value.rect.w>1.00000001||value.rect.y+value.rect.h>1.00000001)fail(path+'.rect');}
+}
 function crop (value, path) {
   if (! value) return;
   object (value, path);
@@ -60,6 +64,7 @@ function crop (value, path) {
   number (value.zoom, 1, 3, path + '.zoom');
   number (value.w, 1, 20, path + '.w');
   number (value.h, 1, 20, path + '.h');
+  cropExtras532(value,path);
 }
 function validateResumeVersion53(v,assets){
  const r=v.resume53;object(r,'resume53');if(r.schemaVersion!==1)fail('resume53.schemaVersion');object(r.base,'resume53.base');flag(r.blank,'resume53.blank');
@@ -213,6 +218,7 @@ function validateDraft (input, {trustedLocal = false} = {}) {
   number (s.avatarCrop.x, 0, 100, 'avatarCrop.x');
   number (s.avatarCrop.y, 0, 100, 'avatarCrop.y');
   number (s.avatarCrop.zoom, 1, 3, 'avatarCrop.zoom');
+  cropExtras532(s.avatarCrop,'avatarCrop');
   list (s.versions, 'versions', 100);
   unique (s.versions.map (v => v?.id), 'versions');
   for (const v of s.versions) {

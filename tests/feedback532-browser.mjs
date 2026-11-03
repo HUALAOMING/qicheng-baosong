@@ -1,0 +1,37 @@
+import {chromium531 as chromium} from './browser531-support.mjs';
+import assert from 'node:assert/strict';
+import {mkdir,writeFile} from 'node:fs/promises';
+import {spawn} from 'node:child_process';
+const base=process.env.QICHENG_TEST_URL532||'http://127.0.0.1:5321/',out='tests/generated/feedback532';await mkdir(out,{recursive:true});
+const server=process.env.QICHENG_TEST_URL532?null:spawn(process.execPath,['scripts/serve.mjs'],{env:{...process.env,QICHENG_PORT:'5321'},stdio:'ignore',windowsHide:true});
+if(server)for(let i=0;i<100;i++){try{await fetch(base);break;}catch{await new Promise(r=>setTimeout(r,50));}}
+const browser=await chromium.launch({executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless:true});
+const context=await browser.newContext({viewport:{width:1024,height:1366},hasTouch:true,isMobile:true,locale:'zh-CN',serviceWorkers:'block'}),page=await context.newPage(),errors=[],checks=[];
+page.on('pageerror',error=>errors.push(error.message));const go=route=>page.evaluate(route=>ResumeStudio.go3(route),route);
+try{
+ await page.goto(base);await page.waitForFunction(()=>!!window.ResumeStudio);if(await page.locator('#startupChoice52[open]').count())await page.locator('#startupContinue52').click();
+ await page.evaluate(()=>{const s=ResumeStudio.getState();s.awardDraft.category='学科竞赛';ResumeStudio.setState(s);});await go('awards');
+ const input=page.locator('[data-record3="awardDraft"][data-key="category"]');await input.focus();
+ await page.evaluate(()=>window.testInput532=document.activeElement);
+ await input.press('End');await input.press('Backspace');await input.press('Backspace');await page.keyboard.insertText('文化');
+ assert.equal(await input.inputValue(),'学科文化');assert.equal(await page.evaluate(()=>document.activeElement===window.testInput532),true);assert.equal(await input.getAttribute('list'),null);assert.equal(await page.locator('.editable-choice-menu532:visible').count(),0);
+ await input.dispatchEvent('compositionstart');await input.fill('自定义荣誉类别');await input.dispatchEvent('compositionend');assert.equal(await page.locator('.editable-choice-menu532:visible').count(),0);
+ await input.locator('..').locator('.editable-choice-toggle532').click();await page.locator('.editable-choice-menu532:visible [role="option"]').first().click();assert.ok(await input.inputValue());
+ checks.push('iPad-size touch layout: repeated deletion and IME edit keep focus/node, no automatic picker; explicit choice still works');
+ await go('profile');assert.equal(await page.locator('input[list]').count(),0);checks.push('language choice also uses explicit suggestions');
+ await page.evaluate(()=>{const canvas=document.createElement('canvas');canvas.width=400;canvas.height=300;const x=canvas.getContext('2d');for(const [color,a,b]of [['#ff0000',0,0],['#00ff00',200,0],['#0000ff',0,150],['#ffff00',200,150]]){x.fillStyle=color;x.fillRect(a,b,200,150);}const s=ResumeStudio.getState();s.avatar={id:'test-avatar532',name:'quadrants.png',data:canvas.toDataURL(),caption:''};s.avatarCrop={x:50,y:50,zoom:1};ResumeStudio.setState(s);});await go('profile');
+ await page.locator('[data-crop-photo="avatar:0"]').click();await page.locator('#cropDialog[open]').waitFor();assert.equal(await page.locator('#cropDialog input[type="range"]').count(),0);assert.equal(await page.locator('[data-crop-handle532]').count(),8);
+ await page.locator('#cropRatio').selectOption('free');
+ const before=await page.locator('#cropSelection532').boundingBox(),handle=await page.locator('[data-crop-handle532="se"]').boundingBox();
+ await page.mouse.move(handle.x+handle.width/2-5,handle.y+handle.height/2-5);await page.mouse.down();await page.mouse.move(handle.x-70,handle.y-55,{steps:12});await page.mouse.up();
+ const after=await page.locator('#cropSelection532').boundingBox();assert.ok(after.width<before.width-20&&after.height<before.height-20);checks.push('eight direct crop handles resize with pointer tracking; position/zoom sliders removed');
+ await page.locator('#cropAngle532').fill('7.5');await page.locator('#cropAngle532').press('Tab');assert.equal(await page.locator('#cropAngle532').inputValue(),'7.5');
+ await page.screenshot({path:out+'/ipad-crop.png',fullPage:true});await page.locator('#cropReset532').click();await page.locator('#cropRight532').click();await page.locator('#cropApply').click();await page.locator('#cropDialog[open]').waitFor({state:'hidden'});
+ const result=await page.evaluate(async()=>{const m=await import('./js/modules/images.js'),{loadImage}=await import('./js/utils/helpers.js');const state=ResumeStudio.getState(),img=await loadImage(await m.avatarData()),c=document.createElement('canvas');c.width=img.width;c.height=img.height;const x=c.getContext('2d');x.drawImage(img,0,0);return {rotation:state.avatarCrop.rotation,rect:state.avatarCrop.rect,width:img.width,height:img.height,topLeft:[...x.getImageData(20,20,1,1).data],original:await (await import('./js/storage.js')).storage.photoData(state.avatar,state)};});
+ assert.equal(result.rotation,90);assert.equal(result.width,480);assert.equal(result.height,640);assert.deepEqual(result.topLeft,[0,0,255,255]);assert.ok(result.original.startsWith('data:image/png;'));checks.push('90-degree output has correct swapped aspect and blue top-left pixel; original bytes retained');
+ const integrity=await page.evaluate(async()=>{const b=await import('./js/backup.js'),backup=await b.getCurrentBackup();await b.verifyBackup521(backup);const parsed=b.parseBackup(backup);return {rotation:parsed.draft.avatarCrop.rotation,rect:parsed.draft.avatarCrop.rect,original:parsed.draft.avatar.data};});assert.equal(integrity.rotation,90);assert.deepEqual(integrity.rect,result.rect);assert.equal(integrity.original,result.original);checks.push('complete backup validates and retains original image plus rotation/rectangle');
+ const circle=await page.evaluate(async()=>{const m=await import('./js/modules/images.js'),{loadImage}=await import('./js/utils/helpers.js');const state=ResumeStudio.getState(),data=await m.exportPhotoData({data:state.avatar.data,crop:{ratio:'circle',x:50,y:50,zoom:1,w:1,h:1,rotation:90,rect:{x:0,y:0,w:1,h:1}}}),img=await loadImage(data),c=document.createElement('canvas');c.width=img.width;c.height=img.height;const x=c.getContext('2d');x.drawImage(img,0,0);return {w:img.width,h:img.height,alpha:x.getImageData(0,0,1,1).data[3]};});assert.deepEqual(circle,{w:480,h:480,alpha:0});checks.push('record-photo export applies rotated fixed-ratio circle with transparent corners');
+ await page.locator('[data-crop-photo="avatar:0"]').click();await page.locator('#cropLeft532').click();await page.locator('#cropSkip').click();assert.equal(await page.evaluate(()=>ResumeStudio.getState().avatarCrop.rotation),90);checks.push('cancel does not commit draft rotation');
+ await page.reload();await page.waitForFunction(()=>!!window.ResumeStudio);if(await page.locator('#startupChoice52[open]').count())await page.locator('#startupContinue52').click();assert.equal(await page.evaluate(()=>ResumeStudio.getState().avatarCrop.rotation),90);checks.push('crop and rotation survive reload');
+ assert.deepEqual(errors,[]);const report={status:'PASS',checks,errors,limitation:'Chromium touch/viewport emulation, not a physical iPad'};await writeFile(out+'/result.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));
+}catch(error){await page.screenshot({path:out+'/failure.png',fullPage:true}).catch(()=>{});throw error;}finally{await browser.close();server?.kill();}

@@ -1,3 +1,4 @@
+import {bindEditableChoices532} from './editable-choices532.js';
 import { bindProfileControls } from './modules/profile.js';
 import { bindAppControls } from './app.js';
 import { bindSettingsControls } from './modules/settings.js';
@@ -38,5 +39,6 @@ function bind () {
   bindJournalControls();
   bindExamCalendarControls();
   bindIntroductions52();
+  bindEditableChoices532();
 }
 export { bind };

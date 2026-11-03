@@ -1,7 +1,7 @@
 import { uid } from './utils/helpers.js';
 // 启程 · js/constants.js
 
-const VERSION = '5.3.1';
+const VERSION = '5.3.2';
 
 const THEMES = {
   pudding : '布丁奶油', obsidian : '黑橙质感', blue : '墨蓝学院', jade : '深海翡翠', berry : '莓果银白'

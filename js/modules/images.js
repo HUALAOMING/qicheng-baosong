@@ -1,3 +1,5 @@
+import {mountCropEditor532} from '../crop-editor532.js';
+import {rotatedSize532,cropRect532,normalizedCropRect532,fitCropRect532} from '../crop-geometry532.js';
 import { $, $$, clamp, esc, loadImage, toast, tr, moveIn } from '../utils/helpers.js';
 import { cleanCrop, currentVersion } from '../model.js';
 import { ctx } from '../state.js';
@@ -30,34 +32,32 @@ function cropAspect (crop, img) {
 }
 
 async function cropCanvas (data, crop) {
-  const img = await loadImage (data), ratio = cropAspect (crop, img);
-  let cw = 480, ch = Math.round (cw / ratio);
-  if (ch > 1200) {
-    ch = 1200;
-    cw = Math.round (ch * ratio)
+  const img=await loadImage(data),c=cleanCrop(crop),size=rotatedSize532(img.width,img.height,c.rotation||0);
+  if(c.rotation&&!c.rect)c.rect=normalizedCropRect532(cropRect532(c,size.width,size.height,cropAspect(c,size)),size.width,size.height);
+  if(c.rect&&['id','square','circle'].includes(c.ratio)){
+    const region=fitCropRect532(c.rect.w*size.width,c.rect.h*size.height,cropAspect(c,size));
+    c.rect={x:c.rect.x+region.x/size.width,y:c.rect.y+region.y/size.height,w:region.w/size.width,h:region.h/size.height};
   }
-  const canvas = document.createElement ('canvas');
-  canvas.width = Math.max (1, cw);
-  canvas.height = Math.max (1, ch);
-  const x = canvas.getContext ('2d');
-  if (crop.ratio !== 'circle') {
-    x.fillStyle = '#fff';
-    x.fillRect (0, 0, cw, ch)
+  const ratio=c.rect ? (c.rect.w*size.width)/(c.rect.h*size.height) : cropAspect(c,size);
+  let cw=480,ch=Math.round(cw/ratio);if(ch>1200){ch=1200;cw=Math.round(ch*ratio);}
+  const canvas=document.createElement('canvas');canvas.width=Math.max(1,cw);canvas.height=Math.max(1,ch);
+  const x=canvas.getContext('2d');
+  if(c.ratio==='circle'){x.beginPath();x.arc(canvas.width/2,canvas.height/2,Math.min(canvas.width,canvas.height)/2,0,Math.PI*2);x.clip();}
+  else{x.fillStyle='#fff';x.fillRect(0,0,canvas.width,canvas.height);}
+  if(c.rect){
+    const sx=canvas.width/(c.rect.w*size.width),sy=canvas.height/(c.rect.h*size.height);
+    x.scale(sx,sy);x.translate(size.width/2-c.rect.x*size.width,size.height/2-c.rect.y*size.height);x.rotate((c.rotation||0)*Math.PI/180);x.drawImage(img,-img.width/2,-img.height/2);
+  }else{
+    const scale=Math.max(canvas.width/img.width,canvas.height/img.height)*c.zoom,w=img.width*scale,h=img.height*scale;
+    x.drawImage(img,(canvas.width-w)*c.x/100,(canvas.height-h)*c.y/100,w,h);
   }
-  else {
-    x.beginPath ();
-    x.arc (cw / 2, ch / 2, Math.min (cw, ch) / 2, 0, Math.PI * 2);
-    x.clip ()
-  }
-  const scale = Math.max (cw / img.width, ch / img.height) * clamp (crop.zoom, 1, 3, 1), w = img.width * scale, h = img.height * scale;
-  x.drawImage (img, (cw - w) * clamp (crop.x, 0, 100, 50) / 100, (ch - h) * clamp (crop.y, 0, 100, 50) / 100, w, h);
-  return canvas
+  return canvas;
 }
 
 async function exportPhotoData (photo) {
   photo={...photo,data:await storage.photoData(photo,ctx.state)};
   const c = cleanCrop (photo.crop);
-  if (c.ratio === 'original' && c.zoom === 1 && c.x === 50 && c.y === 50 && /^data:image\/(jpeg|png);/.test (photo.data)) return photo.data;
+  if (!c.rect && !c.rotation && c.ratio === 'original' && c.zoom === 1 && c.x === 50 && c.y === 50 && /^data:image\/(jpeg|png);/.test (photo.data)) return photo.data;
   const canvas = await cropCanvas (photo.data, c);
   return canvas.toDataURL (c.ratio === 'circle' ? 'image/png' : 'image/jpeg', .92)
 }
@@ -70,117 +70,24 @@ async function avatarData () {
   return canvas.toDataURL ('image/png')
 }
 
-async function openCropDialog (owner, index, queue = []) {
-  const photo = owner === 'avatar' ? ctx.state.avatar : photoArray (owner)?.[index];
-  if (! photo) return;
-  const originalData521=await storage.photoData(photo,ctx.state);
-  const v = currentVersion (), working = owner === 'avatar' ? cleanCrop ( {
-    ratio : v.avatarShape, w : v.avatarRatioW, h : v.avatarRatioH, ...ctx.state.avatarCrop
-  }) : cleanCrop (photo.crop);
-  let dialog = $ ('#cropDialog');
-  if (! dialog) {
-    dialog = document.createElement ('dialog');
-    dialog.id = 'cropDialog';
-    dialog.className = 'crop-dialog';
-    document.body.appendChild (dialog)
-  }
-  const next = () => {
-    dialog.close ();
-    if (queue.length) {
-      const item = queue.shift ();
-      openCropDialog (item.owner, item.index, queue)
-    }
-    else render ()
-  };
-  dialog.innerHTML = '<div class="crop-top"><div><div class="eyebrow">QICHENG / CROP</div><h2>' + tr ('裁剪照片', 'Crop photo') +
-  '</h2><p>' + esc (photo.name) + '</p></div><button id="cropClose" aria-label="' + tr ('关闭', 'Close') + '">×</button></div><div class="crop-layout"><div class="crop-stage"><canvas id="cropCanvas" aria-label="' +
-  tr ('照片裁剪预览', 'Crop preview') + '"></canvas><p class="hint">' + tr ('拖动预览调整位置；原照片保留，可以以后重新裁剪。', 'Drag to reposition. The original photo is kept for later adjustments.') +
-  '</p></div><div class="crop-options"><label class="field"><span>' + tr ('裁剪比例', 'Crop ratio') + '</span><select id="cropRatio">' +
-  [['original', tr ('原图比例', 'Original')], ['id', tr ('证件照 2:3', 'ID photo 2:3')], ['square', tr ('方形 1:1', 'Square 1:1')],
-  ['circle', tr ('圆形 1:1', 'Circle 1:1')], ['custom', tr ('自定义', 'Custom')]].map (([id, label]) => '<option value="' +
-  id + '" ' + (working.ratio === id ? 'selected' : '') + '>' + label + '</option>').join ('') + '</select></label><div class="crop-custom"><label>' +
-  tr ('宽', 'Width') + '<input id="cropW" type="number" min="1" max="20" step=".1" value="' + working.w + '"></label><span>:</span><label>' +
-  tr ('高', 'Height') + '<input id="cropH" type="number" min="1" max="20" step=".1" value="' + working.h + '"></label></div>' +
-  [['x', '水平位置', 'Horizontal position'], ['y', '垂直位置', 'Vertical position'], ['zoom', '缩放', 'Zoom']].map (([key, zh,
-  en]) => '<label class="crop-range">' + tr (zh, en) + ' <output id="cropOut-' + key + '">' + working [key] + '</output><input type="range" data-crop-edit="' +
-  key + '" min="' + (key === 'zoom' ? 1 : 0) + '" max="' + (key === 'zoom' ? 3 : 100) + '" step="' + (key === 'zoom' ?
-  .05 : 1) + '" value="' + working [key] + '"></label>').join ('') + '</div></div><div class="crop-actions"><button id="cropSkip">' +
-  tr (queue.length ? '跳过并处理下一张' : '取消', 'Skip / cancel') + '</button><button class="primary" id="cropApply">' + tr (queue.length ?
-  '应用并处理下一张' : '应用裁剪', 'Apply and next') + '</button></div>';
-  dialog.showModal ();
-  let drawToken = 0;
-  const draw = async () => {
-    const token = ++ drawToken;
-    try {
-      const canvas = await cropCanvas (originalData521, working);
-      if (token !== drawToken || ! dialog.open) return;
-      const target = $ ('#cropCanvas');
-      target.width = canvas.width;
-      target.height = canvas.height;
-      target.getContext ('2d').drawImage (canvas, 0, 0);
-      target.style.aspectRatio = canvas.width + '/' + canvas.height
-    }
-    catch (e) {
-      toast (e.message)
-    }
-  };
-  const toggle = () => {
-    dialog.querySelector ('.crop-custom').hidden = working.ratio !== 'custom'
-  };
-  toggle ();
-  draw ();
-  $ ('#cropRatio').onchange = e => {
-    working.ratio = e.target.value;
-    toggle ();
-    draw ()
-  };
-  for (const key of ['w', 'h']) $ ('#crop' + key.toUpperCase ()).oninput = e => {
-    working [key] = clamp (e.target.value, 1, 20, key === 'w' ? 2 : 3);
-    draw ()
-  };
-  $$ ('[data-crop-edit]').forEach (e => e.oninput = () => {
-    working [e.dataset.cropEdit] = Number (e.value); $ ('#cropOut-' + e.dataset.cropEdit).textContent = e.value; draw ()
-  });
-  let start = null;
-  $ ('#cropCanvas').onpointerdown = e => {
-    start = {
-      x : e.clientX, y : e.clientY, cx : working.x, cy : working.y
-    };
-    e.target.setPointerCapture (e.pointerId)
-  };
-  $ ('#cropCanvas').onpointermove = e => {
-    if (! start) return;
-    const box = e.target.getBoundingClientRect ();
-    working.x = clamp (start.cx + (e.clientX - start.x) / box.width * 90, 0, 100, 50);
-    working.y = clamp (start.cy + (e.clientY - start.y) / box.height * 90, 0, 100, 50);
-    for (const key of ['x', 'y']) {
-      const input = $ ('[data-crop-edit="' + key + '"]');
-      input.value = working [key];
-      $ ('#cropOut-' + key).textContent = Math.round (working [key])
-    }
-    draw ()
-  };
-  $ ('#cropCanvas').onpointerup = () => start = null;
-  $ ('#cropCanvas').onpointercancel = () => start = null;
-  $ ('#cropClose').onclick = () => {
-    dialog.close ();
-    render ()
-  };
-  $ ('#cropSkip').onclick = next;
-  $ ('#cropApply').onclick = async () => {
-    if (owner === 'avatar') {
-      ctx.state.avatarCrop = {
-        x : working.x, y : working.y, zoom : working.zoom
-      };
-      v.avatarShape = working.ratio === 'original' ? 'custom' : working.ratio;
-      const originalImage521=await loadImage(originalData521);
-      v.avatarRatioW = working.ratio === 'original' ? Math.max (1, originalImage521.width / Math.max (originalImage521.width,originalImage521.height) * 20) : working.w;
-      v.avatarRatioH = working.ratio === 'original' ? Math.max (1, originalImage521.height / Math.max (originalImage521.width,originalImage521.height) * 20) : working.h
-    }
-    else photo.crop = cleanCrop (working);
-    await save ();
-    next ()
-  }
+async function openCropDialog(owner,index,queue=[]) {
+ const photo=owner==='avatar'?ctx.state.avatar:photoArray(owner)?.[index];if(!photo)return;
+ const data=await storage.photoData(photo,ctx.state),img=await loadImage(data),v=currentVersion();
+ const working=owner==='avatar'?cleanCrop({...ctx.state.avatarCrop,ratio:v.avatarShape,w:v.avatarRatioW,h:v.avatarRatioH}):cleanCrop(photo.crop);
+ let dialog=$('#cropDialog');if(!dialog){dialog=document.createElement('dialog');dialog.id='cropDialog';dialog.className='crop-dialog';document.body.appendChild(dialog);}
+ const next=()=>{dialog.close();if(queue.length){const item=queue.shift();openCropDialog(item.owner,item.index,queue);}else render();};
+ mountCropEditor532(dialog,img,working,{name:photo.name,queueLength:queue.length,cancel:next,close:()=>{dialog.close();render();},apply:async value=>{
+  try{
+   if(owner==='avatar'){
+    ctx.state.avatarCrop={x:value.x,y:value.y,zoom:value.zoom,rotation:value.rotation,rect:value.rect};
+    v.avatarShape=value.ratio==='original'?'custom':value.ratio;
+    const size=rotatedSize532(img.width,img.height,value.rotation),rw=value.rect.w*size.width,rh=value.rect.h*size.height;
+    v.avatarRatioW=Math.max(1,rw/Math.max(rw,rh)*20);v.avatarRatioH=Math.max(1,rh/Math.max(rw,rh)*20);
+   }else photo.crop=cleanCrop(value);
+   await save();next();
+  }catch(error){toast(error.message);}
+ }});
+ dialog.showModal();
 }
 
 function selectedPhotos () {
@@ -204,6 +111,7 @@ export { uploadPhotos, photoTiles, cropAspect, cropCanvas, exportPhotoData, avat
 
 // All controls for this feature, in their original override order.
 function bindImagesControls () {
+  const thumb=$('[data-crop-avatar532]'),avatar=ctx.state.avatar;if(thumb&&avatar)avatarData().then(data=>{if(thumb.isConnected&&ctx.state.avatar===avatar)thumb.src=data;}).catch(()=>{});
   for(const url of originalViewURLs521)URL.revokeObjectURL(url);originalViewURLs521.clear();
   $$('[data-original-asset521]').forEach(async img=>{
     const asset=ctx.state.assets.find(a=>a.id===img.dataset.originalAsset521);if(!asset?._assetBlobRef)return;

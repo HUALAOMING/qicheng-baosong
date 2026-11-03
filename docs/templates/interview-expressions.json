@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "book": {
+    "id": "my-interview-expressions",
+    "title": "我的英文面试积累",
+    "version": "1.0.0",
+    "englishTitle": "My Interview Notebook",
+    "subtitle": "可按典籍格式继续导入的双语表达"
+  },
+  "passages": [
+    {
+      "id": "my-expression-001",
+      "chapter": "判断与求知",
+      "text": "I try to match my confidence to the quality of the evidence.\n我努力让自己的确信程度与证据质量相匹配。",
+      "explanation": "这是自主表达示例，不是名人原话。可填写原句的真实作者、作品、核对链接、含义和自己的面试接话。后续更新本集合时保留 book.id 和已有段落 id；文件应包含更新后的完整 passages。"
+    }
+  ]
+}

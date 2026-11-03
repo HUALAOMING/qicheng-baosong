@@ -105,17 +105,11 @@ function draftHasContent (kind) {
 
 function avatarEditor22 () {
   return '<div class="avatar-editor"><div class="avatar-thumb ' + (currentVersion ().avatarShape === 'id' ? 'portrait-id' : '') +
-  '">' + (ctx.state.avatar ? '<img data-original-asset521="' + esc(ctx.state.avatar.assetId||'') + '" src="' + esc (ctx.state.avatar.data) + '" alt="' + tr ('个人照片', 'Portrait') + '" style="object-position:' +
-  ctx.state.avatarCrop.x + '% ' + ctx.state.avatarCrop.y + '%;transform:scale(' + ctx.state.avatarCrop.zoom + ');transform-origin:' +
-  ctx.state.avatarCrop.x + '% ' + ctx.state.avatarCrop.y + '%">' : '<span>＋</span>') + '</div><div><h3>' + tr ('个人照片',
+  '">' + (ctx.state.avatar ? '<img data-crop-avatar532 src="' + esc(ctx.state.avatar.data||'') + '" alt="' + tr('个人照片裁剪预览','Cropped portrait preview') + '">' : '<span>＋</span>') + '</div><div><h3>' + tr ('个人照片',
   'Portrait') + '</h3><label class="file-button">' + tr ('上传 / 更换照片', 'Upload / replace') + '<input type="file" data-upload="avatar" accept="image/*" hidden></label>' +
   (ctx.state.avatar ? '<button data-crop-photo="avatar:0">' + tr ('裁剪照片', 'Crop portrait') + '</button><button data-v2="removeAvatar">' +
   tr ('移除', 'Remove') + '</button>' : '') + '<p class="hint">' + tr ('保留原图；导出时按裁剪位置显示。', 'The source image is kept. Exports use your crop settings.') +
-  '</p></div></div>' + (ctx.state.avatar ? '<div class="crop-controls">' + [['x', '水平位置', 'Horizontal position', 0,
-  100, 1], ['y', '垂直位置', 'Vertical position', 0, 100, 1], ['zoom', '放大', 'Zoom', 1, 3, .05]].map (([k, z, e, min, max,
-  step]) => '<label>' + tr (z, e) + ' <output>' + ctx.state.avatarCrop [k] + '</output><input type="range" data-crop="' +
-  k + '" min="' + min + '" max="' + max + '" step="' + step + '" value="' + ctx.state.avatarCrop [k] + '"></label>').join ('') +
-  '</div>' : '');
+  '</p></div></div>';
 }
 
 function avatarEditor () {

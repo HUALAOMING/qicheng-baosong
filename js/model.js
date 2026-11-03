@@ -24,11 +24,17 @@ function currentVersion () {
 }
 
 function cleanCrop (c) {
-  return {
+  const result = {
     ratio : ['original', 'id', 'square', 'circle', 'custom'].includes (c?.ratio) ? c.ratio : 'original', x : clamp (c?.x,
     0, 100, 50), y : clamp (c?.y, 0, 100, 50), zoom : clamp (c?.zoom, 1, 3, 1), w : clamp (c?.w, 1, 20, 2), h : clamp (c?.h,
     1, 20, 3)
+  };
+  if(c?.rotation!==undefined)result.rotation=clamp(c.rotation,-180,180,0);
+  if(c?.rect&&typeof c.rect==='object'){
+    const w=clamp(c.rect.w,.000001,1,1),h=clamp(c.rect.h,.000001,1,1);
+    result.rect={x:clamp(c.rect.x,0,1-w,0),y:clamp(c.rect.y,0,1-h,0),w,h};
   }
+  return result;
 }
 
 function cleanModuleStyle (s) {

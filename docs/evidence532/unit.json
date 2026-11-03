@@ -1,0 +1,7 @@
+{
+  "tests": 320,
+  "passed": 320,
+  "failed": 0,
+  "command": "node --experimental-vm-modules --test tests/*.test.mjs",
+  "note": "Historical journal test now fixes its clock to its original October fixture."
+}

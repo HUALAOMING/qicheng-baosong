@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "checks": [
+    "iPad-size touch layout: repeated deletion and IME edit keep focus/node, no automatic picker; explicit choice still works",
+    "language choice also uses explicit suggestions",
+    "eight direct crop handles resize with pointer tracking; position/zoom sliders removed",
+    "90-degree output has correct swapped aspect and blue top-left pixel; original bytes retained",
+    "complete backup validates and retains original image plus rotation/rectangle",
+    "record-photo export applies rotated fixed-ratio circle with transparent corners",
+    "cancel does not commit draft rotation",
+    "crop and rotation survive reload"
+  ],
+  "errors": [],
+  "limitation": "Chromium touch/viewport emulation, not a physical iPad"
+}

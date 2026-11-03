@@ -1,0 +1,122 @@
+{
+  "browser": "156.0.4314.50",
+  "platform": "Windows headless Edge; tablet is viewport simulation only",
+  "checks": [
+    {
+      "name": "independent version content reaches full editor and design modes without changing master",
+      "status": "PASS"
+    },
+    {
+      "name": "advanced legacy settings remain editable and template switching preserves saved appearance",
+      "status": "PASS",
+      "details": {
+        "restoredAvatarSize": 40,
+        "backgroundPreserved": true
+      }
+    },
+    {
+      "name": "all four DOCX templates contain editable independent text, selective TOC and native columns",
+      "status": "PASS",
+      "details": [
+        {
+          "template": "original",
+          "hasName": true,
+          "hasBody": true,
+          "hasMaster": false,
+          "protected": false,
+          "drawing": false,
+          "heading1": 1,
+          "columns": false
+        },
+        {
+          "template": "classic",
+          "hasName": true,
+          "hasBody": true,
+          "hasMaster": false,
+          "protected": false,
+          "drawing": false,
+          "heading1": 1,
+          "columns": false
+        },
+        {
+          "template": "modern",
+          "hasName": true,
+          "hasBody": true,
+          "hasMaster": false,
+          "protected": false,
+          "drawing": false,
+          "heading1": 1,
+          "columns": false
+        },
+        {
+          "template": "academic",
+          "hasName": true,
+          "hasBody": true,
+          "hasMaster": false,
+          "protected": false,
+          "drawing": false,
+          "heading1": 1,
+          "columns": true
+        }
+      ]
+    },
+    {
+      "name": "native portrait images stay separate from editable body paragraphs in all templates",
+      "status": "PASS",
+      "details": [
+        {
+          "template": "original",
+          "drawingCount": 1,
+          "hasBody": true,
+          "nativeMedia": 1,
+          "protected": false
+        },
+        {
+          "template": "classic",
+          "drawingCount": 1,
+          "hasBody": true,
+          "nativeMedia": 1,
+          "protected": false
+        },
+        {
+          "template": "modern",
+          "drawingCount": 1,
+          "hasBody": true,
+          "nativeMedia": 1,
+          "protected": false
+        },
+        {
+          "template": "academic",
+          "drawingCount": 1,
+          "hasBody": true,
+          "nativeMedia": 1,
+          "protected": false
+        }
+      ]
+    },
+    {
+      "name": "unified export button navigates before generation; filename does not rename version and files persist",
+      "status": "PASS",
+      "details": {
+        "description": "File_custom.docx · 16 KB"
+      }
+    },
+    {
+      "name": "PDF/PPTX/HTML/Markdown and PNG share resolved content, cover and finite page geometry",
+      "status": "PASS",
+      "details": {
+        "pages": 3,
+        "pptBytes": 81385,
+        "htmlHas": true,
+        "htmlMaster": false,
+        "mdHas": true,
+        "pngPages": 3
+      }
+    },
+    {
+      "name": "landscape tablet layout keeps design controls usable and avoids document horizontal overflow",
+      "status": "PASS"
+    }
+  ],
+  "errors": []
+}

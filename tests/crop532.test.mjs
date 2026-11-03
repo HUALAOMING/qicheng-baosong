@@ -1,0 +1,8 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {rotatedSize532,fitCropRect532,cropRect532,moveCropRect532,resizeCropRect532,normalizedCropRect532} from '../js/crop-geometry532.js';
+test('quarter turns swap dimensions and fine rotation expands bounds',()=>{assert.deepEqual(rotatedSize532(400,300,90),{width:300,height:400});assert.deepEqual(rotatedSize532(400,300,-180),{width:400,height:300});assert.ok(rotatedSize532(400,300,8).width>400);});
+test('legacy percent position and zoom resolve to the same visible source region',()=>{assert.deepEqual(cropRect532({x:100,y:0,zoom:2},400,300,1),{x:250,y:0,w:150,h:150});const r=cropRect532({rect:{x:.1,y:.2,w:.5,h:.4}},400,300);assert.deepEqual(r,{x:40,y:60,w:200,h:120});assert.deepEqual(normalizedCropRect532(r,400,300),{x:.1,y:.2,w:.5,h:.4});});
+test('dragging clamps to image bounds without changing selection size',()=>{assert.deepEqual(moveCropRect532({x:20,y:30,w:100,h:80},900,-900,400,300),{x:300,y:0,w:100,h:80});});
+test('every edge and corner preserves fixed ratio and stays inside the source',()=>{const r=fitCropRect532(400,300,2/3);for(const handle of ['n','ne','e','se','s','sw','w','nw'])for(const [dx,dy]of [[-100,-80],[100,80],[9999,-9999],[-9999,9999]]){const next=resizeCropRect532(r,handle,dx,dy,400,300,2/3);assert.ok(Math.abs(next.w/next.h-2/3)<1e-8);assert.ok(next.x>=0&&next.y>=0&&next.x+next.w<=400.000001&&next.y+next.h<=300.000001);assert.ok(next.w>0&&next.h>0);}});
+test('free crop changes only the grabbed edge and never inverts',()=>{const r={x:50,y:40,w:200,h:160},a=resizeCropRect532(r,'w',20,80,400,300);assert.deepEqual(a,{x:70,y:40,w:180,h:160});assert.ok(resizeCropRect532(r,'se',-999,-999,400,300).w>0);});
