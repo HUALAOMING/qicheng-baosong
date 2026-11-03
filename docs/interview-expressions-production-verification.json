@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "site": "https://hualaoming.github.io/qicheng-baosong/",
+  "checks": [
+    "live manifest and exact download checksum",
+    "clicked online resource update and confirmation",
+    "new reading entry opens all 24 bilingual expressions",
+    "theme filter and bilingual / author search",
+    "390px reading layout without horizontal overflow",
+    "default daily source accepts new resource and shows English plus Chinese",
+    "daily expression links to its reading entry",
+    "weekly quote picker lists all 24 and saves a seven-expression plan",
+    "reload preserves 24 expressions, default choice, weekly bilingual plan and Zhuangzi 50",
+    "repeat update does not duplicate resources"
+  ],
+  "errors": [],
+  "count": 24,
+  "weekly": 7
+}
