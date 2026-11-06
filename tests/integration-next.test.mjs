@@ -58,8 +58,8 @@ test('manual save observes a pending resource failure even while current is bein
     assert.equal(r.getExamScheduleResource().examSchedule.length,0);
   }finally{storage.setMany=original;}
 });
-test('settings has one set of JSON controls and keeps independent HTML copies under Advanced tools',()=>{
-  const html=settings.settingsPage();assert.equal((html.match(/data-action="backup"/g)||[]).length,1);assert.equal((html.match(/data-transfer-import>/g)||[]).length,1);assert.equal((html.match(/data-local-save>/g)||[]).length,1);
+test('settings separates modular backups and keeps independent HTML copies under Advanced tools',()=>{
+  const html=settings.settingsPage();assert.equal((html.match(/data-backup-part54=/g)||[]).length,3);assert.equal((html.match(/data-backup-import54=/g)||[]).length,5);assert.match(html,/data-settings-category53="importexport"/);assert.equal((html.match(/data-local-save>/g)||[]).length,1);
   assert.doesNotMatch(html,/data-transfer-role|data-transfer-export|id="backupSettings"/);assert.match(html,/高级工具/);assert.match(html,/导出可编辑 HTML 副本/);assert.match(html,/不与原 PWA 持续同步/);
 });
 test('materials/results and unified practice statistics have separate pages and independent filters',async()=>{

@@ -1,10 +1,10 @@
-import {ensureVendors} from '../lazy-runtime.js';
-import { getCurrentBackup } from '../backup.js';
+import {folderName54, createFolder54, renameFolder54, moveFiles54, removeFolder54, renameFile54, filterFiles54} from '../file-model54.js';
+import {generateFilesArchive54} from '../modular-backup54.js';
 import { storage } from '../storage.js';
 import { tasks } from '../tasks.js';
 import { ctx } from '../state.js';
-import { $, $$, checkbox, dataBytes, download, esc, formatSize3, heading3, icon3, loadImage, readFile, safeFilename3, toast, tr, uid, moveIn } from '../utils/helpers.js';
-import { cleanCrop, normalizeAssets3, snapshot3 } from '../model.js';
+import { $, $$, checkbox, download, esc, formatSize3, heading3, icon3, readFile, safeFilename3, toast, tr, uid, moveIn } from '../utils/helpers.js';
+import { cleanCrop, normalizeAssets3 } from '../model.js';
 import { save, scheduleSave } from '../autosave.js';
 import { confirmAction, render, changed } from '../app.js';
 import { openCropDialog, photoArray } from './images.js';
@@ -107,14 +107,17 @@ async function importAssets3 (files, owner = 'center') {
   ctx.busy = true;
   const task521=tasks.start('批量图片与附件处理');
   let processed521=0;
-  const queue = [], errors = [];
+  const queue = [], errors = [], originalIDs54 = new Set(ctx.state.assets.map(a=>a.id)), targetFolder54 = ['center','resume-center'].includes(owner) && activeMaterialFolder54 !== '*' ? activeMaterialFolder54 : '';
   try {
     for (const f of owner === 'avatar' ? list.slice (0, 1) : list) {
       task521.stage('读取并校验文件',{done:processed521,total:owner==='avatar'?1:list.length});
       try {
         if (owner === 'avatar' && ! /^image\/(jpeg|png|webp|gif)$/.test (f.type)) throw Error (tr ('请选择 JPG、PNG、WebP 或 GIF 照片',
         'Choose JPG, PNG, WebP or GIF'));
-        const a = await addAsset3 (f), ref = linkAsset3 (a, owner);
+        const a = await addAsset3 (f);
+        if(!originalIDs54.has(a.id))a.folderId=targetFolder54;
+        if(owner==='resume-center')a.collection='resume';
+        const ref = linkAsset3 (a, owner==='resume-center'?'center':owner);
         if (ref) queue.push (ref)
       }
       catch (e) {
@@ -154,24 +157,45 @@ function assetUsage3 (id) {
   return result
 }
 
+let activeMaterialFolder54 = '*';
+const materialSelection54 = new Set(), archiveSelection54 = new Set();
+function folderOptions54(selected = '') {
+  return '<option value="" '+(!selected?'selected':'')+'>未分类</option>'+(ctx.state.assetFolders||[]).map(folder=>'<option value="'+esc(folder.id)+'" '+(selected===folder.id?'selected':'')+'>'+esc(folder.name)+'</option>').join('');
+}
+function materialFolders54(kind) {
+  if(activeMaterialFolder54!=='*'&&activeMaterialFolder54&&!(ctx.state.assetFolders||[]).some(folder=>folder.id===activeMaterialFolder54))activeMaterialFolder54='*';
+  const folders=[['*',tr('全部资料','All materials')],['',tr('未分类','Unfiled')],...(ctx.state.assetFolders||[]).map(folder=>[folder.id,folder.name])];
+  return '<section class="panel material-folders54"><div class="panel-title"><h2>'+tr('文件夹','Folders')+'</h2><button type="button" data-create-folder54>＋ '+tr('新建文件夹','New folder')+'</button></div><div class="folder-list54">'+folders.map(([id,name])=>'<button type="button" data-folder54="'+esc(id)+'" class="'+(id===activeMaterialFolder54?'active':'')+'" aria-pressed="'+(id===activeMaterialFolder54)+'">'+icon3('folder')+'<span>'+esc(name)+'</span><small>'+filterFiles54(ctx.state,{kind,folder:id}).length+'</small></button>').join('')+'</div>'+(activeMaterialFolder54&&activeMaterialFolder54!=='*'?'<div class="actions folder-actions54"><button data-rename-folder54="'+esc(activeMaterialFolder54)+'">'+tr('重命名文件夹','Rename folder')+'</button><button data-delete-folder54="'+esc(activeMaterialFolder54)+'">'+tr('删除文件夹（保留文件）','Delete folder (keep files)')+'</button></div>':'')+'</section>';
+}
+function materialCard54(a) {
+  const use=assetUsage3(a.id);
+  return '<article class="asset-card3"><label class="material-check54"><input type="checkbox" data-material-check54="'+esc(a.id)+'" '+(materialSelection54.has(a.id)?'checked':'')+' aria-label="选择 '+esc(a.name)+'"><span>'+tr('选择','Select')+'</span></label><button class="file-mark3" data-open-asset521="'+esc(a.id)+'" aria-label="打开 '+esc(a.name)+'">'+icon3('folder')+'<span>'+esc(a.name.split('.').pop().toUpperCase().slice(0,8))+'</span></button><div class="asset-info"><h3 title="'+esc(a.name)+'">'+esc(a.name)+'</h3><p>'+formatSize3(a.size)+' · '+new Date(a.createdAt).toLocaleDateString()+'</p><small>'+esc(folderName54(ctx.state,a.folderId))+' · '+tr('关联 ','Linked to ')+use.length+tr(' 处',' records')+'</small><div class="actions"><button data-open-asset521="'+esc(a.id)+'">'+tr('打开','Open')+'</button><button data-download-asset3="'+esc(a.id)+'">'+tr('下载','Download')+'</button><button data-rename-asset54="'+esc(a.id)+'">'+tr('重命名','Rename')+'</button><button data-move-asset54="'+esc(a.id)+'">'+tr('移动','Move')+'</button><button data-attach-asset3="'+esc(a.id)+'">'+tr('关联','Attach')+'</button><button data-delete-asset3="'+esc(a.id)+'">'+tr('删除','Delete')+'</button></div></div></article>';
+}
 function materialsPage3 (kind) {
-  normalizeAssets3 ();
-  const list = ctx.state.assets.filter (a => a.kind === kind && (! ctx.assetSearch3 || a.name.toLowerCase ().includes (ctx.assetSearch3.toLowerCase ())));
-  return heading3 ('MATERIALS / ' + (kind === 'image' ? 'IMAGES' : 'FILES'), tr (kind === 'image' ? '让每张照片，都有归处。' : '把文件，收在同一个地方。',
-  kind === 'image' ? 'One place for every image.' : 'All your files, in one place.'), tr ('从任何页面上传都会同步到这里；也可以在这里上传，再关联到其他记录。',
-  'Uploads from every page appear here. Upload here and attach them to your records later.')) + '<section class="panel material-toolbar"><label class="search3">' +
-  icon3 ('search') + '<input id="assetSearch3" value="' + esc (ctx.assetSearch3) + '" placeholder="' + tr ('按文件名搜索',
-  'Search filenames') + '"></label><label class="file-button primary">＋ ' + tr ('添加资料', 'Add materials') + '<input type="file" data-import3="center" ' +
-  (kind === 'image' ? 'accept="image/jpeg,image/png,image/webp,image/gif"' : '') + ' multiple hidden></label><span class="badge">' +
-  list.length + ' ' + tr ('项', 'items') + '</span></section><div class="asset-grid3 ' + (kind === 'file' ? 'asset-files3' : '') +
-  '">' + (list.length ? list.map (a => {
-    const use = assetUsage3 (a.id); return '<article class="asset-card3">' + '<button class="file-mark3" data-open-asset521="'+esc(a.id)+'" aria-label="打开 '+esc(a.name)+'">'+icon3('folder')+'<span>'+esc(a.name.split('.').pop().toUpperCase().slice(0,8))+'</span></button>' + '<div class="asset-info"><h3 title="' +
-    esc (a.name) + '">' + esc (a.name) + '</h3><p>' + formatSize3 (a.size) + ' · ' + new Date (a.createdAt).toLocaleDateString () +
-    '</p><small>' + tr ('关联 ', 'Linked to ') + use.length + tr (' 处', ' records') + '</small><div class="actions"><button data-open-asset521="'+esc(a.id)+'">打开</button><button data-download-asset3="' +
-    a.id + '">' + tr ('下载', 'Download') + '</button><button data-attach-asset3="' + a.id + '">' + tr ('关联', 'Attach') +
-    '</button><button data-delete-asset3="' + a.id + '">' + tr ('删除', 'Delete') + '</button></div></div></article>'
-  }).join ('') : '<div class="panel empty3">' + icon3 ('folder') + '<p>' + tr ('还没有资料。上传后会自动保存到这里。', 'No materials yet. Uploads are saved here automatically.') +
-  '</p></div>') + '</div>'
+  normalizeAssets3();
+  for(const id of materialSelection54)if(!ctx.state.assets.some(a=>a.id===id))materialSelection54.delete(id);
+  const isResume=kind==='resume',list=filterFiles54(ctx.state,{kind,folder:activeMaterialFolder54,search:ctx.assetSearch3});
+  return heading3('MATERIALS / '+(isResume?'MY RESUMES':kind==='image'?'IMAGES':'FILES'),tr(isResume?'我的简历':kind==='image'?'让每张照片，都有归处。':'把文件，收在同一个地方。',isResume?'My resumes':kind==='image'?'One place for every image.':'All your files, in one place.'),tr(isResume?'上传你在 Word、WPS 等工具中继续完善的最终版简历，方便随时查找和下载。':'从任何页面上传都会同步到这里；通过文件夹整理、重命名，再关联到其他记录。',isResume?'Upload final resumes refined in Word, WPS or other tools, and find them here whenever needed.':'Organize uploaded images and attachments into folders, rename them and attach them to records.'))+materialFolders54(kind)+'<section class="panel material-toolbar"><label class="search3">'+icon3('search')+'<input id="assetSearch3" value="'+esc(ctx.assetSearch3)+'" placeholder="'+tr('按文件名搜索','Search filenames')+'"></label><label class="file-button primary">＋ '+tr(isResume?'上传我的简历':'添加资料',isResume?'Upload my resume':'Add materials')+'<input type="file" data-import3="'+(isResume?'resume-center':'center')+'" '+(kind==='image'?'accept="image/jpeg,image/png,image/webp,image/gif"':'')+' multiple hidden></label><span class="badge" id="materialCount54">'+list.length+' '+tr('项','items')+'</span></section><section class="panel material-bulk54"><span id="materialSelected54" aria-live="polite">'+tr('已选 ','Selected ')+materialSelection54.size+' '+tr('项','items')+'</span><div class="actions"><button data-select-materials54>'+tr('选择当前列表','Select visible')+'</button><button data-clear-materials54>'+tr('取消选择','Clear selection')+'</button><button data-move-selected54>'+tr('移动所选到文件夹','Move selected')+'</button><button data-zip-materials54>'+tr('导出所选 ZIP','Export selected ZIP')+'</button></div></section><div class="asset-grid3 '+(kind!=='image'?'asset-files3':'')+'">'+(list.length?list.map(materialCard54).join(''):'<div class="panel empty3">'+icon3('folder')+'<p>'+tr(isResume?'这里还没有上传的简历。选择“上传我的简历”添加最终版本。':'当前列表没有资料，可以上传文件或切换文件夹。',isResume?'Upload your completed resume to keep it here.':'No files in this view. Upload files or choose another folder.')+'</p></div>')+'</div>';
+}
+
+function materialDialog54(title, body, apply) {
+  let dialog=$('#materialDialog54');if(!dialog){dialog=document.createElement('dialog');dialog.id='materialDialog54';dialog.className='material-dialog54';document.body.append(dialog);}
+  dialog.innerHTML='<form><h2>'+esc(title)+'</h2>'+body+'<p id="materialError54" class="hint" role="alert"></p><div class="actions"><button type="button" data-material-cancel54>'+tr('取消','Cancel')+'</button><button type="submit" class="primary">'+tr('确认','Confirm')+'</button></div></form>';
+  dialog.querySelector('[data-material-cancel54]').onclick=()=>dialog.close();
+  dialog.querySelector('form').onsubmit=event=>{event.preventDefault();try{apply();dialog.close();changed();}catch(error){$('#materialError54').textContent=error.message;}};
+  dialog.showModal();dialog.querySelector('input,select')?.focus();
+}
+function showFolderDialog54(id) {
+  const folder=(ctx.state.assetFolders||[]).find(folder=>folder.id===id);
+  materialDialog54(tr(folder?'重命名文件夹':'新建文件夹',folder?'Rename folder':'New folder'),'<label class="field"><span>'+tr('文件夹名称','Folder name')+'</span><input id="materialName54" maxlength="100" required value="'+esc(folder?.name||'')+'"></label>',()=>{const value=$('#materialName54').value;if(folder)renameFolder54(ctx.state,id,value);else activeMaterialFolder54=createFolder54(ctx.state,value,uid()).id;});
+}
+function showRenameAsset54(id) {
+  const asset=assetBy3(id);if(!asset)return;
+  materialDialog54(tr('重命名文件','Rename file'),'<label class="field"><span>'+tr('文件名','Filename')+'</span><input id="materialName54" maxlength="240" required value="'+esc(asset.name)+'"></label><p class="hint">'+tr('省略扩展名时会保留原扩展名；文件内容和关联不变。','The original extension is kept if omitted; file bytes and links are preserved.')+'</p>',()=>renameFile54(ctx.state,id,$('#materialName54').value));
+}
+function showMoveAssets54(ids) {
+  if(!ids.length)return toast(tr('请先选择文件。','Select some files first.'));
+  materialDialog54(tr('移动文件到文件夹','Move files to folder'),'<p>'+tr('所选文件：','Selected files: ')+ids.length+'</p><label class="field"><span>'+tr('目标文件夹','Destination folder')+'</span><select id="materialFolderDestination54">'+folderOptions54(assetBy3(ids[0])?.folderId)+'</select></label>',()=>moveFiles54(ctx.state,ids,$('#materialFolderDestination54').value));
 }
 
 function outputsPage3 () {
@@ -247,60 +271,35 @@ async function deleteAsset3 (id) {
 }
 
 function archivePage3 () {
-  normalizeAssets3 ();
-  const totals = {
-    image : 0, file : 0, export : 0
-  };
-  ctx.state.assets.forEach (a => totals [a.kind] ++);
-  return heading3 ('CREATE / PERSONAL ARCHIVE', tr ('把自己的资料，完整带走。', 'Take your personal materials with you.'), tr ('打包图片、附件、已导出的文档与完整进度备份，原图保留原始比例。',
-  'Bundle original images, attachments, exported documents and a complete progress backup.')) + '<section class="panel archive-panel3"><div class="archive-symbol3">' +
-  icon3 ('folder') + '</div><h2>' + tr ('个人资料 ZIP', 'Personal archive ZIP') + '</h2><div class="archive-counts3">' +
-  [['image', '图片', 'images'], ['file', '附件', 'files'], ['export', '导出文档', 'exports']].map (([k, z, e]) => '<div><strong>' +
-  totals [k] + '</strong><span>' + tr (z, e) + '</span></div>').join ('') + '</div><p class="hint">' + tr ('另外包含进度备份 JSON、资料索引和恢复说明。',
-  'Also includes a JSON progress backup, material index and restore instructions.') + '</p><label class="field"><span>' +
-  tr ('压缩包名称', 'ZIP filename') + '</span><input id="packageName3" value="' + esc (ctx.state.filePackageName) + '"></label><button class="primary" data-action3="archive">' +
-  icon3 ('export') + tr ('打包导出个人资料', 'Download personal archive') + '</button></section>'
+  normalizeAssets3();
+  for(const id of archiveSelection54)if(!assetBy3(id))archiveSelection54.delete(id);
+  const folders=[['',tr('未分类','Unfiled')],...(ctx.state.assetFolders||[]).map(folder=>[folder.id,folder.name])];
+  return heading3('MATERIALS / ZIP',tr('选择需要带走的资料。','Choose the files to take with you.'),tr('按文件夹或单个文件选择；首次进入不默认勾选。ZIP 保存文件原件与分类，可在设置的“导入与导出”页面恢复。','Select folders or individual files. Nothing is selected by default. Restore the ZIP from Import & export in Settings.'))+'<section class="panel archive-selection54"><div class="panel-title"><h2>'+tr('个人资料 ZIP','Personal files ZIP')+'</h2><span class="badge" id="archiveCount54" aria-live="polite"></span></div><div class="actions"><button data-archive-all54>'+tr('全部选择','Select all')+'</button><button data-archive-clear54>'+tr('取消全部','Clear all')+'</button></div><div class="archive-folders54">'+folders.map(([id,name])=>{const files=ctx.state.assets.filter(a=>(a.folderId||'')===id);if(!files.length)return '';return '<details open><summary><label><input type="checkbox" data-archive-folder54="'+esc(id)+'" aria-label="选择文件夹 '+esc(name)+'"><strong>'+esc(name)+'</strong> <small>'+files.length+' '+tr('项','items')+'</small></label></summary><div class="archive-files54">'+files.map(a=>'<label><input type="checkbox" data-archive-file54="'+esc(a.id)+'" '+(archiveSelection54.has(a.id)?'checked':'')+'><span>'+esc(a.name)+'</span><small>'+formatSize3(a.size)+'</small></label>').join('')+'</div></details>';}).join('')+(ctx.state.assets.length?'':'<p class="hint">'+tr('暂无可导出的文件。','No files to export.')+'</p>')+'</div><label class="field"><span>'+tr('压缩包名称','ZIP filename')+'</span><input id="packageName3" value="'+esc(ctx.state.filePackageName)+'"></label><p class="hint">'+tr('此压缩包不包含文字进度或学习数据；请在设置中按需分别备份。','This archive contains files only. Back up progress and learning separately in Settings.')+'</p><button class="primary" data-action3="archive">'+icon3('export')+tr('导出所选资料','Export selected files')+'</button></section>';
 }
-
+async function downloadSelection54(ids) {
+  if(!ids.length)return toast(tr('请先选择要导出的文件或文件夹。','Select files or folders to export.'));
+  if(ctx.busy||ctx.uploadBusy)return;
+  ctx.busy=true;
+  try{
+    toast(tr('正在打包所选资料…','Preparing selected files…'));
+    const blob=await generateFilesArchive54(ids);
+    download(blob,'application/zip',safeFilename3(ctx.state.filePackageName||'我的个人资料')+'.zip');
+    toast(tr('所选资料已打包，共 ','Archive ready: ')+ids.length+tr(' 项。',' files.'));
+  }catch(error){toast(tr('打包失败：','Archive failed: ')+error.message);}
+  finally{ctx.busy=false;}
+}
 async function exportArchive3 () {
-  await ensureVendors(['jszip']);
-  if (ctx.busy) return;
-  ctx.busy = true;
-  toast (tr ('正在打包个人资料…', 'Preparing archive…'));
-  try {
-    normalizeAssets3 ();
-    const zip = new JSZip (), index = [], used = new Set (), folders = {
-      image : '01_图片', file : '02_文件附件', export : '03_导出文档'
-    };
-    for (const a of ctx.state.assets) {
-      let name = a.name.replace (/[\\/:*?"<>|\x00-\x1f]/g, '_') || 'File', path = folders [a.kind] + '/' + name, n = 2;
-      while (used.has (path)) {
-        path = folders [a.kind] + '/' + n + '_' + name;
-        n ++
-      }
-      used.add (path);
-      zip.file (path, await (await storage.assetBlob(a)).arrayBuffer(), {
-        binary : true
-      });
-      index.push ( {
-        id : a.id, name : a.name, path, mime : a.mime, size : a.size, linkedRecords : assetUsage3 (a.id).map (x => x.label)
-      })
-    }
-    zip.file ('00_进度备份.json', JSON.stringify (await getCurrentBackup (), null, 2));
-    zip.file ('00_资料索引.json', JSON.stringify (index, null, 2));
-    zip.file ('恢复说明.md', '# 启程 4.0 Beta 个人资料\n\n将 00_进度备份.json 在启程 4.0 Beta 中通过“恢复备份”导入，即可恢复文字、照片、附件、文档版本与导出历史。\n\n01_图片 保留原始照片；裁剪参数保存在进度中。02_文件附件 为上传的原文件。03_导出文档 为曾生成的成果。\n\nRestore 00_进度备份.json in Qicheng 4.0 Beta to recover your workspace. The image folder contains original files; crop settings remain in the progress backup.\n');
-    const blob = await zip.generateAsync ( {
-      type : 'blob', mimeType : 'application/zip', compression : 'STORE'
-    });
-    download (blob, 'application/zip', safeFilename3 (ctx.state.filePackageName) + '.zip');
-    toast (tr ('个人资料已打包', 'Archive ready'))
+  return downloadSelection54([...archiveSelection54]);
+}
+function updateArchiveSelection54() {
+  for(const input of $$('[data-archive-file54]'))input.checked=archiveSelection54.has(input.dataset.archiveFile54);
+  for(const input of $$('[data-archive-folder54]')){
+    const files=ctx.state.assets.filter(a=>(a.folderId||'')===input.dataset.archiveFolder54),count=files.filter(a=>archiveSelection54.has(a.id)).length;
+    input.checked=!!files.length&&count===files.length;input.indeterminate=count>0&&count<files.length;
   }
-  catch (e) {
-    toast (tr ('打包失败：', 'Archive failed: ') + e.message)
-  }
-  finally {
-    ctx.busy = false
-  }
+  const assets=ctx.state.assets.filter(a=>archiveSelection54.has(a.id));
+  if($('#archiveCount54'))$('#archiveCount54').textContent=tr('已选 ','Selected ')+assets.length+' '+tr('项','files')+' · '+formatSize3(assets.reduce((total,a)=>total+a.size,0));
+  const button=$('[data-action3="archive"]');if(button)button.disabled=!assets.length;
 }
 
 function bindAssetCards3 () {
@@ -309,7 +308,10 @@ function bindAssetCards3 () {
     const a = assetBy3 (b.dataset.downloadAsset3); downloadAsset521(a)
   });
   $$ ('.asset-grid3 [data-delete-asset3]').forEach (b => b.onclick = () => deleteAsset3 (b.dataset.deleteAsset3));
-  $$ ('.asset-grid3 [data-attach-asset3]').forEach (b => b.onclick = () => showAttach3 (b.dataset.attachAsset3))
+  $$ ('.asset-grid3 [data-attach-asset3]').forEach (b => b.onclick = () => showAttach3 (b.dataset.attachAsset3));
+  $$('[data-rename-asset54]').forEach(b=>b.onclick=()=>showRenameAsset54(b.dataset.renameAsset54));
+  $$('[data-move-asset54]').forEach(b=>b.onclick=()=>showMoveAssets54([b.dataset.moveAsset54]));
+  $$('[data-material-check54]').forEach(input=>input.onchange=()=>{input.checked?materialSelection54.add(input.dataset.materialCheck54):materialSelection54.delete(input.dataset.materialCheck54);if($('#materialSelected54'))$('#materialSelected54').textContent=tr('已选 ','Selected ')+materialSelection54.size+' '+tr('项','items');});
 }
 
 function showAttach3 (id) {
@@ -345,6 +347,25 @@ export { ownerObject3, assetBy3, attachmentPanel3, addAsset3, linkAsset3, import
 
 // All controls for this feature, in their original override order.
 function bindMaterialsControls () {
+  bindAssetCards3();
+  $$('[data-create-folder54]').forEach(button=>button.onclick=()=>showFolderDialog54());
+  $$('[data-rename-folder54]').forEach(button=>button.onclick=()=>showFolderDialog54(button.dataset.renameFolder54));
+  $$('[data-folder54]').forEach(button=>button.onclick=()=>{activeMaterialFolder54=button.dataset.folder54;render();});
+  $$('[data-delete-folder54]').forEach(button=>button.onclick=async()=>{
+    const id=button.dataset.deleteFolder54;
+    if(!await confirmAction(tr('删除这个文件夹？','Delete this folder?'),tr('文件原件和关联都会保留，文件将移回“未分类”。','Original files and their links are kept; files move to Unfiled.'),tr('删除文件夹','Delete folder')))return;
+    removeFolder54(ctx.state,id);activeMaterialFolder54='';changed();
+  });
+  const selectedVisible54=()=>$$('[data-material-check54]').map(input=>input.dataset.materialCheck54);
+  if($('[data-select-materials54]'))$('[data-select-materials54]').onclick=()=>{selectedVisible54().forEach(id=>materialSelection54.add(id));render();};
+  if($('[data-clear-materials54]'))$('[data-clear-materials54]').onclick=()=>{materialSelection54.clear();render();};
+  if($('[data-move-selected54]'))$('[data-move-selected54]').onclick=()=>showMoveAssets54([...materialSelection54]);
+  if($('[data-zip-materials54]'))$('[data-zip-materials54]').onclick=()=>downloadSelection54([...materialSelection54]);
+  $$('[data-archive-file54]').forEach(input=>input.onchange=()=>{input.checked?archiveSelection54.add(input.dataset.archiveFile54):archiveSelection54.delete(input.dataset.archiveFile54);updateArchiveSelection54();});
+  $$('[data-archive-folder54]').forEach(input=>input.onchange=()=>{for(const asset of ctx.state.assets.filter(a=>(a.folderId||'')===input.dataset.archiveFolder54))input.checked?archiveSelection54.add(asset.id):archiveSelection54.delete(asset.id);updateArchiveSelection54();});
+  if($('[data-archive-all54]'))$('[data-archive-all54]').onclick=()=>{ctx.state.assets.forEach(asset=>archiveSelection54.add(asset.id));updateArchiveSelection54();};
+  if($('[data-archive-clear54]'))$('[data-archive-clear54]').onclick=()=>{archiveSelection54.clear();updateArchiveSelection54();};
+  updateArchiveSelection54();
   $$('[data-open-asset521]').forEach(b=>b.onclick=()=>openAsset521(b.dataset.openAsset521));
   $$ ('[data-import3]').forEach (e => e.onchange = () => importAssets3 (e.files, e.dataset.import3));
   $$ ('[data-picker3]').forEach (b => b.onclick = e => {
@@ -369,10 +390,11 @@ function bindMaterialsControls () {
   $$ ('[data-attach-asset3]').forEach (b => b.onclick = () => showAttach3 (b.dataset.attachAsset3));
   if ($ ('#assetSearch3')) $ ('#assetSearch3').oninput = e => {
     ctx.assetSearch3 = e.target.value;
-    const kind = ctx.state.route === 'images' ? 'image' : 'file';
+    const kind = ctx.state.route === 'images' ? 'image' : ctx.state.route === 'my-resumes' ? 'resume' : 'file';
     const fresh = document.createElement ('div');
     fresh.innerHTML = materialsPage3 (kind);
     $ ('.asset-grid3').innerHTML = fresh.querySelector ('.asset-grid3').innerHTML;
+    $('#materialCount54').textContent=fresh.querySelector('#materialCount54').textContent;
     bindAssetCards3 ()
   };
   if ($ ('#packageName3')) $ ('#packageName3').oninput = e => {

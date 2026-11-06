@@ -86,5 +86,5 @@ test('dashboard help explains normalization and equivalent ratios with correct e
 test('help never echoes an unknown route as executable content', () => {
   const help = getPageHelp52('unknown:<img src=x onerror=alert(1)>');
   assert.doesNotMatch(help.title+help.html,/<img|onerror|<script/);
-  assert.match(help.html,/手动保存/);
+  assert.match(help.html,/保存进度/);
 });

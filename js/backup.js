@@ -18,6 +18,7 @@ import { validateHomeRecords, initializeHome, waitForHomeWrites } from './module
 import {validateJournalRecords,initializeJournal,waitForJournalWrites} from './modules/journal.js';
 import {initializeExamCalendar,validateExamCalendarRecords,waitForExamCalendarWrites} from './modules/exam-calendar.js';
 import {resetIntroductions52} from './modules/introductions.js';
+import {openSettings,selectSettingsCategory53} from './modules/settings.js';
 const BACKUP_VERSION = 2;
 let manualSavePending = null;
 function saveAllLocal() {
@@ -123,18 +124,10 @@ function backupFilename () {
 }
 async function exportBackup () {
   if (ctx.busy || ctx.uploadBusy) return;
-  try {
-    let saved=true;
-    try { await saveAllLocal(); } catch { saved=false; }
-    const backup = await getCurrentBackup ();
-    download (JSON.stringify (backup, null, 2), 'application/json;charset=utf-8', backupFilename ());
-    await noteExternalBackup521('download',backupFilename()).catch(error=>toast('备份已生成，但无法记录备份时间：'+error.message));
-    if(!saved)toast(tr('本机保存尚未完成，JSON 已包含当前可读取的资料和答案草稿，请妥善保存文件。','Local saving is incomplete. This JSON includes the readable current materials and answer draft; keep the file safely.'));
-  }
-  catch (error) {
-    toast (tr ('无法生成备份：', 'Unable to back up: ') + error.message);
-  }
+  openSettings();
+  selectSettingsCategory53('importexport');
 }
+
 function resetTransientState () {
   resetViewMemory50();
   resetIntroductions52();

@@ -23,7 +23,7 @@ function initializeSaving301 (snapshot = snapshot3 ({forStorage:true})) {
   clearTimeout(savePresentation53.timer);savePresentation53={phase:'saved',since:0,timer:null};lastActualSaving53=false;
 }
 let savePresentation53={phase:'saved',since:0,timer:null},lastActualSaving53=false;
-function getSaveFeedback53(){const phase=savePresentation53.phase;return {phase,text:phase==='error'?tr('保存失败','Save failed'):phase==='saving'?tr('正在保存…','Saving…'):phase==='dirty'?tr('待自动保存','Pending save'):tr('已保存','Saved')};}
+function getSaveFeedback53(){const phase=savePresentation53.phase;return {phase,text:phase==='error'?tr('保存失败','Save failed'):phase==='saving'?tr('正在保存…','Saving…'):phase==='dirty'?tr('有修改 · 请保存','Unsaved changes'):tr('已保存','Saved')};}
 function updateSaveStatus301 () {
   const now=Date.now(),actual=ctx.saveError?'error':ctx.saving?'saving':ctx.dirty301?'dirty':'saved';
   clearTimeout(savePresentation53.timer);savePresentation53.timer=null;
@@ -44,9 +44,9 @@ function scheduleSave () {
   ctx.editRevision301 ++;
   updateSaveStatus301 ();
   clearTimeout (ctx.timer);
-  ctx.timer = setTimeout (() => {
-    ctx.timer = null; save ();
-  }, 500);
+  // Editing marks progress as dirty. Only an explicit save or committed action
+  // writes the workspace; typing never clones or serializes the whole document.
+  ctx.timer = null;
 }
 function cancelPendingSave () {
   clearTimeout (ctx.timer);

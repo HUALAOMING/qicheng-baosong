@@ -1,0 +1,155 @@
+{
+  "version": "5.4.0",
+  "date": "2026-11-07",
+  "baselineCommit": "18ab923490107e3fb88428ddc73afc1cd236fc2e",
+  "unit": {
+    "passed": 343,
+    "failed": 0
+  },
+  "platform": "Windows Edge headless; desktop/tablet/phone viewports; synthetic isolated profiles",
+  "browser": {
+    "migration": {
+      "status": "PASS",
+      "checks": [
+        "5.3.2 creates text, regular score, award-linked image, 1.3 MB attachment, custom classic and future user record",
+        "same-origin upgrade preserves old fields, files byte-for-byte, custom resources and versions; adds empty new collections",
+        "typing, focus changes and internal navigation cause zero workspace writes",
+        "menu Save persists progress across reload without a generated file",
+        "legacy complete JSON imports into 5.4 with exact original attachment content and field values",
+        {
+          "name": "metadata reads and learning export avoid original attachment expansion",
+          "length": 6471,
+          "full": 1740145,
+          "refs": true,
+          "usersHaveCurrent": false,
+          "record": {
+            "text": "保留未识别的用户学习记录"
+          }
+        }
+      ],
+      "errors": []
+    },
+    "files": {
+      "status": "PASS",
+      "checks": [
+        "uploaded final resume, user folders and renamed filenames persist after manual save/reload; exact original bytes preserved",
+        "archive defaults to no files, folder selection and individual exclusions work; selected ZIP imports into an empty browser with exact binary bytes/folder metadata and survives reload",
+        "desktop/tablet/phone layouts fit; deleting folder keeps all originals and survives reload"
+      ],
+      "errors": [],
+      "limitation": "Chromium viewport tests; no physical iPad used"
+    },
+    "resume_scores": {
+      "checks": [
+        "language and score input are separate pages",
+        "regular exams and display-only scores submit through separate forms",
+        "new version from existing version preserves content, style and selection with independent edits",
+        "selected language and award values remain visible at desktop and tablet widths",
+        "saved display grades, existing exams and cloned versions survive reload"
+      ],
+      "errors": []
+    },
+    "modular_backup": {
+      "status": "PASS",
+      "checks": [
+        "tablet-size settings has a separate Import & Export page, defaults to none, exports small profile JSON, independent learning JSON and lossless files ZIP; multiple selections produce one wrapper ZIP",
+        "profile-only import with missing originals rejects during preflight without touching receiving data",
+        "fresh browser batch import restores fields, introductions, study notes, marks, exact 512 KB original, folder, uploaded-resume category and background; existing custom bank remains visible; reload retains all",
+        "a simulated quota failure does not block rescue export: the downloaded profile JSON contains latest unsaved edits and the page explains local saving is incomplete"
+      ],
+      "payloadBytes": {
+        "original": 524288,
+        "profileJSON": 10875,
+        "learningJSON": 220972,
+        "filesZIP": 526300,
+        "selectedBundle": 758580
+      },
+      "originalSHA256": "df552db5ff2e4f024d4a778681ed03fb26b5c8e7542cda9400da75e9764a6274",
+      "errors": []
+    },
+    "pwa_update": {
+      "browser": "156.0.4314.58",
+      "actualDevice": "Windows headless Edge; not Android or installed OS PWA shell",
+      "scope": "/qicheng-baosong/",
+      "checks": [
+        {
+          "name": "5.3.0 existing app boots and commits baseline user data",
+          "status": "PASS",
+          "milliseconds": 1409
+        },
+        {
+          "name": "5.3.2 saved single-window update migrates to 5.4.0 without losing database",
+          "status": "PASS",
+          "milliseconds": 1885
+        },
+        {
+          "name": "offline restart and lazy school/map, quiz and document route work under GitHub Pages subpath",
+          "status": "PASS",
+          "milliseconds": 2276
+        },
+        {
+          "name": "editing peer blocks actual waiting-worker activation without refresh",
+          "status": "PASS",
+          "milliseconds": 1330,
+          "detail": {
+            "controllerState": "activated"
+          }
+        },
+        {
+          "name": "all clean windows acknowledge, save and reload together; new boot verifies expected revision",
+          "status": "PASS",
+          "milliseconds": 2604
+        },
+        {
+          "name": "interrupted/mismatched new resources fail installation; old offline program and data remain usable",
+          "status": "PASS",
+          "milliseconds": 894
+        }
+      ],
+      "errors": [],
+      "httpErrors": [],
+      "startedAt": "2026-11-06T17:08:39.994Z"
+    },
+    "storage": {
+      "date": "2026-11-06T17:10:28.960Z",
+      "platform": "Windows Edge headless",
+      "checks": [
+        {
+          "name": "real IDB Blob original/no-thumbnail/lazy attachment/incremental single-field commit",
+          "status": "PASS",
+          "fullImageExact": true,
+          "fullAttachmentExact": true,
+          "originalSize": [
+            768,
+            1024
+          ],
+          "thumbnailRecords": 0,
+          "lazyAttachmentBytes": 37,
+          "saveMs": 1.600000023841858,
+          "changedKeys": [
+            "@521:ws:profile"
+          ],
+          "revision": 2
+        },
+        {
+          "name": "separate Edge tabs reject stale whole-workspace overwrite",
+          "status": "PASS"
+        },
+        {
+          "name": "refresh retains text and exact attachment size",
+          "status": "PASS",
+          "profileName": "winner",
+          "size": 4194304
+        }
+      ]
+    },
+    "export": {
+      "source": "export53/summary.json",
+      "verifiedInExecution": true
+    },
+    "portable": {
+      "source": "offline53/summary.json",
+      "verifiedInExecution": true
+    }
+  }
+}

@@ -2,20 +2,33 @@ import {ctx} from './state.js';
 import {newVersion} from './model.js';
 import {MODULES,MODULE_NAMES,PROFILE,EDU_FIELDS,AWARD_FIELDS,EXP_FIELDS,EXAM_FIELDS,BOOK_FIELDS,ACHIEVEMENT_FIELDS} from './constants.js';
 import {uid} from './utils/helpers.js';
+import {displayScoreExam54,DISPLAY_EXAM_FIELDS54} from './display-scores54.js';
 const resumeMasterKeys53=['profile','education','statement','academics','awards','experiences','practices','achievements','exams','learning','customBlocks','avatar','avatarCrop','media'];
 const resumeRecordModules53={education:'education',awards:'awards',experiences:'experiences',practices:'practices',achievements:'achievements',exams:'exams',learning:'learning.books',custom:'customBlocks'};
 const resumeFieldDefs53={profile:PROFILE,education:[['stage','教育阶段'],...EDU_FIELDS],statement:[['zh','中文个人陈述'],['en','英文个人陈述'],['otherLanguage','其他语种'],['other','其他语种陈述']],academics:[['languageLearning','语言学习'],['certificates','证书与等级']],strengths:[['strengths','个人特长'],['hobbies','兴趣爱好']],awards:AWARD_FIELDS,experiences:EXP_FIELDS,practices:EXP_FIELDS,achievements:ACHIEVEMENT_FIELDS,exams:EXAM_FIELDS,learning:BOOK_FIELDS,custom:[['title','标题'],['text','正文']]};
 function copyResume53(value){return value===undefined?undefined:JSON.parse(JSON.stringify(value));}
 function captureResumeMaster53(state=ctx.state){
  const clean=value=>{if(!value||typeof value!=='object')return value;if(Array.isArray(value))return value.map(clean);return Object.fromEntries(Object.entries(value).filter(([key])=>!['data','_assetPreview','_assetBlobRef'].includes(key)).map(([key,v])=>[key,clean(v)]));};
- return Object.fromEntries(resumeMasterKeys53.map(key=>[key,clean(state[key]??null)]));
+ const master=Object.fromEntries(resumeMasterKeys53.map(key=>[key,clean(state[key]??null)]));
+ master.exams=[...(master.exams||[]),...(state.displayScores||[]).map(displayScoreExam54)];
+ return master;
 }
 function initialResumeData53(state=ctx.state,{blank=false}={}){
  const base=captureResumeMaster53(state);if(blank){for(const key of Object.keys(base)){if(Array.isArray(base[key]))base[key]=[];else if(base[key]&&typeof base[key]==='object')for(const f of Object.keys(base[key]))base[key][f]=Array.isArray(base[key][f])?[]:'';else base[key]=null;}}
  return {schemaVersion:1,base,blank,overrides:{},labels:{},styles:{},hidden:[],recordOrder:{},fieldOrder:{},addedRecords:{},addedFields:{},customModules:[],sectionOrder:[...MODULES],cover:{enabled:false,title:''},toc:{enabled:false,sections:[...MODULES]},template:'classic',design:{columns:1,fontFamily:'Microsoft YaHei',sectionLines:true}};
 }
 function initializeResumeVersions53(state=ctx.state){let changed=false;for(const v of state.versions){if(v.resume53)continue;const data=initialResumeData53(state);data.sectionOrder=[...v.order];data.hidden=[...v.disabled.map(key=>'module:'+key),...v.excluded.map(key=>'record:'+key),...v.hiddenFields];data.toc.enabled=!!v.showToc;if(v.target)data.overrides['profile.targetSchool']=v.target;v.resume53=data;v.createdAt53=v.createdAt53||state.savedAt||null;v.modifiedAt53=v.modifiedAt53||state.savedAt||null;v.targets53=v.targets53||(v.target?[v.target]:[]);changed=true;}return changed;}
-function createResumeVersion53(name,targets=[],{blank=false}={}){if(!name.trim())throw new Error('请填写简历名称。');if(ctx.state.versions.length>=100)throw new Error('最多保存100份简历。');const v=newVersion(name.trim());v.targets53=[...new Set(targets.map(t=>t.trim()).filter(Boolean))];v.target=v.targets53.join('、');v.resume53=initialResumeData53(ctx.state,{blank});v.resume53.hidden=['module:learning'];v.createdAt53=v.modifiedAt53=new Date().toISOString();ctx.state.versions.push(v);ctx.state.activeVersion=v.id;return v;}
+function createResumeVersion53(name,targets=[],{blank=false,sourceId=''}={}){
+ if(!name.trim())throw new Error('请填写简历名称。');if(ctx.state.versions.length>=100)throw new Error('最多保存100份简历。');
+ const source=sourceId?ctx.state.versions.find(v=>v.id===sourceId):null;if(sourceId&&!source)throw new Error('来源简历不存在，请重新选择。');
+ if(source&&!source.resume53)initializeResumeVersions53();
+ const v=source?copyResume53(source):newVersion(name.trim());
+ if(source){v.id=uid();v.name=name.trim();v.filename=v.name;}else{v.resume53=initialResumeData53(ctx.state,{blank});v.resume53.hidden=['module:learning'];}
+ v.targets53=[...new Set(targets.map(t=>t.trim()).filter(Boolean))];v.target=v.targets53.join('、');
+ // A target inherited as an explicit source override must follow the newly selected schools.
+ if(source&&Object.hasOwn(v.resume53.overrides,'profile.targetSchool'))v.resume53.overrides['profile.targetSchool']=v.target;
+ v.createdAt53=v.modifiedAt53=new Date().toISOString();ctx.state.versions.push(v);ctx.state.activeVersion=v.id;return v;
+}
 function cloneResumeVersion53(id){if(ctx.state.versions.length>=100)throw new Error('最多保存100份简历。');const source=ctx.state.versions.find(v=>v.id===id);if(!source)throw new Error('简历不存在。');const v=copyResume53(source);v.id=uid();v.name+=' · 副本';v.createdAt53=v.modifiedAt53=new Date().toISOString();ctx.state.versions.push(v);return v;}
 function getResumeVersion53(id=ctx.state.activeVersion){return ctx.state.versions.find(v=>v.id===id)||null;}
 function mergeResume53(base,live){if(Array.isArray(base)&&Array.isArray(live)){if([...base,...live].every(x=>x&&typeof x==='object'&&typeof x.id==='string')){const byID=new Map(base.map(x=>[x.id,x]));return [...live.map(x=>mergeResume53(byID.get(x.id)||{},x)),...base.filter(x=>!live.some(y=>y.id===x.id))];}return copyResume53(live);}if(base&&live&&typeof base==='object'&&typeof live==='object'&&!Array.isArray(base)&&!Array.isArray(live)){const result=copyResume53(base);for(const [key,value]of Object.entries(live))result[key]=mergeResume53(base[key],value);return result;}return live===undefined?copyResume53(base):copyResume53(live);}
@@ -37,7 +50,7 @@ function resolveResume53(id=ctx.state.activeVersion,state=ctx.state){
    entries.push({id:'learning-text',title:'学习文字',hidden:hidden.has('record:learning:learning-text'),fields:[['readingNotes','阅读随记'],['plan','学习计划'],['notes','其他记录']].map(([name,label])=>field('learning.'+name,label,workspace.learning[name]))});
   }
   if(resumeRecordModules53[key])for(const record of orderResume53(recordListResume53(workspace,key),r.recordOrder[key])){
-   const defs=resumeFieldDefs53[key],titleKey=key==='education'?'stage':'title',fields=defs.map(([name,label])=>field(key+':'+record.id+':'+name,label,record[name],name===titleKey?'title':'body'));
+   const defs=key==='exams'&&record.displayOnly54?DISPLAY_EXAM_FIELDS54:resumeFieldDefs53[key],titleKey=key==='education'?'stage':'title',fields=defs.map(([name,label])=>field(key+':'+record.id+':'+name,label,record[name],name===titleKey?'title':'body'));
    if(key==='exams')for(const sub of record.subjects||[])for(const [name,label]of [['name','科目'],['score','得分'],['fullMark','满分'],['rank','排名']])fields.push(field(key+':'+record.id+':subjects:'+sub.id+':'+name,label,sub[name]));
    const recordPath=key+':'+record.id;
    if(record.priority&&(version.includedFields||[]).includes(recordPath+':priority'))fields.push(field(recordPath+':priority','整理优先级',record.priority));

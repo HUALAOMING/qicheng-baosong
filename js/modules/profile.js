@@ -1,5 +1,5 @@
 import {preserveResumeReferences53} from '../resume-model53.js';
-import { $, $$, area, esc, head, input, options, select, tr, translateLabel } from '../utils/helpers.js';
+import { $, $$, area, esc, head, input, options, select, toast, tr, translateLabel } from '../utils/helpers.js';
 import { ctx } from '../state.js';
 import { EDU_FIELDS, EDU_STAGES, EXAM_TYPES, PROFILE, blankEducation, draftKeys } from '../constants.js';
 import { currentVersion, records } from '../model.js';
@@ -7,6 +7,7 @@ import { save, scheduleSave } from '../autosave.js';
 import { changed, confirmAction, render } from '../app.js';
 import { collect } from './records.js';
 import {introductionPicker52,bindIntroductionImports52} from './introductions.js';
+import {DISPLAY_SCORE_FIELDS54,blankDisplayScore54,prepareDisplayScore54} from '../display-scores54.js';
 // 启程 · js/modules/profile.js
 
 
@@ -75,10 +76,19 @@ function formActions (kind, label) {
 }
 
 function academicsPage () {
-  const e = ctx.state.examDraft;
-  return head ('INFORMATION / LANGUAGES & SCORES', '让语言能力与成绩清晰可读。') + '<section class="panel language-panel"><h2>语言学习</h2><div class="grid2">' +
+  return head ('INFORMATION / LANGUAGES', '让语言能力清晰可读。') + '<section class="panel language-panel"><h2>语言学习</h2><div class="grid2">' +
   area ('academics.languageLearning', '语言学习经历与水平', ctx.state.academics.languageLearning, '语种、学习年限、课程与实际使用经历。') + area ('academics.certificates',
-  '语言证书与等级', ctx.state.academics.certificates, '证书名称、时间、等级或分数。') + '</div></section><div class="work-grid"><section class="panel"><h2>' +
+  '语言证书与等级', ctx.state.academics.certificates, '证书名称、时间、等级或分数。') + '</div></section>';
+}
+
+function displayScoresPanel54(){
+ const draft=ctx.state.displayScoreDraft||blankDisplayScore54(),list=ctx.state.displayScores||[],placeholders={title:'例如：高二下学期期中考试',item:'例如：总分、数学、外语或口语',score:'例如：138，也可填写等级',fullMark:'例如：150（选填）',classRank:'例如：1 / 45（选填）',gradeRank:'例如：8 / 600（选填）'};
+ return '<section class="panel display-scores54"><div class="panel-title"><h2>仅在简历中展示的成绩</h2><span class="badge">'+list.length+' 条</span></div><p>适合展示以往的优秀成绩。这里的记录可在简历编辑中逐项勾选，不参与数据看板或趋势统计。</p><form id="displayScoreForm54"><div class="grid2">'+DISPLAY_SCORE_FIELDS54.map(([key,label])=>input('displayScoreDraft.'+key,label,draft[key],placeholders[key],'text',['title','item'].includes(key)?'required maxlength="500"':'maxlength="500"')).join('')+'</div><div class="actions"><button type="submit" class="primary">'+(draft.id?'保存修改':'添加仅展示的成绩')+'</button>'+(draft.id?'<button type="button" data-display-score-cancel54>结束编辑</button>':'')+'</div></form><div class="records">'+(list.length?list.map(record=>'<article class="record"><div class="record-head"><div><h3>'+esc(record.title)+'</h3><p>'+esc([record.item,record.score!==''?record.score+(record.fullMark?' / '+record.fullMark:''):'',record.classRank?'班级排名 '+record.classRank:'',record.gradeRank?'年级排名 '+record.gradeRank:''].filter(Boolean).join(' · '))+'</p></div><div class="record-actions"><button data-display-score-edit54="'+esc(record.id)+'">编辑</button><button data-display-score-delete54="'+esc(record.id)+'">移除</button></div></div></article>').join(''):'<p class="hint">添加后可前往简历管理中心，选择要展示的成绩和排名。</p>')+'</div></section>';
+}
+
+function scoresPage () {
+  const e = ctx.state.examDraft;
+  return head ('INFORMATION / SCORES', '把每一次成绩，放在合适的位置。', '常规考试参与数据看板，也可用于简历；仅展示的成绩只用于简历。') + '<div class="work-grid"><section class="panel"><h2>' +
   (ctx.editing.exams ? '编辑考试成绩' : '录入一次考试') + '</h2><form id="examForm"><div class="grid2">' + input ('examDraft.title',
   '考试名称', e.title, '例如：高三上学期期中考试') + select ('examDraft.type', '考试类型', e.type, EXAM_TYPES) + input ('examDraft.date',
   '考试时间', e.date, '', 'date') + input ('examDraft.rankScope', '排名范围', e.rankScope, '年级 / 班级 / 保送班') + '</div><h3>分科成绩</h3><div class="subject-list">' +
@@ -91,7 +101,7 @@ function academicsPage () {
   '总分满分', e.totalFullMark, '选填', 'text', 'inputmode="decimal"') + input ('examDraft.rank', '总排名', e.rank, '选填', 'text',
   'inputmode="numeric"') + input ('examDraft.rankTotal', '参考人数', e.rankTotal, '选填', 'text', 'inputmode="numeric"') +
   '</div>' + area ('examDraft.note', '成绩备注', e.note) + formActions ('exams', '这次考试') + '</form></section><aside>' +
-  recordList ('exams') + '</aside></div>';
+  '<p class="hint">这里收录的常规考试会参与数据看板，并可在简历中展示。</p>' + recordList ('exams') + '</aside></div>'+displayScoresPanel54();
 }
 
 function draftHasContent (kind) {
@@ -117,11 +127,34 @@ function avatarEditor () {
   'Choose from Materials') + '</button><p class="hint">')
 }
 
-export { profilePage, educationPage, statementPage, itemActions, recordList, formActions, academicsPage, draftHasContent, avatarEditor22, avatarEditor };
+export { profilePage, educationPage, statementPage, itemActions, recordList, formActions, academicsPage, scoresPage, draftHasContent, avatarEditor22, avatarEditor };
 
 // All controls for this feature, in their original override order.
 function bindProfileControls () {
   bindIntroductionImports52();
+  $('#displayScoreForm54')?.addEventListener('submit',async event=>{
+    event.preventDefault();
+    try{
+      const record=prepareDisplayScore54(ctx.state.displayScoreDraft),list=ctx.state.displayScores,index=list.findIndex(item=>item.id===record.id);
+      if(index<0&&list.length>=500)throw Error('最多收录500条仅展示的成绩。');
+      if(index>=0)list[index]=record;else list.push(record);
+      ctx.state.displayScoreDraft=blankDisplayScore54();scheduleSave();const saved=await save();render();toast(saved?'成绩已收录，可在简历中选择。':'成绩已收录到当前工作区，请重试保存进度。');
+    }catch(error){toast(error.message);}
+  });
+  $$('[data-display-score-edit54]').forEach(button=>button.onclick=async()=>{
+    if(ctx.state.displayScoreDraft&&DISPLAY_SCORE_FIELDS54.some(([key])=>ctx.state.displayScoreDraft[key])&&!await confirmAction('编辑这条展示成绩？','当前未收录的展示成绩草稿会被替换。','切换编辑'))return;
+    const record=ctx.state.displayScores.find(item=>item.id===button.dataset.displayScoreEdit54);if(!record)return;
+    ctx.state.displayScoreDraft={...record};scheduleSave();render();$('#displayScoreForm54')?.scrollIntoView({block:'center'});
+  });
+  $$('[data-display-score-delete54]').forEach(button=>button.onclick=async()=>{
+    if(!await confirmAction('移除这条展示成绩？','已建立的简历版本会保留原有内容，可在简历编辑中隐藏。','移除'))return;
+    preserveResumeReferences53();ctx.state.displayScores=ctx.state.displayScores.filter(item=>item.id!==button.dataset.displayScoreDelete54);
+    if(ctx.state.displayScoreDraft?.id===button.dataset.displayScoreDelete54)ctx.state.displayScoreDraft=blankDisplayScore54();scheduleSave();await save();render();
+  });
+  $('[data-display-score-cancel54]')?.addEventListener('click',async()=>{
+    if(!await confirmAction('结束这条展示成绩的编辑？','当前草稿的修改会被放弃，已收录成绩保留。','结束编辑'))return;
+    ctx.state.displayScoreDraft=blankDisplayScore54();scheduleSave();render();
+  });
   $$ ('[data-bind]').forEach (el => el.addEventListener ('input', () => {
     const [g, k] = el.dataset.bind.split ('.'); ctx.state [g] [k] = el.value; scheduleSave (); if (g === 'profile' &&
     ['name', 'school'].includes (k)) {

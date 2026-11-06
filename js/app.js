@@ -28,12 +28,12 @@ import { initializeHomeResources, initializeResources, reloadResources, listQuiz
 import { initializeQuizSummary, initializeQuiz, quizPage, getRecentQuiz, validateQuizRecords, flushQuizDraft, refreshQuizClock, hasPendingQuizWrites } from './modules/quiz.js';
 import { homePage, dailyQuotePage, dailyQuoteMarkup, initializeHome, getHomePreferences, validateHomeRecords, refreshHomeOverviewView53 } from './modules/home.js';
 import { explorePage, readingPage, classicPage, exploreBook } from './modules/explore.js';
-import { academicsPage, educationPage, profilePage, statementPage } from './modules/profile.js';
+import { academicsPage, scoresPage, educationPage, profilePage, statementPage } from './modules/profile.js';
 import { bind } from './events.js';
 import {initializeJournalSummary,initializeJournal,validateJournalRecords,calendarPage,progressPage} from './modules/journal.js';
 import {examCalendarPage,initializeExamCalendar,validateExamCalendarRecords} from './modules/exam-calendar.js';
 import {introductionsPage52} from './modules/introductions.js';
-import {saveLocalFile52,showStartupChoice52} from './local-files52.js';
+import {showStartupChoice52} from './local-files52.js';
 import {getPageHelp52} from './modules/page-help52.js';
 // 启程 · js/app.js
 
@@ -139,7 +139,7 @@ async function go3 (route) {
   if(route.startsWith('resume-editor:')&&(isLite53()||!canEditWorkspace53())){route=route.replace('resume-editor:','resume-review:');blockedEditor53=true;}
   await flushLoadedFeatures53();
   const sequence=++routeSequence521;
-  if((ctx.dirty301||ctx.saveError)&&!await save()){toast('最新修改尚未保存，请先重试或备份。');return;}
+  // Page navigation retains the in-memory draft without an implicit workspace save.
   const task={stage(){},succeed(){},fail(){}};
   try {
     task.stage('准备页面所需资料');
@@ -174,7 +174,7 @@ function shell (content) {
   const navVisible = isMobile ? document.body.classList.contains ('nav-mobile-open') : ! ctx.state.sidebarHidden;
   const breadcrumb = isHome ? '<strong>'+tr('首页','Home')+'</strong>' : tr(active?.zh||'工作台',active?.en||'Workspace')+' <em>/</em> <strong>'+esc(routeName3())+'</strong>';
   const navigation = NAV3.filter(g=>!isLite53()||!['organize','personal','dashboard'].includes(g.id)).map (g => g.standalone ? '<button data-go3="home" class="nav-home ' + (isHome ? 'active' : '') + '" ' + (isHome ? 'aria-current="page"' : '') + '>' + icon3('home') + '<span>' + tr(g.zh,g.en) + '</span></button>' : '<section class="nav-group ' + (ctx.state.menuOpen.includes (g.id) ? 'is-open' : '') + '"><button class="nav-group-toggle ' + (g.id === active?.id ? 'active-group' : '') + '" data-nav-group="' + g.id + '" aria-expanded="' + ctx.state.menuOpen.includes (g.id) + '">' + icon3 (g.icon) + '<span>' + tr (g.zh, g.en) + '</span><i>' + icon3 ('chevron') + '</i></button><div class="nav-sub" ' + (ctx.state.menuOpen.includes (g.id) ? '' : 'inert') + '><div>' + g.items.map (x => '<button data-go3="' + x[0] + '" class="nav-item ' + ((ctx.state.route === x[0] || (x[0] === 'reading' && ctx.state.route.startsWith('classic:'))) ? 'active' : '') + '" ' + ((ctx.state.route === x[0] || (x[0] === 'reading' && ctx.state.route.startsWith('classic:'))) ? 'aria-current="page"' : '') + '>' + tr (x[1], x[2]) + '</button>').join ('') + '</div></div></section>').join ('');
-  return '<div class="shell3 '+(ctx.state.sidebarHidden?'nav-hidden':'')+'"><button class="nav-backdrop" data-action3="toggleNav" aria-label="'+tr('收起菜单','Close menu')+'"></button><aside class="sidebar3" id="sidebar3" '+(navVisible?'':'inert')+'><a class="brand3" href="#" data-go3="home"><span class="brand-mark">'+LOGO+'</span><span><strong>启程</strong><small>PERSONAL STUDIO</small></span></a><button class="sidebar-close50" data-action3="toggleNav" aria-label="'+tr('收起菜单','Close menu')+'">'+icon3('close')+'</button><div class="nav-caption">'+tr('我的成长档案','YOUR PERSONAL WORKSPACE')+'</div><nav aria-label="'+tr('工作台导航','Workspace navigation')+'">'+navigation+'</nav><div class="sidebar-tools"><div class="sidebar-save52" data-save-state="saved"><div class="sidebar-save-copy52"><span class="sidebar-save-eyebrow52">'+tr('工作进度','WORKSPACE')+'</span><div id="savedStatus" class="save-status" role="status" aria-live="polite">'+tr('已保存','Saved')+'</div></div><button class="sidebar-save-button52" data-action="saveFile52" aria-label="'+tr('手动保存为本地文件','Save a complete local file')+'">'+icon3('download')+'<span>'+tr('手动保存','Save file')+'</span></button></div><button class="sidebar-bottom-link" data-go3="settings">'+GEAR+'<span>'+tr('设置','Settings')+'</span></button></div></aside><main class="main3"><header class="topbar3"><div class="topbar-left"><button class="menu-toggle" data-action3="toggleNav" aria-controls="sidebar3" aria-expanded="'+navVisible+'" aria-label="'+tr('展开或收起菜单','Toggle menu')+'">'+icon3('menu')+'</button><div class="topbar-context"><span class="breadcrumb">'+breadcrumb+'</span>'+(isSettings?'':dailyQuoteMarkup(true))+'</div></div><div class="topbar-actions">'+searchButton53()+(isHome||isSettings?'':'<button data-go3="resumes">'+tr('编辑与导出','Edit & export')+' '+icon3('export')+'</button><button class="primary" data-action="save">'+tr('保存进度','Save')+'</button>')+'</div></header><div class="page-content3" id="workspaceContent">'+content+'</div><footer class="quiet-footer"><span>QICHENG PERSONAL STUDIO</span><span>'+tr('在这里，记录成长的每一步。','A place for every step of your growth.')+'</span></footer></main></div>'+help()+'<input type="file" id="backupInput" accept=".json,application/json" hidden><datalist id="awardCategories">'+options(cats('awards'),'')+'</datalist><datalist id="experienceCategories">'+options(cats('experiences'),'')+'</datalist><datalist id="languageList">'+options(['英语','德语','西班牙语','法语','日语','俄语'],'')+'</datalist>';
+  return '<div class="shell3 '+(ctx.state.sidebarHidden?'nav-hidden':'')+'"><button class="nav-backdrop" data-action3="toggleNav" aria-label="'+tr('收起菜单','Close menu')+'"></button><aside class="sidebar3" id="sidebar3" '+(navVisible?'':'inert')+'><a class="brand3" href="#" data-go3="home"><span class="brand-mark">'+LOGO+'</span><span><strong>启程</strong><small>PERSONAL STUDIO</small></span></a><button class="sidebar-close50" data-action3="toggleNav" aria-label="'+tr('收起菜单','Close menu')+'">'+icon3('close')+'</button><div class="nav-caption">'+tr('我的成长档案','YOUR PERSONAL WORKSPACE')+'</div><nav aria-label="'+tr('工作台导航','Workspace navigation')+'">'+navigation+'</nav><div class="sidebar-tools"><div class="sidebar-save52" data-save-state="saved"><div class="sidebar-save-copy52"><span class="sidebar-save-eyebrow52">'+tr('工作进度','WORKSPACE')+'</span><div id="savedStatus" class="save-status" role="status" aria-live="polite">'+tr('已保存','Saved')+'</div></div><button class="sidebar-save-button52" data-action="save" aria-label="'+tr('保存当前工作进度到本机','Save current progress on this device')+'">'+icon3('download')+'<span>'+tr('保存进度','Save progress')+'</span></button></div><button class="sidebar-bottom-link" data-go3="settings">'+GEAR+'<span>'+tr('设置','Settings')+'</span></button></div></aside><main class="main3"><header class="topbar3"><div class="topbar-left"><button class="menu-toggle" data-action3="toggleNav" aria-controls="sidebar3" aria-expanded="'+navVisible+'" aria-label="'+tr('展开或收起菜单','Toggle menu')+'">'+icon3('menu')+'</button><div class="topbar-context"><span class="breadcrumb">'+breadcrumb+'</span>'+(isSettings?'':dailyQuoteMarkup(true))+'</div></div><div class="topbar-actions">'+searchButton53()+(isHome||isSettings?'':'<button data-go3="resumes">'+tr('编辑与导出','Edit & export')+' '+icon3('export')+'</button><button class="primary" data-action="save">'+tr('保存进度','Save')+'</button>')+'</div></header><div class="page-content3" id="workspaceContent">'+content+'</div><footer class="quiet-footer"><span>QICHENG PERSONAL STUDIO</span><span>'+tr('在这里，记录成长的每一步。','A place for every step of your growth.')+'</span></footer></main></div>'+help()+'<input type="file" id="backupInput" accept=".json,application/json" hidden><datalist id="awardCategories">'+options(cats('awards'),'')+'</datalist><datalist id="experienceCategories">'+options(cats('experiences'),'')+'</datalist><datalist id="languageList">'+options(['英语','德语','西班牙语','法语','日语','俄语'],'')+'</datalist>';
 }
 
 // View position belongs to this running session, never to the user's saved data.
@@ -253,11 +253,11 @@ function render () {
   document.body.dataset.theme = ctx.state.theme;
   document.body.classList.toggle('resume-editor53',ctx.state.route.startsWith('resume-editor:'));
   const pages3 = {
-    profile : profilePage, education : educationPage, statement : statementPage, academics : academicsPage, awards : () =>
+    profile : profilePage, education : educationPage, statement : statementPage, academics : academicsPage, scores : scoresPage, awards : () =>
     entryPage3 ('awards'), experiences : () => entryPage3 ('experiences'), practices : () => entryPage3 ('practices'),
     'sort-awards' : () => organizationPage3 ('awards'), 'sort-experiences' : () => organizationPage3 ('experiences'),
     'sort-practices' : () => organizationPage3 ('practices'), learning : learningPage3, achievements : () => entryPage3 ('achievements'),
-    custom : customPage3, dashboard : dashboardPage3, 'practice-dashboard':practiceDashboardPage, home : homePage, explore : explorePage, reading : readingPage, quiz : quizPage, settings : settingsPage, backup : settingsPage, 'daily-quote' : dailyQuotePage, images : () => materialsPage3 ('image'), files : () => materialsPage3 ('file'),
+    custom : customPage3, dashboard : dashboardPage3, 'practice-dashboard':practiceDashboardPage, home : homePage, explore : explorePage, reading : readingPage, quiz : quizPage, settings : settingsPage, backup : settingsPage, 'daily-quote' : dailyQuotePage, images : () => materialsPage3 ('image'), files : () => materialsPage3 ('file'), 'my-resumes' : () => materialsPage3 ('resume'),
     outputs : outputsPage3, studio : previewPage, archive : archivePage3, schools : schoolPage, calendar:calendarPage,'reading-progress':progressPage,'exam-calendar':examCalendarPage,'self-introductions':introductionsPage52
   };
   let page = ctx.state.route.startsWith ('classic:') ? () => classicPage (ctx.state.route.slice (8)) : ctx.state.route.startsWith ('school:') ? () => schoolDetail3 (decodeURIComponent (ctx.state.route.slice (7))) : pages3 [ctx.state.route] ||
@@ -350,7 +350,7 @@ async function action (name) {
     catch(error) { toast(tr('尚未全部保存：','Some changes are not saved: ')+error.message); }
     return;
   }
-  if (name === 'saveFile52') return saveLocalFile52();
+  if (name === 'saveFile52') return action('save');
   if (name === 'backup') return exportBackup ();
   if (name === 'restore') return $ ('#backupInput').click ();
   if (name === 'clearAll') return clearAll ();
@@ -423,22 +423,20 @@ async function boot () {
   render ();
   if(resumeMigration53){ctx.savedFingerprint301=null;scheduleSave();}
   bindGlobalLifecycle53();
-  document.addEventListener('focusout',()=>{if(ctx.dirty301||ctx.saveError)save();});
   window.addEventListener ('beforeunload', event => {
     const featurePending53=hasPendingFeatures53();if(featurePending53)flushLoadedFeatures53().catch(()=>{});
     const quizPending = hasPendingQuizWrites()||featurePending53;
     if (quizPending) flushQuizDraft().catch(() => {});
     if (ctx.dirty301 || ctx.saveError) {
-      save (); event.preventDefault (); event.returnValue = '';
+      event.preventDefault (); event.returnValue = '';
     }
     else if (quizPending) { event.preventDefault (); event.returnValue = ''; }
   });
   document.addEventListener ('visibilitychange', () => {
-    if (document.visibilityState === 'hidden' && (ctx.dirty301 || ctx.saveError)) save ();
     if (document.visibilityState === 'hidden'){flushQuizDraft().catch(() => {});flushLoadedFeatures53().catch(()=>{});}
     refreshQuizClock();
   });
-  window.addEventListener ('pagehide', () => { if (ctx.dirty301 || ctx.saveError) save (); flushQuizDraft().catch(() => {}); flushLoadedFeatures53().catch(() => {}); });
+  window.addEventListener ('pagehide', () => { flushQuizDraft().catch(() => {}); flushLoadedFeatures53().catch(() => {}); });
   // A browser back/forward-cache restore resumes the existing app without writing data.
   window.addEventListener ('pageshow', refreshQuizClock);
   window.addEventListener ('unhandledrejection', event => {
@@ -448,6 +446,7 @@ async function boot () {
     toast (tr ('操作出现错误：', 'An operation failed: ') + event.message);
   });
   document.addEventListener ('keydown', event => {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') { event.preventDefault(); action('save'); return; }
     if (event.key !== 'Escape') return; if ($ ('#helpPanel')) {
       const helpPanel=$('#helpPanel'),returnToHelp=!helpPanel.hidden&&helpPanel.contains?.(document.activeElement);helpPanel.hidden=true;$('#helpToggle')?.setAttribute('aria-expanded','false');if(returnToHelp)$('#helpToggle')?.focus?.({preventScroll:true});
     }

@@ -29,7 +29,7 @@ test('beta1 schema and every original user field remain readable; transient fiel
   assert.equal(DATABASE_NAME,'qicheng-v4');
   const old=JSON.parse(await readFile(path.join(root,'tests/fixtures/input.json'),'utf8'));
   assert.equal(old.format,'qicheng-resume');assert.equal(old.version,6);
-  const expected={...old,introductions:[],introductionDraft:{id:'',title:'',language:'',minutes:'1',seconds:'0',note:'',body:''},statement:{...old.statement,other:'',otherLanguage:''},versions:old.versions.map(v=>({paperColor:'#ffffff',lineColor:'#d6d6d6',titleColor:'#000000',paperImage:'',layoutPreset:'custom',...v}))};
+  const expected={...old,displayScores:[],displayScoreDraft:fresh().displayScoreDraft,assetFolders:[],introductions:[],introductionDraft:{id:'',title:'',language:'',minutes:'1',seconds:'0',note:'',body:''},statement:{...old.statement,other:'',otherLanguage:''},versions:old.versions.map(v=>({paperColor:'#ffffff',lineColor:'#d6d6d6',titleColor:'#000000',paperImage:'',layoutPreset:'custom',...v}))};
   assert.deepEqual(validateDraft(old),expected);
   const portable=structuredClone(old);for(const key of ['route','section','step','sidebarHidden','menuOpen'])delete portable[key];
   const restored=validateDraft(portable);assert.equal(restored.route,'home');

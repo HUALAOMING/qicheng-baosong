@@ -33,9 +33,9 @@ test('cache clearing asks for confirmation and removes only this installation as
     assert.deepEqual(removed,['qicheng-static-%2F-v4-current']);assert.deepEqual(unregistered,['this']);assert.deepEqual(await storage.getAll(),before);
   }finally{delete globalThis.caches;delete navigator.serviceWorker;}
 });
-test('manual JSON save preserves unsaved current data even when database writing fails',async()=>{
+test('manual progress save keeps unsaved data on database failure without creating a file',async()=>{
   ctx.state.profile.name='数据库写入失败仍可另存';saving.scheduleSave();env.factory.failWrite=true;let content='';
   globalThis.showSaveFilePicker=async()=>({createWritable:async()=>({write:async text=>{content=text;},close:async()=>{},abort:async()=>{}})});
-  try{assert.equal(await local.saveLocalFile52(),true);assert.equal(backup.parseBackup(content).draft.profile.name,'数据库写入失败仍可另存');assert.equal(ctx.state.profile.name,'数据库写入失败仍可另存');}
+  try{assert.equal(await local.saveLocalFile52(),false);assert.equal(content,'');assert.equal(ctx.dirty301,true);assert.equal(ctx.state.profile.name,'数据库写入失败仍可另存');}
   finally{delete globalThis.showSaveFilePicker;}
 });

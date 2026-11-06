@@ -1,6 +1,6 @@
 {
   "name": "qicheng-pwa",
-  "version": "5.3.2",
+  "version": "5.4.0",
   "private": true,
   "type": "module",
   "description": "启程 Local First PWA · 原生 HTML/CSS/JavaScript",
@@ -15,7 +15,9 @@
     "test:5.3.1": "node --experimental-vm-modules --test tests/*.test.mjs",
     "test:browser:5.3.1": "node tests/banks531-browser.mjs && node tests/import531-browser.mjs && node tests/resume531-browser.mjs && node tests/pwa531-browser.mjs",
     "test:browser:5.3": "node tests/ui53-browser.mjs && node tests/resume53-browser.mjs && node tests/export53-browser.mjs && node tests/learning53-browser.mjs && node tests/global53-browser.mjs && node tests/runtime53-browser.mjs && node tests/storage521-browser.mjs && node tests/pwa53-browser.mjs && node tests/offline53-browser.mjs",
-    "test:5.3.2": "node --experimental-vm-modules --test tests/*.test.mjs",
-    "test:browser:5.3.2": "node tests/feedback532-browser.mjs"
+    "test:5.4.0": "node --experimental-vm-modules --test tests/*.test.mjs",
+    "test:browser:5.4.0": "node tests/feedback532-browser.mjs",
+    "test:5.4": "node --experimental-vm-modules --test tests/*.test.mjs",
+    "test:browser:5.4": "node tests/migration54-browser.mjs && node tests/files54-browser.mjs && node tests/resume-scores54-browser.mjs && node tests/modular54-browser.mjs && node tests/pwa54-browser.mjs"
   }
 }

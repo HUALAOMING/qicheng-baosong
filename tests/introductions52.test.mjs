@@ -42,12 +42,13 @@ test('complete backups preserve introduction versions, drafts, and optional thir
   const restored=parseBackup(createBackup(s)).draft;assert.deepEqual(restored.introductions,s.introductions);assert.equal(restored.introductionDraft.body,'尚未提交的正文');assert.equal(restored.statement.other,'Guten Tag.');
   s.introductions[0].durationSeconds=0;assert.throws(()=>validateDraft(s),/durationSeconds/);
 });
-test('manual local-file save writes a restorable JSON and cancellation keeps user data',async()=>{
-  ctx.state=fresh();ctx.state.profile.name='手动存档测试';initializeSaving301();let content='',closed=false;
-  globalThis.showSaveFilePicker=async()=>({createWritable:async()=>({write:async value=>{content=value;},close:async()=>{closed=true;},abort:async()=>{}})});
-  const {saveLocalFile52}=await import('../js/local-files52.js');assert.equal(await saveLocalFile52(),true);assert.equal(closed,true);assert.equal(parseBackup(content).draft.profile.name,'手动存档测试');
-  globalThis.showSaveFilePicker=async()=>{throw new DOMException('Cancelled','AbortError');};assert.equal(await saveLocalFile52(),false);assert.equal(ctx.state.profile.name,'手动存档测试');delete globalThis.showSaveFilePicker;
+test('manual progress save writes to IndexedDB without opening a file picker',async()=>{
+  ctx.state=fresh();ctx.state.profile.name='手动存档测试';initializeSaving301();ctx.savedFingerprint301=null;let picked=false;
+  globalThis.showSaveFilePicker=async()=>{picked=true;throw Error('Unexpected picker');};
+  try{const {saveLocalFile52}=await import('../js/local-files52.js');assert.equal(await saveLocalFile52(),true);assert.equal(picked,false);assert.equal((await storage.get('current')).profile.name,'手动存档测试');}
+  finally{delete globalThis.showSaveFilePicker;}
 });
+
 test('AI instruction example satisfies the actual importer and includes strict JSON guidance',()=>{
   const prompt=quizAIInstructions52(),example=prompt.slice(prompt.indexOf('{\n'),prompt.indexOf('\n\n二、'));
   const bank=validateQuizBank(JSON.parse(example));assert.equal(bank.questions.length,2);assert.equal(bank.questions[1].answer,true);assert.match(prompt,/不要 Markdown/);assert.match(prompt,/12 MB/);assert.match(prompt,/20000/);

@@ -92,7 +92,7 @@ function validateDraft (input, {trustedLocal = false} = {}) {
   if (input.format !== 'qicheng-resume' || input.version !== 6) throw new Error ('这不是当前 PWA 版本的启程数据。');
   const s = clone (input), defaults = fresh ();
   // Additive 5.2 fields: old 5.1 workspaces and backups remain readable.
-  for (const key of ['introductions','introductionDraft']) if (!Object.hasOwn(s,key)) s[key]=clone(defaults[key]);
+  for (const key of ['introductions','introductionDraft','displayScores','displayScoreDraft','assetFolders']) if (!Object.hasOwn(s,key)) s[key]=clone(defaults[key]);
   if (s.statement && !Object.hasOwn(s.statement,'other')) s.statement.other='';
   if (s.statement && !Object.hasOwn(s.statement,'otherLanguage')) s.statement.otherLanguage='';
   // Navigation is deliberately omitted from backups. Older backups retain these fields.
@@ -141,6 +141,14 @@ function validateDraft (input, {trustedLocal = false} = {}) {
     if (! SCHOOLS.some (x => x.name === name)) fail ('dreamSchools');
   });
   if (s.savedAt !== null && (typeof s.savedAt !== 'string' || ! Number.isFinite (Date.parse (s.savedAt)))) fail ('savedAt');
+  const displayFields54=[['id'],['title'],['item'],['score'],['fullMark'],['classRank'],['gradeRank']];
+  list(s.displayScores,'displayScores',500); unique(s.displayScores.map(x=>x?.id),'displayScores');
+  for(const score of s.displayScores){fields(score,displayFields54,'displayScores');id(score.id,'displayScores.id');if(s.exams.some(exam=>exam.id===score.id))fail('displayScores.id（与常规考试重复）');}
+  fields(s.displayScoreDraft,displayFields54,'displayScoreDraft');if(s.displayScoreDraft.id)id(s.displayScoreDraft.id,'displayScoreDraft.id');
+  list(s.assetFolders,'assetFolders',200); unique(s.assetFolders.map(x=>x?.id),'assetFolders');
+  const folderNames54=new Set();
+  for(const folder of s.assetFolders){object(folder,'assetFolders');id(folder.id,'assetFolders.id');text(folder.name,'assetFolders.name');text(folder.createdAt,'assetFolders.createdAt');if(!folder.name.trim()||folder.name.length>100||folderNames54.has(folder.name.trim().toLocaleLowerCase()))fail('assetFolders.name');folderNames54.add(folder.name.trim().toLocaleLowerCase());}
+  const folderIds54=new Set(s.assetFolders.map(x=>x.id));
   list (s.assets, 'assets', 1500);
   unique (s.assets.map (a => a?.id), 'assets');
   const assets = new Map ();
@@ -149,6 +157,8 @@ function validateDraft (input, {trustedLocal = false} = {}) {
     object (a, 'assets');
     id (a.id, 'assets.id');
     text (a.name, 'assets.name');
+    if(a.folderId!==undefined){text(a.folderId,'assets.folderId');if(a.folderId&&!folderIds54.has(a.folderId))fail('assets.folderId');}
+    if(a.collection!==undefined)choice(a.collection,['','resume'],'assets.collection');
     text (a.mime, 'assets.mime');
     choice (a.kind, ['image', 'file', 'export'], 'assets.kind');
     if (! validData3 (a.data) || a.data.split (',') [1].length % 4 !== 0) fail ('assets.data');

@@ -9,7 +9,7 @@ const pageHelpContent52 = {
     sections: [
       ['梦想院校', 'Dream universities', '先在“目标院校与地图”收藏学校，再选择首页主要展示院校。点击右侧的小院校卡片，即可把它切换到主位置；原来的主院校会回到侧边。', 'Favorite universities in Universities & map, then choose your featured university. Click a smaller university card to bring it to the main position; the previous one moves to the side.'],
       ['每天的起点', 'Your daily starting point', '点击每日一句可阅读原文并安排本周七句。倒计时日期可以在学习日历中设置；有未完成练习时，可以从首页继续答题。', 'Open the daily quote to read its source or arrange seven quotes for this week. Set your countdown date in the Learning calendar. Unfinished practice can be resumed from Home.'],
-      ['保存记录', 'Keep your records', '内容修改后会自动保存在当前浏览器中。菜单底部的“手动保存”会另存完整 JSON 文件，包含资料与学习记录；请保留该文件以便恢复或换设备。', 'Edits save automatically in this browser. Save file at the bottom of the menu creates a complete JSON file containing your materials and study records. Keep it for restoration or another device.']
+      ['保存记录', 'Keep your records', '修改后请点击菜单底部“保存进度”，或按 Ctrl / ⌘ + S。外部备份请前往设置的“导入与导出”，分别选择个人资料、学习数据和附件。', 'Click Save progress or press Ctrl / Command + S after editing. Use Settings > Import & export for separate personal, learning and attachment backups.']
     ]
   },
   quiz: {
@@ -85,11 +85,16 @@ const pageHelpContent52 = {
     ]
   },
   academics: {
-    title: ['语言与考试成绩', 'Languages & exams'],
-    sections: [
-      ['收录考试', 'Save an exam', '填写考试名称、日期和排名范围，录入总分、总分满分及各科成绩；可增加或移除科目。完成后点击收录，再在已收录列表编辑或移除。', 'Enter an exam’s name, date and ranking group, then its total score, full mark and subjects. Add or remove subjects as needed. Save the exam before editing or removing it from the saved list.'],
-      ['让比较有依据', 'Make comparisons meaningful', '不同考试满分可能不同，建议同时填写对应满分，成绩看板才能比较得分率。单科排名与总排名分开填写；缺失数据会在看板中显示为空，不按零分处理。', 'Record full marks as well as scores so the dashboard can compare score rates across exams. Keep subject ranks separate from overall rank. Missing values appear as missing rather than zero.']
-    ]
+    title: ['语言能力', 'Languages'],
+    sections: [['语言与证书', 'Languages and certificates', '填写语言学习经历、水平和证书。考试成绩请到独立的“成绩录入”页面；简历可以同时选择这些内容。', 'Enter language experience, proficiency and certificates. Use the separate Examination results page for scores; both can be selected for resumes.']]
+  },
+  scores: {
+    title: ['成绩录入', 'Examination results'],
+    sections: [['两种成绩用途', 'Two score purposes', '常规考试会用于成绩看板，也可加入简历。“仅展示成绩”可自由填写考试、项目、分数与班级和年级排名，只用于简历。', 'Regular exams feed the dashboard and resumes. Display-only scores allow custom exams, items, scores and class/grade ranks for resumes only.'], ['选择简历内容', 'Select resume content', '收录成绩后，在简历版本中从底稿补入或创建新版本，再勾选需要的成绩。旧版本保留原有内容。', 'After recording scores, add them from the master data to a resume or create a new version, then select the required scores. Existing versions keep their original content.']]
+  },
+  'my-resumes': {
+    title: ['我的简历', 'My uploaded resumes'],
+    sections: [['保存最终版本', 'Keep final resumes', '上传自己美化后的最终简历，可按文件夹分类、重命名并再次下载。此处存放上传文件，简历编辑版本仍在简历管理中心。', 'Upload your final polished resumes, organize them in folders, rename and download them. Editable resume versions remain in the Resume manager.']]
   },
   awards: {
     title: ['荣誉录入', 'Honors & awards'],
@@ -233,7 +238,7 @@ const pageHelpContent52 = {
     title: ['设置', 'Settings'],
     sections: [
       ['外观与资源', 'Appearance and resources', '选择浅色、深色或蓝图主题及界面语言。导入题包时，先下载AI指令md文档，附给AI并补充出题需求；可复制AI说明提供简短背景。核对生成的JSON后选择目标题库，导入题目会归入该题库。新建题库需选择科目。', 'Choose Light, Dark or Blueprint and the interface language. For question packs, download the Markdown instructions and attach them with your requirements. Copy AI brief supplies short context. Verify generated JSON and choose a destination bank; imported questions belong to that bank. New banks require a subject.'],
-      ['保存与恢复', 'Save and restore', '自动保存写入当前浏览器的本地数据库。“手动保存”或完整 JSON 备份会生成可另存的本地文件，启动时可选择继续当前进度或载入该文件。建议定期保留完整文件。', 'Autosave writes to this browser’s local database. Save file or complete JSON backup creates a file you can keep separately. At startup, continue the current progress or load that file. Keep complete files regularly.'],
+      ['保存与恢复', 'Save and restore', '“保存进度”写入当前浏览器的本地数据库，不生成下载文件。设置中的“导入与导出”提供分项备份，并兼容旧版完整 JSON。', 'Save progress writes to this browser without generating a file. Settings > Import & export provides separate backups and accepts legacy complete JSON files.'],
       ['缓存与本地数据', 'Cache and local records', '“清除程序缓存”清理离线程序资源，与“清除本地数据”分开；清除前请先手动保存。清除本地数据会移除个人资料和学习记录，操作前请核对提示。', 'Clear application cache removes offline program resources and is separate from Clear local data. Save a file before clearing. Clearing local data removes personal and study records; read the confirmation first.'],
       ['获取更新', 'Get updates', '点击“检查应用新版本”，发现更新后使用“保存并更新应用”。已安装的题库资源可单独通过“在线获取最新版资源”更新。', 'Choose Check for app updates, then Save & update app when an update is available. Installed bank resources can be updated separately with Get latest resources online.']
     ]
@@ -280,7 +285,7 @@ const studioHelpContent52 = {
     title: ['编排与导出 · 导出文件', 'Compose & export · Export'],
     sections: [
       ['预览与下载', 'Preview and download', '检查分页预览与导出文件名，再选择所需文件格式。较大的图片或长文档生成时可能需要稍等；完成后按提示保存文件。', 'Inspect the page preview and export filename, then choose the required format. Large images or long documents may take a moment to generate. Save the file when prompted.'],
-      ['保留可编辑版本', 'Keep an editable version', '已生成文件可到“导出内容管理”再次下载。想恢复全部可编辑资料，请使用手动保存的完整 JSON 文件；导出成稿不会替代完整进度备份。', 'Generated files can be downloaded again in Exported documents. Use a complete JSON file from Save file to restore all editable records. Exported documents do not replace a workspace backup.']
+      ['保留可编辑版本', 'Keep an editable version', '已生成文件可到“导出内容管理”再次下载。想恢复全部可编辑资料，请使用设置中导出的个人资料、学习数据与附件备份；导出成稿不会替代进度备份。', 'Generated files can be downloaded again in Exported documents. Use a complete JSON file from Save file to restore all editable records. Exported documents do not replace a workspace backup.']
     ]
   }
 };
@@ -303,7 +308,7 @@ function getPageHelp52(route = ctx.state?.route || 'home', studioTab = ctx.studi
   const entry = pageKey === 'studio' ? studioHelpContent52[studioTab] || studioHelpContent52.content : pageHelpContent52[pageKey];
   const content = entry || {
     title: ['当前页面', 'Current page'],
-    sections: [['使用当前页面', 'Using this page', '通过左侧菜单选择需要的工具。修改资料后会自动保存，也可用菜单底部的“手动保存”留存完整本地文件。', 'Choose a tool from the menu. Edits save automatically; Save file at the bottom of the menu creates a complete local file.']]
+    sections: [['使用当前页面', 'Using this page', '通过左侧菜单选择需要的工具。修改后点击“保存进度”；备份和换设备请到设置中的“导入与导出”。', 'Choose a tool from the menu. Click Save progress after edits; use Settings > Import & export for backups and transfers.']]
   };
   return {
     key: currentRoute + (pageKey === 'studio' ? ':' + studioTab : '') + ':' + (ctx.state?.uiLang || 'zh'),

@@ -1,0 +1,8 @@
+#modularBackup54 fieldset{border:1px solid var(--line,#dfd6c4);border-radius:12px;padding:16px;margin:18px 0}
+#modularBackup54 legend{padding:0 8px;font-weight:600}
+#modularBackup54 .check{display:flex;align-items:flex-start;gap:10px;padding:7px 0;line-height:1.7}
+#modularBackup54 input[type=checkbox]{width:18px;height:18px;flex:0 0 18px;margin-top:4px}
+#modularBackup54 .actions{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0 24px}
+#modularBackup54 h3{margin-top:24px}
+#modularBackup54 [data-backup-notice54]:empty{display:none}
+@media(max-width:600px){#modularBackup54 .actions>button{flex:1 1 100%;min-height:44px}#modularBackup54 fieldset{padding:12px}}

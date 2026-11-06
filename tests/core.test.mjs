@@ -68,8 +68,8 @@ test('all original routes render with both interface languages and every current
 test('IndexedDB get/set/update/remove/getAll/clear use committed transactions',async()=>{
   await storage.clear();await storage.set('note',{n:1});await storage.update('note',v=>({...v,n:v.n+1}));assert.equal((await storage.get('note')).n,2);assert.ok((await storage.getAll()).note);await storage.remove('note');assert.equal(await storage.get('note'),undefined);
 });
-test('debounced autosave saves latest edits and queued writes preserve order',async()=>{
-  reset();ctx.state.profile.name='first';autosave.scheduleSave();ctx.state.profile.name='second';autosave.scheduleSave();await new Promise(r=>setTimeout(r,650));await ctx.saveChain;assert.equal((await storage.get('current')).profile.name,'second');assert.equal(ctx.dirty301,false);
+test('editing stays in memory until explicit save and queued writes preserve order',async()=>{
+  reset();await storage.clear();ctx.state.profile.name='first';autosave.scheduleSave();ctx.state.profile.name='second';autosave.scheduleSave();await new Promise(r=>setTimeout(r,650));await ctx.saveChain;assert.equal(await storage.get('current'),undefined);assert.equal(ctx.dirty301,true);await autosave.save();assert.equal((await storage.get('current')).profile.name,'second');assert.equal(ctx.dirty301,false);
   ctx.state.profile.name='A';const a=autosave.save();ctx.state.profile.name='B';const b=autosave.save();await Promise.all([a,b]);assert.equal((await storage.get('current')).profile.name,'B');
 });
 test('closing/reopening database retains user data (storage-layer restart)',async()=>{

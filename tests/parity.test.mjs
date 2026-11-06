@@ -10,6 +10,7 @@ const env=await setup();
 const {ctx}=await import('../js/state.js');
 const {loadBuiltinData,loadRouteData}=await import('../js/data.js');
 const {validateDraft}=await import('../js/utils/validation.js');
+const {scoresPage}=await import('../js/modules/profile.js');
 const {render}=await import('../js/app.js');
 const {journalDateKey}=await import('../js/modules/journal.js');
 const {chartValue3,lineChart3}=await import('../js/modules/dashboard.js');
@@ -27,6 +28,20 @@ function boundControls(html) {
   return result;
 }
 function assertEvolvedRouteParity(route,html,expected) {
+  if(route==='academics') {
+    const actual=boundControls(html+scoresPage());
+    for(const [binding,control]of boundControls(expected))assert.deepEqual(actual.get(binding),control,binding);
+    assert.ok(!html.includes('id="examForm"'));assert.ok(scoresPage().includes('id="examForm"'));return;
+  }
+  if(['images','files'].includes(route)){
+    for(const marker of ['id="assetSearch3"','data-import3="center"','data-create-folder54','data-move-selected54','data-zip-materials54'])assert.ok(html.includes(marker),marker);
+    for(const asset of ctx.state.assets.filter(a=>a.kind===(route==='images'?'image':'file')))assert.ok(html.includes(asset.name));return;
+  }
+  if(route==='archive'){
+    for(const marker of ['id="packageName3"','data-archive-all54','data-archive-clear54','data-action3="archive"'])assert.ok(html.includes(marker),marker);
+    assert.equal(boundControls(html).get('filePackageName'),boundControls(expected).get('filePackageName'));return;
+  }
+
   if(route==='statement') {
     for(const field of ['statement.otherLanguage','statement.other'])assert.ok(html.includes('data-bind="'+field+'"'),field);
     for(const language of ['zh','en','other'])assert.ok(html.includes('data-intro-choice52="'+language+'"'));

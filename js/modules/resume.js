@@ -207,7 +207,7 @@ function settleOrder () {
   });
   if(v.order.join('|')===next.join('|'))return;
   v.order=next;changed(false);
-  const status=$('#orderStatus');if(status)status.textContent=tr('顺序已调整，将自动保存。','Order updated. Saving automatically.');
+  const status=$('#orderStatus');if(status)status.textContent=tr('顺序已调整，请保存进度。','Order updated. Save your progress.');
 }
 function flipOrder(mutate) {
   const rows=orderRows(), before=new Map(rows.map(row=>[row,row.getBoundingClientRect()]));
@@ -681,7 +681,7 @@ function preflight3 (options={}) {
     tr ('建议补充基本信息：' + z, 'Consider adding your ' + e), 'profile');
     for (const [condition, z, e, route] of [[! state53.education.some (x => x.school), '教育经历', 'education', 'education'],
     [! state53.statement.zh && ! state53.statement.en && ! state53.statement.other, '个人陈述', 'a personal statement', 'statement'], [! state53.exams.length,
-    '考试成绩', 'exam results', 'academics'], [! state53.awards.length, '个人荣誉', 'honors & awards', 'awards'], [! state53.experiences.length &&
+    '考试成绩', 'exam results', 'scores'], [! state53.awards.length, '个人荣誉', 'honors & awards', 'awards'], [! state53.experiences.length &&
     ! state53.practices.length, '个人经历或社会实践', 'experience or social practice', 'experiences']]) if (condition) add (suggestions,
     tr ('尚未填写' + z + '，可按需要补充。', 'No ' + e + ' saved. Add it if relevant.'), route);
   }
@@ -696,7 +696,7 @@ function preflight3 (options={}) {
       const key = normalized (x.title) + '|' + normalized (x.date);
       if (! normalized (x.title)) continue;
       if (seen.has (key)) add (suggestions, tr ('可能重复录入：', 'Possible duplicate record: ') + x.title, kind === 'exams' ?
-      'academics' : kind);
+      'scores' : kind);
       else seen.set (key, x)
     }
   }
@@ -706,11 +706,11 @@ function preflight3 (options={}) {
   for (const e of (v.disabled.includes ('exams') ? [] : state53.exams.filter (x => ! v.excluded.includes ('exams:' +
   x.id)))) {
     if (numeric3 (e.totalScore) !== null && numeric3 (e.totalFullMark) !== null && numeric3 (e.totalScore) > numeric3 (e.totalFullMark)) add (errors,
-    tr ('考试总分高于满分：', 'Total score exceeds full mark: ') + e.title, 'academics');
+    tr ('考试总分高于满分：', 'Total score exceeds full mark: ') + e.title, 'scores');
     for (const s of e.subjects) if (numeric3 (s.score) !== null && numeric3 (s.fullMark) !== null && numeric3 (s.score) > numeric3 (s.fullMark)) add (errors,
-    tr ('分科成绩高于满分：', 'Subject score exceeds full mark: ') + e.title + ' / ' + s.name, 'academics');
+    tr ('分科成绩高于满分：', 'Subject score exceeds full mark: ') + e.title + ' / ' + s.name, 'scores');
     if (numeric3 (e.rank) !== null && numeric3 (e.rankTotal) !== null && numeric3 (e.rank) > numeric3 (e.rankTotal)) add (errors,
-    tr ('排名超过参考人数：', 'Rank exceeds participant count: ') + e.title, 'academics')
+    tr ('排名超过参考人数：', 'Rank exceeds participant count: ') + e.title, 'scores')
   }
   for (const kind of ['awards', 'experiences', 'practices', 'achievements', 'books', 'exams']) {
     const d = state53 [draftFor3 (kind)], arr = kind === 'books' ? state53.learning.books : state53 [kind], saved = arr.find (x =>
@@ -719,7 +719,7 @@ function preflight3 (options={}) {
     v.length));
     if (d && (saved ? JSON.stringify (d) !== JSON.stringify (saved) : content)) add (suggestions, tr ('有尚未收录的草稿或修改，不会进入导出：',
     'An unsaved draft or edit will not be exported: ') + (d.title || tr ('未命名记录', 'Untitled record')), kind === 'books' ?
-    'learning' : kind === 'exams' ? 'academics' : kind)
+    'learning' : kind === 'exams' ? 'scores' : kind)
   }
   if (! exportRows (options).length) add (errors, tr ('没有选择可导出的内容。', 'No exportable content has been selected.'));
   return {

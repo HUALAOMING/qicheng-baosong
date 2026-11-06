@@ -123,7 +123,7 @@ function fresh () {
       zh : '', en : '', otherLanguage : '', other : '', strengths : '', hobbies : ''
     }, academics : {
       languageLearning : '', certificates : ''
-    }, awards : [], experiences : [], practices : [], achievements : [], exams : [], learning : {
+    }, awards : [], experiences : [], practices : [], achievements : [], exams : [], displayScores : [], displayScoreDraft : {id:'',title:'',item:'',score:'',fullMark:'',classRank:'',gradeRank:''}, assetFolders : [], learning : {
       readingNotes : '', plan : '', notes : '', books : []
     }, dreamSchools : [], awardDraft : blankAward (), experienceDraft : blankExp (), examDraft : blankExam (), bookDraft : blankBook (),
     practiceDraft : {

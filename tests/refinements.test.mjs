@@ -23,7 +23,7 @@ test('navigation, menu and temporary filters produce zero current writes; an edi
     assert.equal(ctx.dirty301,false);await saving.save();assert.equal(writes,0);
     ctx.state.profile.name='编辑后立刻切页';saving.scheduleSave();await app.go3('explore');
     await new Promise(resolve=>setTimeout(resolve,650));await ctx.saveChain;
-    assert.equal(writes,1);assert.equal((await storage.get('current')).profile.name,'编辑后立刻切页');assert.equal((await storage.get('current')).route,'home');
+    assert.equal(writes,0);assert.equal(ctx.state.profile.name,'编辑后立刻切页');assert.equal(ctx.dirty301,true);await saving.save();assert.equal(writes,1);assert.equal((await storage.get('current')).profile.name,'编辑后立刻切页');assert.equal((await storage.get('current')).route,'home');
     for(const route of ['settings','profile','home'])await app.go3(route);await saving.save();assert.equal(writes,1);
   }finally{storage.commitCurrent=original;saving.cancelPendingSave();}
 });

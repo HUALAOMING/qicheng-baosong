@@ -1,7 +1,7 @@
 import { uid } from './utils/helpers.js';
 // 启程 · js/constants.js
 
-const VERSION = '5.3.2';
+const VERSION = '5.4.0';
 
 const THEMES = {
   pudding : '布丁奶油', obsidian : '黑橙质感', blue : '墨蓝学院', jade : '深海翡翠', berry : '莓果银白'
@@ -103,7 +103,7 @@ const NAV3 = [ {
   id : 'learning-center', zh : '学习中心', en : 'Learning center', icon : 'bulb', items : [['explore', '学习中心首页', 'Learning home'], ['quiz', '练习中心', 'Practice center'], ['learning-review','错题与收藏','Review & collections'],['question-bank','题库管理','Question banks'],['quiz-history','答题历史','Practice history'], ['reading', '阅读扩展', 'Reading'], ['reading-progress', '每日阅读进度', 'Reading progress'], ['calendar', '学习日历', 'Learning calendar'], ['self-introductions','自我介绍汇总','Self introductions']]
 }, {
   id : 'entry', zh : '信息录入', en : 'Information', icon : 'edit', items : [['profile', '个人基本信息', 'Basic information'],
-  ['education', '教育经历', 'Education'], ['statement', '个人陈述', 'Personal statement'], ['academics', '语言与考试成绩', 'Languages & exams'],
+  ['education', '教育经历', 'Education'], ['statement', '个人陈述', 'Personal statement'], ['academics', '语言能力', 'Languages'], ['scores', '成绩录入', 'Examination results'],
   ['awards', '荣誉录入', 'Honors & awards'], ['experiences', '个人经历录入', 'Experience'], ['practices', '社会实践录入', 'Social practice']]
 }, {
   id : 'organize', zh : '材料组织整理', en : 'Organize', icon : 'layers', items : [['sort-awards', '荣誉整理', 'Organize awards'],
@@ -115,7 +115,7 @@ const NAV3 = [ {
   id : 'dashboard', zh : '数据看板', en : 'Dashboard', icon : 'chart', items : [['dashboard', '资料与成绩', 'Materials & results'], ['practice-dashboard', '练习数据', 'Practice data']]
 }, {
   id : 'materials', zh : '资料中心', en : 'Materials', icon : 'folder', items : [['images', '图片管理', 'Images'], ['files',
-  '文件管理', 'Files'], ['outputs', '导出内容管理', 'Exported documents']]
+  '文件管理', 'Files'], ['my-resumes', '我的简历', 'My uploaded resumes'], ['outputs', '导出内容管理', 'Exported documents']]
 }, {
   id : 'export', zh : '编辑与导出', en : 'Edit & export', icon : 'export', items : [['resumes', '简历管理中心', 'Resume manager'],['export-center','统一导出中心','Export center'],
   ['archive', '个人资料打包', 'Download all materials']]
