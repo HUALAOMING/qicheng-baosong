@@ -1,0 +1,52 @@
+import {chromium531 as chromium} from './browser531-support.mjs';
+import assert from 'node:assert/strict';
+import {mkdir,writeFile} from 'node:fs/promises';
+import {spawn} from 'node:child_process';
+const out='tests/generated/intro-font541',base='http://127.0.0.1:5411/';
+await mkdir(out,{recursive:true});
+const server=spawn(process.execPath,['scripts/serve.mjs'],{env:{...process.env,QICHENG_PORT:'5411'},stdio:'ignore',windowsHide:true});
+let browser;
+const checks=[];
+try{
+ for(let i=0;i<100;i++){try{await fetch(base);break;}catch{await new Promise(r=>setTimeout(r,50));}}
+ browser=await chromium.launch({executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless:true});
+ const context=await browser.newContext({viewport:{width:1280,height:900},serviceWorkers:'block'}),page=await context.newPage();
+ const open=async()=>{
+  await page.waitForFunction(()=>!!window.ResumeStudio);
+  if(await page.locator('#startupChoice52[open]').count())await page.locator('#startupContinue52').click();
+  await page.evaluate(()=>{const s=ResumeStudio.getState();s.introductions=[{id:'font541',title:'中文面试版',language:'中文',durationSeconds:60,note:'',body:'各位老师好！我是启程。\n我热爱探索，也期待在大学里继续学习与成长。',updatedAt:new Date().toISOString()}];ResumeStudio.setState(s);ResumeStudio.go3('self-introductions');});
+  await page.locator('[data-intro-open52="font541"]').click();
+ };
+ await page.goto(base);await open();
+ const slider=page.locator('#introFontSize541'),script=page.locator('#introScript541');
+ const size=()=>script.evaluate(el=>getComputedStyle(el).fontSize);
+ assert.equal(await size(),'18px');assert.equal(await slider.getAttribute('aria-controls'),'introScript541');
+ checks.push('Default is 18px; range has an accessible label and identifies the controlled script');
+ await slider.focus();await slider.press('Home');assert.equal(await size(),'14px');await slider.press('ArrowRight');assert.equal(await size(),'15px');await slider.press('End');assert.equal(await size(),'32px');await slider.press('ArrowRight');assert.equal(await size(),'32px');
+ checks.push('Keyboard: Home/End, arrow steps, 14–32px bounds and live text size');
+ const box=await slider.boundingBox();
+ await page.mouse.move(box.x+box.width-12,box.y+box.height/2);await page.mouse.down();
+ await page.mouse.move(box.x+box.width*.55,box.y+box.height/2,{steps:12});const middle=Number(await slider.inputValue());assert.ok(middle>14&&middle<32);assert.equal(await size(),middle+'px');
+ await page.mouse.move(box.x+box.width*.3,box.y+box.height/2,{steps:8});assert.ok(Number(await slider.inputValue())<middle);await page.mouse.up();
+ const remembered=await slider.inputValue();assert.equal(await page.locator('#introFontValue541').textContent(),remembered+' px');
+ assert.equal(await slider.getAttribute('aria-valuetext'),remembered+' 像素');
+ checks.push('Real mouse drag updates text before release and reverses immediately; output and accessibility value stay in sync');
+ await page.locator('[data-intro-back52]').click();await page.locator('[data-intro-open52="font541"]').click();assert.equal(await size(),remembered+'px');
+ await page.reload();await open();assert.equal(await size(),remembered+'px');
+ checks.push('Preference survives leaving the version and reloading the page');
+ await page.screenshot({path:out+'/desktop.png',fullPage:true});
+ await page.emulateMedia({reducedMotion:'reduce'});
+ assert.ok(await slider.evaluate(el=>parseFloat(getComputedStyle(el,'::-webkit-slider-thumb').transitionDuration)<=.001));
+ await slider.focus();await slider.press('Home');assert.equal(await size(),'14px');
+ checks.push('Reduced motion disables thumb animation and retains adjustment');
+ const touch=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,serviceWorkers:'block'}),mobile=await touch.newPage();
+ await mobile.goto(base);await mobile.waitForFunction(()=>!!window.ResumeStudio);if(await mobile.locator('#startupChoice52[open]').count())await mobile.locator('#startupContinue52').click();
+ await mobile.evaluate(()=>{const s=ResumeStudio.getState();s.introductions=[{id:'touch541',title:'English',language:'英语',durationSeconds:60,note:'',body:'Hello, teachers. I enjoy learning and exploring new ideas.',updatedAt:new Date().toISOString()}];ResumeStudio.setState(s);ResumeStudio.go3('self-introductions');});
+ await mobile.locator('[data-intro-open52="touch541"]').click();
+ const range=mobile.locator('#introFontSize541');await range.scrollIntoViewIfNeeded();const r=await range.boundingBox();assert.ok(r.height>=44);
+ await mobile.touchscreen.tap(r.x+r.width*.8,r.y+r.height/2);assert.ok(Number(await range.inputValue())>18);assert.equal(await mobile.locator('#introScript541').evaluate(el=>getComputedStyle(el).fontSize),(await range.inputValue())+'px');
+ assert.ok(await mobile.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ await mobile.screenshot({path:out+'/mobile.png',fullPage:true});
+ checks.push('390px touch layout: 44px target, touch adjustment and no horizontal overflow');
+ const report={status:'PASS',checks,limitation:'Touch verified with Chromium emulation, not a physical iPad.'};await writeFile(out+'/result.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));
+}finally{await browser?.close();server.kill();}

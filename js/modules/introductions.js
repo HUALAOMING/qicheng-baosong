@@ -5,6 +5,12 @@ import {changed,render,confirmAction} from '../app.js';
 
 let introActive52='', introEditing52=false, introInterval52=null;
 const introTimers52=new Map();
+// A device reading preference, independent of scripts and saved work.
+let introFontSize541=18;
+try{const saved=Number(localStorage.getItem('qicheng.introductionFontSize'));if(Number.isInteger(saved)&&saved>=14&&saved<=32)introFontSize541=saved;}catch{}
+function introFontControl541(){
+  return '<div class="intro-font541"><div class="intro-font-heading541"><label for="introFontSize541">'+tr('正文字号','Text size')+'</label><output id="introFontValue541" for="introFontSize541">'+introFontSize541+' px</output></div><div class="intro-font-track541"><span aria-hidden="true">A</span><input id="introFontSize541" type="range" min="14" max="32" step="1" value="'+introFontSize541+'" style="--intro-fill541:'+((introFontSize541-14)/18*100)+'%" aria-controls="introScript541" aria-valuetext="'+introFontSize541+' '+tr('像素','pixels')+'"><span aria-hidden="true">A</span></div></div>';
+}
 function introductionDuration52(minutes,seconds){
   if(String(minutes).trim()===''&&String(seconds).trim()==='')return 0;
   const m=Number(minutes||0),s=Number(seconds||0);
@@ -50,7 +56,7 @@ function introductionsPage52(){
   const item=ctx.state.introductions.find(x=>x.id===introActive52);
   if(item&&!introEditing52){
     const clock=introductionClock52(item.id,item.durationSeconds),count=introductionCount52(item.body,item.language);
-    return '<div class="introductions52"><button data-intro-back52>← '+tr('全部自我介绍','All introductions')+'</button><header class="page-head"><div><p class="eyebrow">REHEARSE / YOUR STORY</p><h1>'+esc(introductionLabel52(item))+'</h1><p>'+esc(item.language)+' · '+Math.floor(item.durationSeconds/60)+tr(' 分 ','m ')+item.durationSeconds%60+tr(' 秒','s')+' · '+count.count+' '+count.unit+'</p></div><button data-intro-edit52="'+esc(item.id)+'">'+tr('编辑','Edit')+'</button></header><div class="intro-review52"><article class="panel"><p class="intro-script52">'+esc(item.body)+'</p>'+(item.note?'<p class="hint">'+esc(item.note)+'</p>':'')+'</article><aside class="panel intro-timer52"><p>'+tr('朗读计时','Rehearsal timer')+'</p><output id="introClock52" class="'+(clock.overtime?'overtime':'')+'">'+introClockText52(clock)+'</output><p id="introTimerStatus52" role="status">'+(clock.overtime?tr('已超出 ','Overtime: ')+clock.seconds+tr(' 秒',' seconds'):tr('倒计时结束后自动记录超时','Overtime starts after the countdown'))+'</p><div class="actions"><button class="primary" data-intro-timer52="toggle">'+tr(clock.running?'暂停':'开始 / 继续',clock.running?'Pause':'Start / resume')+'</button><button data-intro-timer52="reset">'+tr('重置','Reset')+'</button></div><p class="hint">'+tr('切换页面后计时仍会继续；刷新页面会重置计时。','Timing continues across pages and resets on reload.')+'</p></aside></div></div>';
+    return '<div class="introductions52"><button data-intro-back52>← '+tr('全部自我介绍','All introductions')+'</button><header class="page-head"><div><p class="eyebrow">REHEARSE / YOUR STORY</p><h1>'+esc(introductionLabel52(item))+'</h1><p>'+esc(item.language)+' · '+Math.floor(item.durationSeconds/60)+tr(' 分 ','m ')+item.durationSeconds%60+tr(' 秒','s')+' · '+count.count+' '+count.unit+'</p></div><button data-intro-edit52="'+esc(item.id)+'">'+tr('编辑','Edit')+'</button></header><div class="intro-review52"><article class="panel">'+introFontControl541()+'<p id="introScript541" class="intro-script52" style="font-size:'+introFontSize541+'px">'+esc(item.body)+'</p>'+(item.note?'<p class="hint">'+esc(item.note)+'</p>':'')+'</article><aside class="panel intro-timer52"><p>'+tr('朗读计时','Rehearsal timer')+'</p><output id="introClock52" class="'+(clock.overtime?'overtime':'')+'">'+introClockText52(clock)+'</output><p id="introTimerStatus52" role="status">'+(clock.overtime?tr('已超出 ','Overtime: ')+clock.seconds+tr(' 秒',' seconds'):tr('倒计时结束后自动记录超时','Overtime starts after the countdown'))+'</p><div class="actions"><button class="primary" data-intro-timer52="toggle">'+tr(clock.running?'暂停':'开始 / 继续',clock.running?'Pause':'Start / resume')+'</button><button data-intro-timer52="reset">'+tr('重置','Reset')+'</button></div><p class="hint">'+tr('切换页面后计时仍会继续；刷新页面会重置计时。','Timing continues across pages and resets on reload.')+'</p></aside></div></div>';
   }
   return '<div class="introductions52"><header class="page-head"><div><p class="eyebrow">LEARNING / INTRODUCTIONS</p><h1>'+tr('自我介绍汇总','Self introductions')+'</h1><p>'+tr('保存不同语言和时长的版本，随时朗读与复习。','Keep versions for different languages and durations, ready to rehearse.')+'</p></div><button class="primary" data-intro-new52>＋ '+tr('新增版本','New version')+'</button></header>'+(introEditing52?introForm52():'<div class="intro-grid52">'+(ctx.state.introductions.length?ctx.state.introductions.map(x=>'<article class="panel intro-card52"><button class="intro-open52" data-intro-open52="'+esc(x.id)+'"><span class="eyebrow">'+esc(x.language)+'</span><h2>'+esc(introductionLabel52(x))+'</h2><p>'+Math.floor(x.durationSeconds/60)+tr(' 分 ','m ')+x.durationSeconds%60+tr(' 秒','s')+'</p>'+(x.note?'<p class="hint">'+esc(x.note)+'</p>':'')+'</button><div class="actions"><button data-intro-edit52="'+esc(x.id)+'">'+tr('编辑','Edit')+'</button><button data-intro-delete52="'+esc(x.id)+'">'+tr('删除','Delete')+'</button></div></article>').join(''):'<div class="empty">'+tr('还没有自我介绍，先录入一个版本。','Create your first introduction.')+'</div>')+'</div>')+'</div>';
 }
@@ -61,6 +67,17 @@ function updateIntroClock52(){
   $('[data-intro-timer52="toggle"]').textContent=tr(clock.running?'暂停':'开始 / 继续',clock.running?'Pause':'Start / resume');
 }
 function bindIntroductions52(){
+  const fontSlider=$('#introFontSize541');
+  if(fontSlider){
+    fontSlider.oninput=()=>{
+      introFontSize541=Number(fontSlider.value);
+      $('#introScript541').style.fontSize=introFontSize541+'px';
+      $('#introFontValue541').textContent=introFontSize541+' px';
+      fontSlider.style.setProperty('--intro-fill541',((introFontSize541-14)/18*100)+'%');
+      fontSlider.setAttribute('aria-valuetext',introFontSize541+' '+tr('像素','pixels'));
+    };
+    fontSlider.onchange=()=>{try{localStorage.setItem('qicheng.introductionFontSize',String(introFontSize541));}catch{}};
+  }
   clearInterval(introInterval52);introInterval52=null;
   const add=$('[data-intro-new52]');if(add)add.onclick=()=>{startIntroduction52();render();};
   const back=$('[data-intro-back52]');if(back)back.onclick=()=>{introActive52='';introEditing52=false;render();};
