@@ -392,10 +392,18 @@ async function action (name) {
   if (name === 'preview') return refreshPreview ();
   if (name === 'print') return window.print ();
 }
+function setStartupProgress(value, zh, en) {
+  const progress = $('#startupProgress');
+  if (!progress) return;
+  progress.value = value;
+  $('#startupStatus').textContent = tr(zh, en);
+}
 async function boot () {
-  await Promise.all ([loadBuiltinData (), storage.open ()]);
+  const builtins = loadBuiltinData();
+  const savedWorkspace = storage.open().then(() => storage.getCurrent({lazyAssets:true}));
+  setStartupProgress(1, '正在读取本机保存的进度…', 'Reading saved progress…');
+  const [, stored] = await Promise.all([builtins, savedWorkspace]);
   ctx.state = fresh ();
-  const stored = await storage.getCurrent({lazyAssets:true});
   const embedded = globalThis.QICHENG_EMBEDDED?.draft;
   if (stored !== undefined) ctx.state = validateDraft (stored,{trustedLocal:true});
   else if (embedded && !await storage.get('__seedCleared')) {
@@ -406,14 +414,15 @@ async function boot () {
     await storage.setMany ({...extra, current:snapshot3 ()});
   }
   const resumeMigration53=initializeResumeVersions53(ctx.state);
-  await initializeRuntime53(()=>{if(ctx.state.route.startsWith('resume-editor:')&&(isLite53()||!canEditWorkspace53()))go3(ctx.state.route);else render();});ctx.device53=deviceSettings53;
+  setStartupProgress(2, '正在准备工作台和学习记录…', 'Preparing your workspace and study records…');
+  await initializeRuntime53(()=>{if(!ctx.initialized)return;if(ctx.state.route.startsWith('resume-editor:')&&(isLite53()||!canEditWorkspace53()))go3(ctx.state.route);else render();});ctx.device53=deviceSettings53;
   // Startup always opens Home, regardless of the route in an old draft or backup.
   ctx.state.route = 'home';
   ctx.state.section = 'resume'; ctx.state.step = 0;
   ctx.state.menuOpen = ['start']; ctx.state.sidebarHidden = true;
-  await initializeHomeResources ();
-  await Promise.all ([initializeQuizSummary (), initializeHome (),initializeJournalSummary(),refreshHomeOverview53()]);
+  await Promise.all ([initializeHomeResources (), initializeQuizSummary (), initializeHome (),initializeJournalSummary(),refreshHomeOverview53()]);
   if(getHomePreferences().quoteSource==='classic')await loadRouteData('reading');
+  setStartupProgress(3, '正在打开工作台…', 'Opening your workspace…');
   storage.enableActivityTracking();
   // Export/preview prepares its own document fonts; Home never waits for font decoding.
   ctx.initialized = true;
@@ -472,7 +481,10 @@ async function boot () {
   if(deviceSettings53.startRoute!=='home')await go3(deviceSettings53.startRoute);
   showStartupChoice52();
   // First launch stays on Home; appearance is available on the regular Settings page.
-  pwa.init ().catch (error => toast (tr ('离线支持初始化失败：', 'Offline support failed: ') + error.message));
+  // Give the first interactive frame priority over background offline downloads.
+  const startOfflineSupport = () => setTimeout(() => { void pwa.init(); }, 0);
+  if (document.visibilityState === 'visible' && globalThis.requestAnimationFrame) requestAnimationFrame(startOfflineSupport);
+  else startOfflineSupport();
   return window.ResumeStudio;
 }
 export { boot, action };

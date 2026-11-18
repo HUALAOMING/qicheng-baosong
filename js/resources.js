@@ -179,24 +179,27 @@ function validateResourceRecords(records, {allowOfficial = false} = {}) {
 async function initializeHomeResources() {
   const embedded=globalThis.QICHENG_RESOURCE_SEEDS;
   const records=Object.create(null), seeds=Object.create(null);
-  for(const origin of ['official','custom'])for(const id of ['daily-quotes','schedule:'+EXAM_SCHEDULE_ID]){
-    const key='resource:'+origin+':'+id,value=await storage.get(key);if(value)records[key]=value;
+  const quoteKey='resource:official:daily-quotes', scheduleKey='resource:official:schedule:'+EXAM_SCHEDULE_ID;
+  const keys=[quoteKey,scheduleKey,'resource:custom:daily-quotes','resource:custom:schedule:'+EXAM_SCHEDULE_ID];
+  const [officialClassics,customClassics]=await Promise.all([
+    storage.getPrefix('resource:official:classic:'),storage.getPrefix('resource:custom:classic:'),
+    ...keys.map(async key=>{const value=await storage.get(key);if(value)records[key]=value;})
+  ]);
+  const storedQuotes=records[quoteKey];
+  const needsQuotes=!storedQuotes||(storedQuotes.version==='1.0.0'&&!storedQuotes.quotes?.length);
+  const needsSchedule=!records[scheduleKey];
+  const [quotes,schedule]=await Promise.all([
+    needsQuotes && (embedded ? embedded.quotes : resourceFetch('data/resources/daily-quotes.json').then(response=>response.json())),
+    needsSchedule && (embedded ? embedded.examSchedule??{schemaVersion:1,version:'1.0.0',examSchedule:[]} : resourceFetch('data/resources/exam-schedule.json').then(response=>response.json()))
+  ]);
+  if(needsQuotes){
+    const clean=validateQuotes(quotes);
+    if(!storedQuotes||clean.quotes.length)records[quoteKey]=seeds[quoteKey]={...clean,origin:'official'};
   }
-  if(!records['resource:official:daily-quotes']||(records['resource:official:daily-quotes'].version==='1.0.0'&&!records['resource:official:daily-quotes'].quotes?.length)){
-    const input=embedded?embedded.quotes:await(await resourceFetch('data/resources/daily-quotes.json')).json();
-    const clean=validateQuotes(input);
-    if(!records['resource:official:daily-quotes']||clean.quotes.length)records['resource:official:daily-quotes']=seeds['resource:official:daily-quotes']={...clean,origin:'official'};
-  }
-  if(!records['resource:official:schedule:'+EXAM_SCHEDULE_ID]){
-    const input=embedded?embedded.examSchedule??{schemaVersion:1,version:'1.0.0',examSchedule:[]}:await(await resourceFetch('data/resources/exam-schedule.json')).json();
-    records['resource:official:schedule:'+EXAM_SCHEDULE_ID]=seeds['resource:official:schedule:'+EXAM_SCHEDULE_ID]={...validateExamSchedule(input),origin:'official'};
-  }
+  if(needsSchedule)records[scheduleKey]=seeds[scheduleKey]={...validateExamSchedule(schedule),origin:'official'};
   if(Object.keys(seeds).length)await storage.setMany(seeds);
   resourceOfficialQuotes=records['resource:official:daily-quotes'];resourceCustomQuotes=records['resource:custom:daily-quotes']||null;
   resourceOfficialSchedule=records['resource:official:schedule:'+EXAM_SCHEDULE_ID];resourceCustomSchedule=records['resource:custom:schedule:'+EXAM_SCHEDULE_ID]||null;
-  // Custom classics are needed only when a user chose one for the daily quote.
-  const customClassics=await storage.getPrefix('resource:custom:classic:');
-  const officialClassics=await storage.getPrefix('resource:official:classic:');
   resourceClassics=Object.values({...officialClassics,...customClassics});
 }
 async function resourceLoad({metadataOnly=false}={}) {

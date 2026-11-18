@@ -24,19 +24,31 @@ async function publishedBaseline531(){
  }
 }
 const [oldFiles,newFiles]=await Promise.all([publishedBaseline531(),snapshot(root)]);
+const {version}=JSON.parse(newFiles.get('package.json'));
 const assets=[...newFiles.keys()].filter(name=>/^(index\.html|manifest\.webmanifest|css\/|js\/|data\/|assets\/|workers\/)/.test(name)&&!['data/static-resources.json','data/resources/manifest.json'].includes(name)).sort();
 const hashes=Object.fromEntries(assets.map(name=>[name,createHash('sha256').update(newFiles.get(name)).digest('hex')]));
 const revision=createHash('sha256').update(JSON.stringify(hashes)).digest('hex').slice(0,12);
-const worker=rev=>Buffer.from(createServiceWorker521({revision:rev,assets,hashes,appVersion:'5.4.0'}));
+const nextIndex=Buffer.concat([newFiles.get('index.html'),Buffer.from('\n<!-- a subsequent publication -->\n')]);
+const nextHashes={...hashes,'index.html':createHash('sha256').update(nextIndex).digest('hex')};
+const nextRevision=createHash('sha256').update(JSON.stringify(nextHashes)).digest('hex').slice(0,12);
+const brokenHashes={...nextHashes,'js/lazy-runtime.js':'0'.repeat(64)};
+const brokenRevision=createHash('sha256').update(JSON.stringify(brokenHashes)).digest('hex').slice(0,12);
+const releases={new:{revision,hashes},next:{revision:nextRevision,hashes:nextHashes},broken:{revision:brokenRevision,hashes:brokenHashes}};
 let mode='old',failure=false;
+let nextIndexRequests=0;
+let waitForOfflinePack;
 const scope='/qicheng-baosong/',mime={'.html':'text/html','.js':'application/javascript','.mjs':'application/javascript','.json':'application/json','.webmanifest':'application/manifest+json','.css':'text/css','.svg':'image/svg+xml','.png':'image/png','.ttf':'font/ttf'};
 const httpErrors=[];
-const server=createServer((req,res)=>{
+const server=createServer(async(req,res)=>{
  const url=new URL(req.url,'http://localhost');if(!url.pathname.startsWith(scope)){res.writeHead(404);res.end();return;}
  const name=decodeURIComponent(url.pathname.slice(scope.length))||'index.html';const records=mode==='old'?oldFiles:newFiles;
- let bytes=records.get(name);if(name==='service-worker.js'&&mode!=='old')bytes=worker(mode==='new'?revision:mode==='next'?'next-'+revision:'failed-'+revision);
+ let bytes=records.get(name);
+ if(mode!=='old'&&name==='service-worker.js')bytes=Buffer.from(createServiceWorker521({...releases[mode],assets,appVersion:version}));
+ if(mode!=='old'&&name==='data/static-resources.json')bytes=Buffer.from(JSON.stringify({appVersion:version,revision:releases[mode].revision}));
+ if(mode!=='old'&&mode!=='new'&&name==='index.html'){bytes=nextIndex;nextIndexRequests++;}
  if(failure&&name==='js/lazy-runtime.js')bytes=Buffer.from('intentional mismatched resource');
  if(!bytes){httpErrors.push({mode,name});res.writeHead(404);res.end();return;}
+ if(name==='assets/editable-template.html'&&waitForOfflinePack)await waitForOfflinePack;
  res.writeHead(200,{'Content-Type':mime[path.extname(name)]||'application/octet-stream','Cache-Control':'no-store'});res.end(bytes);
 });
 await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const base='http://127.0.0.1:'+server.address().port+scope;
@@ -50,12 +62,43 @@ const go=(route,target=page)=>target.evaluate(route=>ResumeStudio.go3(route),rou
 const pwa=(method,target=page)=>target.evaluate(async({method,scope})=>(await import(scope+'js/pwa.js')).pwa[method](),{method,scope});
 async function check(name,fn){const start=Date.now();try{const detail=await fn();checks.push({name,status:'PASS',milliseconds:Date.now()-start,detail});console.log('PASS '+name);}catch(error){const diagnostic=await page.evaluate(async()=>({controller:navigator.serviceWorker.controller?.state,caches:await Promise.all((await caches.keys()).map(async name=>{const c=await caches.open(name);return {name,app:!!await c.match(new URL('js/app.js',location.href)),ui:!!await c.match(new URL('js/ui53.js',location.href))};})),detail:document.getElementById('startupErrorDetail')?.textContent})).catch(()=>({}));checks.push({name,status:'FAIL',error:error.stack,diagnostic,failedRequests:[...failedRequests]});console.log('FAIL '+name+': '+error.message);await page.screenshot({path:path.join(out,'failure-'+checks.length+'.png')}).catch(()=>{});}await writeFile(path.join(out,'summary.json'),JSON.stringify(report,null,2));}
 try {
- await check('5.3.2 existing app boots and commits baseline user data',async()=>{
+ await check('slow first visit shows startup progress before the workspace; PDF and Word work while offline resources prepare',async()=>{
+  const fresh=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,locale:'zh-CN'});
+  let allowOfflinePack;
+  waitForOfflinePack=new Promise(resolve=>{allowOfflinePack=resolve;});
+  try {
+   mode='new';const first=await fresh.newPage();first.on('pageerror',error=>errors.push(error.message));
+   let allowQuotes,requestQuotes;
+   const quotesRequested=new Promise(resolve=>{requestQuotes=resolve;});
+   const waitForQuotes=new Promise(resolve=>{allowQuotes=resolve;});
+   await first.route('**/data/resources/daily-quotes.json',async route=>{requestQuotes();await waitForQuotes;await route.continue();});
+   await first.goto(base,{waitUntil:'domcontentloaded'});
+   try {
+    await Promise.race([quotesRequested,first.locator('#startupErrorDetail').waitFor({timeout:15000}).then(()=>assert.fail('startup failed'))]);
+    assert.equal(await first.locator('#startupProgress').evaluate(progress=>progress.value),2);
+    assert.equal(await first.locator('#workspaceContent').count(),0);
+    await first.screenshot({path:path.join(out,'first-visit-progress.png')});
+   } finally {allowQuotes();}
+   await ready(first);
+   assert.equal(await first.locator('#startupProgress').count(),0);
+   assert.equal(await first.locator('[data-pwa-offer]').isVisible(),false);
+   const sample=await first.evaluate(async()=>{
+    const state=ResumeStudio.getState();state.profile.name='首次启动导出测试';ResumeStudio.setState(state);
+    const [pdf,word]=await Promise.all([ResumeStudio.pdfBytes(),ResumeStudio.wordBlob()]);
+    return {pdf:pdf.length,word:word.size};
+   });
+   assert.ok(sample.pdf>1000&&sample.word>1000,JSON.stringify(sample));
+   assert.equal(await first.evaluate(async()=>!!(await navigator.serviceWorker.getRegistration())?.active),false);
+   assert.doesNotMatch(await first.locator('#toast').textContent(),/更新失败|更新未完成/);
+   return sample;
+  } finally {allowOfflinePack();waitForOfflinePack=null;await fresh.close();mode='old';}
+ });
+ await check('the previous app boots and commits baseline user data',async()=>{
   await page.goto(base);await ready();assert.equal(await page.evaluate(()=>ResumeStudio.version),process.env.QICHENG_BASELINE_VERSION||'5.3.2');await page.evaluate(async()=>{const state=ResumeStudio.getState();state.profile.name='升级回归资料';ResumeStudio.setState(state);await ResumeStudio.save();});await page.evaluate(()=>navigator.serviceWorker.ready);await page.reload();await ready();await page.waitForFunction(()=>!!navigator.serviceWorker.controller);
   await page.evaluate(async()=>{const r=await import('./js/resources.js');await r.initializeResources({metadataOnly:true});const target=r.listPracticeBankSummaries()[0].bank.id;await r.importResourceJSON({schemaVersion:1,bank:{id:'upgrade531-legacy',name:'5.3.0旧导入题包',subject:'english',section:'grammar',version:'1.0.0'},questions:[{id:'same-id',type:'true-false',question:'旧版导入升级后仍属于题库',answer:true,explanation:'升级保留解析'}]},{targetBankId:target});const note=await r.getQuestionLearning('upgrade531-legacy','same-id');await r.saveQuestionNote('upgrade531-legacy','same-id','升级保留个人笔记',{expectedRevision:note.noteRevision});window.__upgrade531Target=target;});
  });
- await check('5.3.2 saved single-window update migrates to 5.4.0 without losing database',async()=>{
-  mode='new';assert.equal(await pwa('checkUpdate'),true);await Promise.all([page.waitForNavigation({waitUntil:'load'}),pwa('applyUpdate')]);await ready();assert.equal(await page.evaluate(()=>ResumeStudio.version),'5.4.0');assert.equal(await page.evaluate(()=>ResumeStudio.getState().profile.name),'升级回归资料');assert.equal(httpErrors.length,0);
+ await check('legacy saved single-window update migrates to the current version without losing database',async()=>{
+  mode='new';assert.equal(await pwa('checkUpdate'),true);await Promise.all([page.waitForNavigation({waitUntil:'load'}),pwa('applyUpdate')]);await ready();assert.equal(await page.evaluate(()=>ResumeStudio.version),version);assert.equal(await page.evaluate(()=>ResumeStudio.getState().profile.name),'升级回归资料');assert.equal(httpErrors.length,0);
   const preserved=await page.evaluate(async()=>{const r=await import('./js/resources.js');await r.initializeResources({metadataOnly:true});const pack=r.listImportedQuizPackSummaries().find(p=>p.bank.id==='upgrade531-legacy'),result=await r.queryPracticeQuestions(pack.targetBankId,{keyword:'旧版导入升级',limit:30}),note=await r.getQuestionLearning('upgrade531-legacy','same-id');return {rows:result.items.map(q=>({id:q.id,source:q.sourceBankId})),note:note.note.text};});assert.deepEqual(preserved,{rows:[{id:'same-id',source:'upgrade531-legacy'}],note:'升级保留个人笔记'});
  });
  await check('offline restart and lazy school/map, quiz and document route work under GitHub Pages subpath',async()=>{
@@ -63,7 +106,18 @@ try {
  });
  await check('editing peer blocks actual waiting-worker activation without refresh',async()=>{
   peer=await context.newPage();peer.setDefaultTimeout(30000);peer.on('pageerror',error=>errors.push('peer: '+error.message));await peer.goto(base);await ready(peer);await go('profile',peer);const input=peer.locator('[data-bind="profile.name"]');await input.fill('多窗口编辑资料');await input.focus();await peer.evaluate(()=>ResumeStudio.save());
-  mode='next';await go('settings');assert.equal(await pwa('checkUpdate'),true);const oldController=await page.evaluate(()=>navigator.serviceWorker.controller.state);await pwa('applyUpdate');await page.waitForFunction(()=>!document.body.inert&&document.querySelector('[data-pwa-update-status]')?.textContent.includes('其他窗口'));
+  mode='next';await go('settings');
+  const requestsBeforeOffer=nextIndexRequests;
+  await page.evaluate(async()=>{const registration=await navigator.serviceWorker.getRegistration();await registration.update().catch(()=>{});});
+  assert.equal(await pwa('checkUpdate'),true);
+  const offer=page.locator('[data-pwa-offer]');await offer.waitFor({state:'visible'});
+  await offer.locator('[data-pwa-dismiss]').click();assert.equal(await offer.isVisible(),false);
+  assert.equal(nextIndexRequests,requestsBeforeOffer,'no update assets fetched before consent');
+  assert.equal(await pwa('checkUpdate'),true);
+  await offer.locator('[data-pwa-refresh]').click();
+  await page.waitForFunction(()=>document.querySelector('[data-pwa-offer] [data-pwa-refresh]')?.textContent.includes('保存并更新'));
+  assert.ok(nextIndexRequests>requestsBeforeOffer);
+  const oldController=await page.evaluate(()=>navigator.serviceWorker.controller.state);await pwa('applyUpdate');await page.waitForFunction(()=>!document.body.inert&&document.querySelector('[data-pwa-update-status]')?.textContent.includes('其他窗口'));
   assert.equal(await page.evaluate(async()=>!!(await navigator.serviceWorker.getRegistration()).waiting),true);assert.equal(await input.inputValue(),'多窗口编辑资料');assert.equal(await peer.locator('#startupChoice52[open]').count(),0);return {controllerState:oldController};
  });
  await check('all clean windows acknowledge, save and reload together; new boot verifies expected revision',async()=>{
@@ -72,7 +126,7 @@ try {
   await page.waitForFunction(()=>sessionStorage.getItem('qicheng-pwa-transition')===null);assert.equal(await page.evaluate(()=>document.body.inert),false);await peer.close();peer=null;
  });
  await check('interrupted/mismatched new resources fail installation; old offline program and data remain usable',async()=>{
-  mode='broken';failure=true;await go('settings');assert.equal(await pwa('checkUpdate'),false);await page.waitForFunction(()=>document.querySelector('[data-pwa-update-status]')?.textContent.includes('未完成'));assert.equal(await page.evaluate(async()=>!!(await navigator.serviceWorker.getRegistration()).waiting),false);failure=false;await context.setOffline(true);await page.reload();await ready();assert.equal(await page.evaluate(()=>ResumeStudio.getState().profile.name),'多窗口编辑资料');assert.equal(await page.evaluate(()=>ResumeStudio.version),'5.4.0');await context.setOffline(false);
+  mode='broken';failure=true;await go('settings');assert.equal(await pwa('checkUpdate'),true);assert.equal(await pwa('downloadUpdate'),false);await page.waitForFunction(()=>document.querySelector('[data-pwa-update-status]')?.textContent.includes('未完成'));assert.equal(await page.evaluate(async()=>!!(await navigator.serviceWorker.getRegistration()).waiting),false);failure=false;await context.setOffline(true);await page.reload();await ready();assert.equal(await page.evaluate(()=>ResumeStudio.getState().profile.name),'多窗口编辑资料');assert.equal(await page.evaluate(()=>ResumeStudio.version),version);await context.setOffline(false);
  });
  assert.equal(errors.length,0,errors.join('\n'));assert.equal(httpErrors.length,0,JSON.stringify(httpErrors));
 }finally {

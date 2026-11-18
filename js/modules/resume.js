@@ -2,6 +2,7 @@ import { ctx } from '../state.js';
 import { $, $$, checkbox, clone, esc, flip, head, heading3, icon3, tr, translateLabel, clamp, loadImage, readFile, toast } from '../utils/helpers.js';
 import { photoTiles, selectedPhotos } from './images.js';
 import { cleanCrop, currentVersion, fieldVisible, moduleStyle } from '../model.js';
+import { resolveResume53 } from '../resume-model53.js';
 import { ACHIEVEMENT_FIELDS, AWARD_FIELDS, BOOK_FIELDS, EDU_FIELDS, EXAM_FIELDS, EXP_FIELDS, MODULE_NAMES, PROFILE, MODULES } from '../constants.js';
 import { avatarEditor, draftHasContent } from './profile.js';
 import { changed, render, v2Action } from '../app.js';
@@ -987,7 +988,7 @@ function bindResumeControls () {
 export { bindResumeControls };
 
 // Lazy editor registers its pure resolver. The base application never imports editor UI.
-let resumeResolverHook53=null;
+let resumeResolverHook53=resolveResume53;
 function configureResumeResolver53(resolver){resumeResolverHook53=resolver;}
 // Complete presentation presets: content, visibility, labels and section order stay intact.
 const readyResumeTemplates531={
@@ -1018,7 +1019,7 @@ function effectiveExportVersion53(version){
 function resolveExportContext53(options={},legacySnapshot=true){
  if(options.resolved)return options.resolved;
  const version=ctx.state?.versions?.find(v=>v.id===(options.versionId||ctx.state.activeVersion))||currentVersion();
- if(version?.resume53){if(!resumeResolverHook53)throw new Error('简历编辑数据尚未加载，请从简历管理中心重新打开。');const result=resumeResolverHook53(version.id);return {...result,version:effectiveExportVersion53(result.version||version)};}
+ if(version?.resume53){const result=resumeResolverHook53(version.id);return {...result,version:effectiveExportVersion53(result.version||version)};}
  return legacySnapshot?{workspace:clone(ctx.state),version:clone(version),rows:clone(exportRows())}:null;
 }
 function photoChoices53(resolved){

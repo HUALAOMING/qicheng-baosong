@@ -2251,20 +2251,36 @@ body[data-theme=obsidian] .preflight3 li.suggestion{
   color:#746f63
 }
 .startup-track301{
-  height:5px;
+  display:block;
+  width:100%;
+  height:7px;
+  border:0;
+  appearance:none;
   border-radius:9px;
   background:#eee4cd;
+  color:#826421;
+  accent-color:#826421;
   overflow:hidden;
   margin:26px 0
 }
-.startup-track301 i{
-  display:block;
-  width:32%;
-  height:100%;
-  border-radius:inherit;
-  background:#bb9b48;
-  animation:startup301 1.8s ease-in-out infinite
+.startup-track301::-webkit-progress-bar{background:#eee4cd}
+.startup-track301::-webkit-progress-value{background:#826421;border-radius:9px}
+.startup-track301::-moz-progress-bar{background:#826421;border-radius:9px}
+.pwa-update-prompt{
+  position:fixed;
+  top:calc(env(safe-area-inset-top,0px) + 12px);
+  right:calc(env(safe-area-inset-right,0px) + 12px);
+  z-index:50;
+  width:min(360px,calc(100% - 24px));
+  padding:16px;
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  background:var(--surface);
+  color:var(--ink);
+  box-shadow:0 6px 22px #0002
 }
+.pwa-update-prompt p{margin:0 0 10px;overflow-wrap:anywhere}
+.pwa-update-prompt p:last-child{margin:8px 0 0}
 .startup-help301{
   font-size:12px;
   color:#817968;
@@ -2276,20 +2292,6 @@ body[data-theme=obsidian] .preflight3 li.suggestion{
 }
 .startup-help301 code{
   overflow-wrap:anywhere
-}
-@keyframes startup301{
-  0%{
-    transform:translateX(-100%)
-  }
-  100%{
-    transform:translateX(410%)
-  }
-}
-@media(prefers-reduced-motion:reduce){
-  .startup-track301 i{
-    animation:none;
-    margin-left:34%
-  }
 }
 @media(max-width:500px){
   .startup301{

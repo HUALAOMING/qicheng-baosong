@@ -41,11 +41,24 @@ test('backup waits for accepted home writes and a failed write preserves old pre
   const pending=home.saveHomePreferences({motto:'备份前的修改'});await new Promise(r=>setTimeout(r,0));let finished=false;const file=backup.getCurrentBackup().then(v=>{finished=true;return v;});await new Promise(r=>setTimeout(r,0));assert.equal(finished,false);release();await pending;assert.equal((await file).data['settings:home'].motto,'备份前的修改');storage.set=original;
   env.factory.failWrite=true;await assert.rejects(home.saveHomePreferences({motto:'失败的修改'}));assert.equal(home.getHomePreferences().motto,'备份前的修改');env.factory.failWrite=false;
 });
-test('explicit app update check finds waiting versions, handles offline/failure, and never saves content',async()=>{
-  let updateCalls=0,posted=0,fail=false;
-  const reg={waiting:null,installing:null,addEventListener(){},update:async()=>{updateCalls++;if(fail)throw Error('Offline fixture');}};
-  const nav={onLine:true,userAgent:'Test',serviceWorker:{register:async()=>reg,getRegistration:async()=>reg,addEventListener(){},ready:Promise.resolve(reg)}};
-  Object.defineProperty(globalThis,'navigator',{value:nav,configurable:true});globalThis.isSecureContext=true;await pwa.init();const before=JSON.stringify(await storage.getAll());await pwa.checkUpdate();assert.ok(updateCalls>=2);assert.equal(JSON.stringify(await storage.getAll()),before);
-  reg.waiting={postMessage(){posted++;}};assert.equal(await pwa.checkUpdate(),true);ctx.state.profile.name='未保存内容';env.factory.failWrite=true;await pwa.applyUpdate();assert.equal(posted,0);env.factory.failWrite=false;await pwa.applyUpdate();assert.equal(posted,1);assert.equal((await storage.get('current')).profile.name,'未保存内容');
-  const calls=updateCalls;nav.onLine=false;assert.equal(await pwa.checkUpdate(),false);assert.equal(updateCalls,calls);nav.onLine=true;reg.waiting=null;fail=true;assert.equal(await pwa.checkUpdate(),false);
+test('update discovery and download preserve storage; applying saves the current draft first',async()=>{
+  let downloads=0,posted=0;
+  const reg={waiting:null};
+  const nav={onLine:true,userAgent:'Test',serviceWorker:{register:async url=>{
+    downloads++;reg.waiting={scriptURL:url.href,postMessage(){posted++;}};return reg;
+  },getRegistration:async()=>reg,addEventListener(){},ready:Promise.resolve(reg)}};
+  Object.defineProperty(globalThis,'navigator',{value:nav,configurable:true});globalThis.isSecureContext=true;
+  const originalFetch=globalThis.fetch;
+  globalThis.fetch=async()=>Response.json({appVersion:'5.4.3',revision:'0123456789ab'});
+  try {
+    await pwa.init();
+    const before=JSON.stringify(await storage.getAll());
+    assert.equal(await pwa.checkUpdate(),true);assert.equal(downloads,0);
+    assert.equal(await pwa.downloadUpdate(),true);assert.equal(downloads,1);
+    assert.equal(JSON.stringify(await storage.getAll()),before);
+    ctx.state.profile.name='未保存内容';env.factory.failWrite=true;
+    assert.equal(await pwa.applyUpdate(),false);assert.equal(posted,0);
+    env.factory.failWrite=false;assert.equal(await pwa.applyUpdate(),true);assert.equal(posted,1);
+    assert.equal((await storage.get('current')).profile.name,'未保存内容');
+  } finally {globalThis.fetch=originalFetch;env.factory.failWrite=false;}
 });

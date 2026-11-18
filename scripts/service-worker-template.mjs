@@ -10,6 +10,7 @@ const HASHES = ${JSON.stringify(hashes)};
 const URLS = new Set(PRECACHE.map(path => new URL(path,self.registration.scope).href));
 let installProgress = {type:'UPDATE_CACHE_PROGRESS',revision:REVISION,done:0,total:PRECACHE.length};
 let activationSession = null;
+const releaseReadyURL = new URL('__release_ready__',self.registration.scope).href;
 async function scopedClients() {
   return (await self.clients.matchAll({type:'window',includeUncontrolled:true})).filter(client=>client.url?.startsWith(self.registration.scope));
 }
@@ -18,19 +19,40 @@ async function digest(response) {
   const bytes=await response.clone().arrayBuffer();
   return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),byte=>byte.toString(16).padStart(2,'0')).join('');
 }
+async function previousRelease() {
+  const names = (await caches.keys()).filter(name => name.startsWith(CACHE_PREFIX) && name !== CACHE_NAME);
+  for (const name of names.reverse()) {
+    const cache = await caches.open(name);
+    const ready = await cache.match(releaseReadyURL);
+    if (ready) return {cache, manualUpdates: ready.headers.get('X-Qicheng-Manual-Updates') === '1'};
+  }
+  return null;
+}
 self.addEventListener('install',event => {
   event.waitUntil((async () => {
+    const requestedRevision = new URL(self.location.href || self.registration.scope).searchParams.get('revision');
+    const previous = await previousRelease();
+    // A browser can check the worker script on its own. Only an explicit
+    // revision request may download a replacement once this protocol is installed.
+    if (requestedRevision ? requestedRevision !== REVISION : self.registration.active && previous?.manualUpdates) {
+      throw new Error('等待用户确认下载应用更新');
+    }
     try {
       const cache = await caches.open(CACHE_NAME);
+      if (await cache.match(releaseReadyURL)) return;
       await announce(installProgress);
-      // Four real downloads at a time; hashes reject a mixed/incomplete deployment.
-      for(let offset=0;offset<PRECACHE.length;offset+=4){
-        const batch=PRECACHE.slice(offset,offset+4);
+      // Keep background transfers from competing with the interactive page.
+      const paths = [...PRECACHE.filter(path => path !== 'assets/editable-template.html'),
+        ...PRECACHE.filter(path => path === 'assets/editable-template.html')];
+      for(let offset=0;offset<paths.length;offset+=2){
+        const batch=paths.slice(offset,offset+2);
         const results=await Promise.allSettled(batch.map(async path=>{
+          const url=new URL(path,self.registration.scope).href;
+          const existing=await previous?.cache.match(url);
+          if(existing && await digest(existing)===HASHES[path]){await cache.put(url,existing);return;}
           let lastError;
           for(let attempt=0;attempt<2;attempt++)try {
-            const url=new URL(path,self.registration.scope).href;
-            const response=await fetch(new Request(url,{cache:'reload'}));
+            const response=await fetch(new Request(url,{cache:attempt?'reload':'default',priority:'low'}));
             if(!response.ok || response.type==='opaque')throw new Error('HTTP '+response.status);
             if(await digest(response)!==HASHES[path])throw new Error('资源校验不一致，请等待完整版本上传后重试');
             await cache.put(url,response);return;
@@ -42,7 +64,7 @@ self.addEventListener('install',event => {
         installProgress={...installProgress,done:offset+batch.length};
         await announce(installProgress);
       }
-      await cache.put(new URL('__release_ready__',self.registration.scope).href,new Response(REVISION));
+      await cache.put(releaseReadyURL,new Response(REVISION,{headers:{'X-Qicheng-Manual-Updates':'1'}}));
       await announce({type:'UPDATE_CACHE_READY',revision:REVISION,appVersion:APP_VERSION,total:PRECACHE.length});
     } catch(error) {
       await caches.delete(CACHE_NAME);
@@ -71,7 +93,7 @@ async function activateWhenReady() {
   const clients=await scopedClients();
   if(clients.length!==session.clients.size || clients.some(client=>!session.clients.has(client.id)))return abortActivation('窗口发生变化，请稍后重试。');
   const cache=await caches.open(CACHE_NAME);
-  if(!await cache.match(new URL('__release_ready__',self.registration.scope).href))return abortActivation('新版资源尚未完整准备。');
+  if(!await cache.match(releaseReadyURL))return abortActivation('新版资源尚未完整准备。');
   clearTimeout(session.timer);
   await announce({type:'UPDATE_ACTIVATING',requestId:session.id,revision:REVISION});
   await self.skipWaiting();
@@ -90,7 +112,7 @@ self.addEventListener('message',event => {
       if(message.protocol!==2) {
         if(clients.length!==1){event.source.postMessage({type:'UPDATE_ABORTED',detail:'请关闭其他启程窗口，再保存并更新。'});return;}
         const cache=await caches.open(CACHE_NAME);
-        if(await cache.match(new URL('__release_ready__',self.registration.scope).href))await self.skipWaiting();
+        if(await cache.match(releaseReadyURL))await self.skipWaiting();
         return;
       }
       const id=String(message.requestId||'');if(!id)return;
@@ -110,19 +132,27 @@ self.addEventListener('fetch',event => {
   if(request.method !== 'GET' || url.origin !== self.location.origin || !url.href.startsWith(self.registration.scope)) return;
   if(request.cache === 'no-store') return;
   if(request.mode === 'navigate') {
-    event.respondWith((async () => {
-      const cache = await caches.open(CACHE_NAME);
-      return await cache.match(new URL('index.html',self.registration.scope).href) || new Response('离线程序资源缺失，请联网后重新检查应用更新。',{status:503});
-    })()); return;
+    event.respondWith(currentResource(new URL('index.html',self.registration.scope).href));
+    return;
   }
   const cleanURL = new URL(url); cleanURL.search = ''; cleanURL.hash = '';
   if(!URLS.has(cleanURL.href)) return;
-  event.respondWith((async () => {
-    const cache = await caches.open(CACHE_NAME);
-    // Never fetch a possibly newer module into an older page on a cache miss.
-    return await cache.match(cleanURL.href) || new Response('此版本程序资源缺失，请联网检查更新。',{status:503});
-  })());
+  event.respondWith(currentResource(cleanURL.href));
 });
+async function currentResource(url) {
+  const cache = await caches.open(CACHE_NAME);
+  const cached = await cache.match(url);
+  if (cached) return cached;
+  const path = url.slice(self.registration.scope.length);
+  try {
+    const response = await fetch(new Request(url,{cache:'reload'}));
+    if (response.ok && await digest(response) === HASHES[path]) {
+      try { await cache.put(url,response.clone()); } catch { /* Serve verified bytes even if storage is full. */ }
+      return response;
+    }
+  } catch { /* Either offline or this release is no longer served. */ }
+  return new Response('此版本程序资源缺失，请联网检查更新。',{status:503});
+}
 `;
 }
 export {createServiceWorker521};

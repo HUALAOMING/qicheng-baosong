@@ -53,7 +53,7 @@ async function ensureFonts () {
     ['QichengCJK', FONT_CJK]]) {
       const f = new FontFace (name, dataBytes (data)); await f.load (); document.fonts.add (f)
     }
-  }) ();
+  })().catch(error=>{ctx.fontFacePromise=null;throw error;});
   return ctx.fontFacePromise;
 }
 

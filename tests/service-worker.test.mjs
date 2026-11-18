@@ -15,23 +15,24 @@ const source=generated.replace(/const HASHES = [^\n]+;/,'const HASHES = '+JSON.s
 const paths=JSON.parse(source.match(/const PRECACHE = (\[[^;]+\]);/)[1]);
 const origin='https://qicheng.test',scope=origin+'/app/';
 const changeRevision=revision=>source.replace(/const REVISION = "[^"]+";/,'const REVISION = "'+revision+'";');
-function worker({code=source,shared={stores:new Map()},failure='',transient=false,tamper='',clientCount=1}={}) {
-  const listeners={},notices=[];let claimed=false,skipped=false,offline=false,failed=false,inflight=0,maxInflight=0;
+function worker({code=source,shared={stores:new Map()},failure='',transient=false,tamper='',clientCount=1,active=false,requestedRevision=''}={}) {
+  const listeners={},notices=[];let claimed=false,skipped=false,offline=false,failed=false,inflight=0,maxInflight=0,downloads=0;
   const clients=Array.from({length:clientCount},(_,i)=>({id:'window-'+i,url:scope,postMessage:message=>notices.push({client:'window-'+i,...message})}));
   const caches={
     open:async name=>{
       if(!shared.stores.has(name))shared.stores.set(name,new Map());const store=shared.stores.get(name);
-      return {async put(request,response){store.set(typeof request==='string'?request:request.url,new Uint8Array(await response.arrayBuffer()));},async match(request){const bytes=store.get(typeof request==='string'?request:request.url);return bytes?new Response(bytes):undefined;}};
+      return {async put(request,response){store.set(typeof request==='string'?request:request.url,{body:await response.arrayBuffer(),headers:response.headers});},async match(request){const saved=store.get(typeof request==='string'?request:request.url);return saved?new Response(saved.body,{headers:saved.headers}):undefined;}};
     },keys:async()=>[...shared.stores.keys()],delete:async name=>shared.stores.delete(name)
   };
-  const self={registration:{scope},location:{origin},clients:{claim:async()=>{claimed=true;},matchAll:async()=>[...clients,{id:'unrelated',url:origin+'/other/',postMessage:()=>{throw Error('Wrong scope');}}]},addEventListener:(name,fn)=>{listeners[name]=fn;},skipWaiting(){skipped=true;}};
+  const href=scope+'service-worker.js'+(requestedRevision?'?revision='+requestedRevision:'');
+  const self={registration:{scope,active},location:{origin,href},clients:{claim:async()=>{claimed=true;},matchAll:async()=>[...clients,{id:'unrelated',url:origin+'/other/',postMessage:()=>{throw Error('Wrong scope');}}]},addEventListener:(name,fn)=>{listeners[name]=fn;},skipWaiting(){skipped=true;}};
   const context=vm.createContext({self,caches,URL,Request,Response,Set,Uint8Array,crypto:webcrypto,setTimeout,clearTimeout,fetch:async request=>{
-    if(offline)throw new Error('offline');inflight++;maxInflight=Math.max(maxInflight,inflight);
+    if(offline)throw new Error('offline');downloads++;inflight++;maxInflight=Math.max(maxInflight,inflight);
     try {if(request.url.endsWith(failure)&&failure&&(!transient||!failed)){failed=true;throw Error('cache installation failed');}const pathname=new URL(request.url).pathname.slice('/app/'.length);return new Response(request.url.endsWith(tamper)&&tamper?'changed during deployment':await readFile(path.join(root,pathname)));}finally{inflight--;}
   }});
   vm.runInContext(code,context);
   async function event(name,data={}) {let promise,result;listeners[name]({source:clients[0],waitUntil:p=>{promise=p;},respondWith:p=>{result=p;},...data});if(promise)await promise;return result?await result:undefined;}
-  return {event,shared,notices,clients,offline:()=>{offline=true;},claimed:()=>claimed,skipped:()=>skipped,maxInflight:()=>maxInflight};
+  return {event,shared,notices,clients,offline:()=>{offline=true;},claimed:()=>claimed,skipped:()=>skipped,maxInflight:()=>maxInflight,downloads:()=>downloads};
 }
 test('precache paths exist and include lazy modules, workers, templates; exclude user data and tests',async()=>{
   for(const name of ['data/china-map.json','assets/editable-template.html','js/storage.js','js/lazy-runtime.js','workers/json-worker.js'])assert.ok(paths.includes(name),name);
@@ -48,16 +49,38 @@ test('new version retains preceding cache and unrelated apps; legacy single-wind
   const first=worker();await first.event('install');first.shared.stores.set('another-app-cache',new Map());const oldName=[...first.shared.stores.keys()][0];const updated=worker({code:changeRevision('test-update'),shared:first.shared});await updated.event('install');await updated.event('message',{data:{type:'ACTIVATE_UPDATE'}});assert.ok(updated.skipped());await updated.event('activate');const names=[...updated.shared.stores.keys()];assert.ok(names.includes('another-app-cache'));assert.ok(names.includes(oldName));assert.ok(names.some(n=>n.includes('v5-test-update')));updated.offline();assert.ok(await updated.event('fetch',{request:new Request(scope+'js/storage.js')}));
 });
 test('failed installation discards partial new cache and preserves complete old offline version',async()=>{
-  const old=worker();await old.event('install');const before=[...old.shared.stores.keys()];const broken=worker({code:changeRevision('broken'),shared:old.shared,failure:'assets/fonts/cjk.ttf'});await assert.rejects(()=>broken.event('install'),/cache installation failed/);assert.deepEqual([...old.shared.stores.keys()],before);
+  const old=worker();await old.event('install');const before=[...old.shared.stores.keys()];old.shared.stores.get(before[0]).delete(scope+'assets/fonts/cjk.ttf');const broken=worker({code:changeRevision('broken'),shared:old.shared,failure:'assets/fonts/cjk.ttf'});await assert.rejects(()=>broken.event('install'),/cache installation failed/);assert.deepEqual([...old.shared.stores.keys()],before);
 });
-test('mobile installation bounds downloads to four and reports measured resource counts after verification',async()=>{
-  const w=worker({failure:'assets/fonts/cjk.ttf',transient:true});await w.event('install');assert.ok(w.maxInflight()<=4);const progress=w.notices.filter(n=>n.type==='UPDATE_CACHE_PROGRESS');assert.equal(progress[0].done,0);assert.equal(progress.at(-1).done,paths.length);assert.ok(progress.every((n,i)=>n.total===paths.length&&(!i||n.done>=progress[i-1].done)));assert.equal(w.notices.at(-1).type,'UPDATE_CACHE_READY');assert.equal([...w.shared.stores.values()][0].size,paths.length+1);
+test('background installation bounds downloads to two and reports measured resource counts after verification',async()=>{
+  const w=worker({failure:'assets/fonts/cjk.ttf',transient:true});await w.event('install');assert.ok(w.maxInflight()<=2);const progress=w.notices.filter(n=>n.type==='UPDATE_CACHE_PROGRESS');assert.equal(progress[0].done,0);assert.equal(progress.at(-1).done,paths.length);assert.ok(progress.every((n,i)=>n.total===paths.length&&(!i||n.done>=progress[i-1].done)));assert.equal(w.notices.at(-1).type,'UPDATE_CACHE_READY');assert.equal([...w.shared.stores.values()][0].size,paths.length+1);
 });
 test('permanent failure reports error without emitting ready or false completion',async()=>{
   const w=worker({failure:'assets/fonts/cjk.ttf'});await assert.rejects(w.event('install'));assert.equal(w.shared.stores.size,0);const failures=w.notices.filter(n=>n.type==='UPDATE_CACHE_FAILED');assert.equal(failures.length,1);assert.match(failures[0].detail,/assets\/fonts\/cjk.ttf/);assert.equal(w.notices.some(n=>n.type==='UPDATE_CACHE_READY'),false);
 });
 test('hash mismatch rejects mixed-version resources instead of installing broken release',async()=>{const w=worker({tamper:'js/app.js'});await assert.rejects(w.event('install'),/资源校验不一致/);assert.equal(w.shared.stores.size,0);});
-test('missing known resource never falls through to newer network code',async()=>{const w=worker();await w.event('install');[...w.shared.stores.values()][0].delete(scope+'js/app.js');assert.equal((await w.event('fetch',{request:new Request(scope+'js/app.js')})).status,503);});
+test('automatic worker discovery transfers no assets until the user requests the release',async()=>{
+  const old=worker();await old.event('install');
+  const candidate={code:changeRevision('candidate'),shared:old.shared,active:true};
+  const automatic=worker(candidate);
+  await assert.rejects(automatic.event('install'),/等待用户确认/);
+  assert.equal(automatic.downloads(),0);
+  assert.equal(automatic.notices.length,0);
+  const approved=worker({...candidate,requestedRevision:'candidate'});
+  await approved.event('install');
+  assert.equal(approved.downloads(),0,'unchanged downloads were reused from the verified cache');
+  assert.equal(approved.notices.at(-1).type,'UPDATE_CACHE_READY');
+});
+test('missing export resources can be repaired with verified bytes, never with another release',async()=>{
+  const w=worker();await w.event('install');
+  const item=scope+'assets/vendor/docx.js',cache=[...w.shared.stores.values()][0];
+  cache.delete(item);
+  assert.equal((await w.event('fetch',{request:new Request(item)})).status,200);
+  assert.ok(cache.has(item));
+  cache.delete(item);
+  const mixed=worker({shared:w.shared,tamper:'assets/vendor/docx.js'});
+  assert.equal((await mixed.event('fetch',{request:new Request(item)})).status,503);
+  assert.equal(cache.has(item),false);
+});
 test('multi-tab activation needs every client acknowledgement; dirty peer aborts safely',async()=>{
   const w=worker({clientCount:2});await w.event('install');await w.event('message',{data:{type:'ACTIVATE_UPDATE',protocol:2,requestId:'round-1'}});assert.equal(w.skipped(),false);await w.event('message',{data:{type:'APP_UPDATE_READY',requestId:'round-1',ready:true}});assert.equal(w.skipped(),false);await w.event('message',{source:w.clients[1],data:{type:'APP_UPDATE_READY',requestId:'round-1',ready:false,detail:'正在编辑'}});assert.equal(w.skipped(),false);assert.equal(w.notices.at(-1).type,'UPDATE_ABORTED');await w.event('message',{data:{type:'ACTIVATE_UPDATE',protocol:2,requestId:'round-2'}});await w.event('message',{data:{type:'APP_UPDATE_READY',requestId:'round-2',ready:true}});await w.event('message',{source:w.clients[1],data:{type:'APP_UPDATE_READY',requestId:'round-2',ready:true}});assert.equal(w.skipped(),true);
 });
